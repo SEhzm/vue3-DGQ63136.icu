@@ -9,7 +9,7 @@
       <el-table stripe :data="data.tableData" empty-text="我还没有加载完喔~~"
                 class="eldtable"
                 :header-cell-style="{color: '#ff0000', fontSize: '13px',whitespace:'normal !important'}"
-                :cell-style="{}"
+                :cell-style="{}" @row-click="copyText"
       >
 <!--        <el-table-column width="50" prop="id" label="序号"></el-table-column>-->
         <el-table-column prop="barrage" min-width="90" label="弹幕"/>

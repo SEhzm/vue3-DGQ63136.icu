@@ -9,7 +9,7 @@
       <el-table stripe :data="data.tableData" empty-text="我还没有加载完喔~~"
                 class="eldtable"
                 :header-cell-style="{color: '#ff0000', fontSize: '13px',whitespace:'normal !important'}"
-                :cell-style="{}"
+                :cell-style="{}" @row-click="copyText"
       >
         <el-table-column width="50" prop="id" label="序号"></el-table-column>
         <el-table-column prop="barrage" min-width="90" label="弹幕"/>
@@ -29,6 +29,7 @@
             background
             layout="prev, pager, next, jumper"
             :total="data.total"
+            :pager-count=4
             :page-size="data.pageSize"
             @current-change="handlePageChange"
         ></el-pagination>
@@ -145,7 +146,7 @@ const copyText = (row) => {
           id: row.id
         })
       }).then(() => {
-        setTimeout(load, 50); // 50 毫秒后执行 load
+        setTimeout(load(data.currentPage), 50); // 50 毫秒后执行 load
       })
       .catch((err) => {
         // 复制失败，可以显示错误信息
@@ -157,11 +158,6 @@ const copyText = (row) => {
 
 //点击新增按钮
 const handleAdd = () => {
-  ElNotification({
-    title: '温馨提醒',
-    message: '请注意你的行为，不要上传违反法律的内容，后台能监控到你',
-    type: 'warning',
-  })
   data.table = ''
   data.barrage = ''
   data.dialogFormVisible = true
