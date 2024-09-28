@@ -14,9 +14,7 @@
 <!--        <el-table-column width="50" prop="id" label="序号"></el-table-column>-->
         <el-table-column prop="barrage" min-width="90" label="弹幕"/>
         <el-table-column label="" align="center" width="85">
-          <template #default="scope">
-            <el-button type="primary" label="操作" @click="copyText(scope.row)">复制</el-button>
-          </template>
+            <el-button type="primary" label="操作" >复制</el-button>
         </el-table-column>
 <!--        <el-table-column prop="cnt" label="" width="65"/>-->
       </el-table>
@@ -142,6 +140,9 @@ const copyText = (row) => {
         open4()
       });
 };
+
+
+
 
 //点击新增按钮
 const handleAdd = () => {

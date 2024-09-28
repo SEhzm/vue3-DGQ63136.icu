@@ -12,7 +12,6 @@ const router = createRouter({
             children: [// 路由映射
                 {path: 'home', name: 'Home', component: () => import('@/views/manager/Home.vue')},
                 {path: 'JZCM', name: 'JZCM', component: () => import('@/views/manager/JZCM.vue')},
-                {path: 'interesting', name: 'interesting', component: () => import('@/views/manager/interesting.vue')},
                 {path: '2022', name: '2022', component: () => import('@/views/manager/2022.vue')},
                 {path: '2023', name: '2023', component: () => import('@/views/manager/2023.vue')},
                 {path: '2024', name: '2024', component: () => import('@/views/manager/2024.vue')},
