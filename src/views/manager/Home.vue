@@ -93,15 +93,13 @@
     </div>
     <div class="card" style="line-height: 30px;margin-top: 10px;">
       友情链接 <a href="https://sb6657.cn" target="_blank">sb6657.cn</a>
-
     </div>
-    <div class="footer">
-      <a href="https://beian.miit.gov.cn/" target="_blank">基于腾讯云服务器搭建<a style="font-size: 11px">(离服务器到期还有{{ ServerDate }}天)</a>&nbsp;&nbsp;&nbsp;&nbsp; Copyright
-        ©HZM 2024
-        桂ICP备2024022150号</a> &nbsp;
-      <img src="https://ywtb.mps.gov.cn/newhome/templates/Zwfw_Fwmh/img/main/foot-ga.png" alt="">
-      <a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=45040302000258" target="_blank">桂公网安备45040302000258号</a>
-    </div>
+  </div>
+  <div class="el-footer">
+    基于腾讯云服务器搭建<text style="font-size: 11px">(离服务器到期还有{{ ServerDate }}天)</text>
+    <text> 域名所有：<a href="https://yuba.douyu.com/user/main/lOdEpeOJzwnR" target="_blank">@瓜瓜的御用攻城狮</a></text>&nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="https://beian.miit.gov.cn/" target="_blank">桂ICP备2024022150号</a>
+    <text>&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://ywtb.mps.gov.cn/newhome/templates/Zwfw_Fwmh/img/main/foot-ga.png" alt=""><a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=45040302000258" target="_blank"> 桂公网安备45040302000258号</a></text>
   </div>
 </template>
 
@@ -333,6 +331,19 @@ onMounted(() => {
   .home{
     width: 60vw;
   }
+  .el-footer {
+    z-index: 200;
+    height: 40px;
+    line-height: 40px;
+    position: fixed;
+    bottom: 0;
+    width: 100% !important;
+    text-align: center;
+    font-family: Arial;
+    font-size: 14px;
+    letter-spacing: 1px;
+    margin-left: -153px;
+  }
 }
 
 @media (max-width: 600px) {
@@ -376,6 +387,13 @@ onMounted(() => {
   .footer {
     margin-left: 0px;
     font-size: 14px;
+  }
+  .el-footer {
+    text-align: center;
+    font-family: Arial;
+    font-size: 12px;
+    letter-spacing: 0px;
+    margin-left: 0px;
   }
 }
 </style>

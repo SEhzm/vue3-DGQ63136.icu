@@ -10,7 +10,7 @@
                 style="width: 250px; height: 300px; box-sizing: border-box;">
       </el-image>
       <div style="text-align: center; padding: 5%;">
-        <el-button style="width: 100%; font-size: 20px; box-sizing: border-box;">{{ image.date }}</el-button>
+        <el-button style="width: 100%; font-size: 18px; box-sizing: border-box;">{{ image.date }}</el-button>
       </div>
       <el-button @click="toggleComments(image)" style=" font-size: 18px; margin-left: 15px; box-sizing: border-box;">{{
           image.showComments ? '隐藏评论' : '显示评论'
