@@ -5,8 +5,8 @@
                  @click="handleAdd">
         投稿弹幕
       </el-button>
-      <b class="copyCount">复制次数</b>
-      <el-table stripe :data="data.tableData" empty-text="我还没有加载完喔~~"
+
+      <el-table stripe :data="data.displayedData" empty-text="我还没有加载完喔~~"
                 class="eldtable"
                 :header-cell-style="{color: '#ff0000', fontSize: '13px',whitespace:'normal !important'}"
                 :cell-style="{}" @row-click="copyText"
@@ -16,7 +16,7 @@
         <el-table-column label="" align="center" width="85">
             <el-button type="primary" label="操作" >复制</el-button>
         </el-table-column>
-        <el-table-column prop="cnt" label="" width="65"/>
+        <el-table-column prop="cnt" label="复制次数" width="55"/>
       </el-table>
     </div>
 
@@ -74,7 +74,7 @@
 import {ref, reactive} from 'vue'
 import request from "@/utils/request";
 import {ElNotification} from 'element-plus'
-import autoExecPng from "@/assets/autoexec.vue";
+
 
 
 const rules = ({
@@ -89,12 +89,14 @@ const rules = ({
 const data = reactive({
   tableData: [],
   total: 0,
-  pageSize: 15, //每页个数
+  displayedData: [], // 当前展示的数据
+  pageSize: 200,
   currentPage: 1, //起始页码
   dialogFormVisible: false,
   table: '',
   barrage: '',
   ip: '',
+  loadingMore: false, // 控制是否正在加载更多数据
 })
 
 const load = (pageNum = 1) => {
@@ -103,10 +105,11 @@ const load = (pageNum = 1) => {
       status: 0
     }
   }).then(res => {
-    console.log(res)
+    // console.log(res)
     data.tableData = res.data || [];
-    data.total = res.data?.total || 0
-    console.log(data.tableData)
+    data.total = data.tableData.length
+    data.displayedData = data.tableData.slice(0, data.pageSize); 
+    // console.log(data.tableData)
   }).catch(err => {
     console.error('加载数据失败:', err)
   })
@@ -114,10 +117,43 @@ const load = (pageNum = 1) => {
 
 load(data.currentPage)
 
+//回顶部
+const scrollToTop = () => {
+  window.scrollTo({
+    // top: document.documentElement.offsetHeight, //回到底部
+    top: 0, //回到顶部
+    left: 0,
+    behavior: "smooth", //smooth 平滑；auto:瞬间
+  });
+};
+ 
+onMounted(() => {
+  // 页面滚动窗口监听事件
+  window.onscroll = function () {
+    // 获取浏览器卷去的高度
+    let high = document.documentElement.scrollTop || document.body.scrollTop; //兼容各浏览器
+    if (high >= 900) {
+      totop.value.style.display = "block";
+    } else {
+      totop.value.style.display = "none";
+    }
+  };
+});
+
+load(data.currentPage)
+
 const handlePageChange = (page) => {
-  data.currentPage = page
-  load(page)
+  loaded(page);
+  scrollToTop();
 }
+
+const loaded =(n) => {
+  if (data.tableData.length > 0) {
+    data.displayedData = [];
+    data.displayedData = data.tableData.slice(0+(n-1)*(data.pageSize), n*(data.pageSize)); 
+
+  }
+};
 
 const open2 = () => {
   load()
