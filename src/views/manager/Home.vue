@@ -1,7 +1,6 @@
 <template xmlns="http://www.w3.org/1999/html">
   <div class="home">
-    <img src="https://pic.imgdb.cn/item/6607ee969f345e8d03ae656d.png" alt="DG举牌" class="DGjvpai">
-    <div class="card" style="line-height: 25px">
+    <div class="card" style="line-height: 25px;margin-top: 50px;">
       <div>
         <b class="header-text">🎂🎂🎂🎂生日快乐冬瓜强🎂🎂🎂🎂
           <!--          <br>距离丢丢高考还有{{ diudiugaokao }}天-->
@@ -12,7 +11,7 @@
     </div>
     <div class="card" style="line-height: 30px;margin-top: 10px;">
       <div><b>
-        <em style="font-size: 17px;color: red;">新增时光相册2015年-2024年(可评论)，新增在线投稿弹幕(可直接查看，不用审核版)! 可以听小团体生日歌。</em></b>
+          <em style="font-size: 17px;color: red;">新增时光相册2015年-2024年(可评论)，新增在线投稿弹幕(可直接查看，不用审核版)! 可以听小团体生日歌。</em></b>
       </div>
     </div>
 
@@ -28,13 +27,11 @@
     <div class="card" style="line-height: 0px; margin-top: 8px;">
       <div>
         <el-button type="primary" @click="getRandomItem">点我随机一条弹幕</el-button>
-        <el-table v-if="randomlySelectedItem" :data="[randomlySelectedItem]"
-                  style="font-family: 微软雅黑; font-size: 20px;" :header-cell-style="{fontSize: '14px',whitespace:'normal !important'}">
+        <el-table v-loading="loading" v-if="randomlySelectedItem" :data="[randomlySelectedItem]" style="font-family: 微软雅黑; font-size: 20px;"
+          :header-cell-style="{ fontSize: '14px', whitespace: 'normal !important' }" @row-click="copyText">
           <el-table-column prop="barrage" label="弹幕"></el-table-column>
           <el-table-column label="" align="center" width="85">
-            <template #default="scope">
-              <el-button type="primary" @click="copyText(scope.row)">复制</el-button>
-            </template>
+              <el-button type="primary">复制</el-button>
           </el-table-column>
         </el-table>
         <div v-else>
@@ -45,12 +42,12 @@
 
     <div class="card" style="line-height: 45px; margin-top: 10px; margin-bottom: 10px; min-height: 80px;">
       <div>
-      <span style="position: absolute; font-size: 22px; margin-top: -20px; color: blue;">
-        --------搜索在这，🦐吗---------
-      </span>
+        <span style="position: absolute; font-size: 22px; margin-top: -20px; color: blue;">
+          --------搜索在这，🦐吗---------
+        </span>
         <el-input v-model="searchQuery" placeholder="搜索弹幕..." style="font-size: 30px; margin-top: 30px;">
         </el-input>
-        <el-table v-if="searchQuery" :data="filteredItems" stripe  @row-click="copyText">
+        <el-table v-loading="loading" v-if="searchQuery" :data="filteredItems" stripe @row-click="copyText">
           <el-table-column prop="barrage" label="弹幕"></el-table-column>
           <el-table-column label="" align="center" width="85">
             <template #default="scope">
@@ -67,19 +64,19 @@
         <el-form :model="data" label-width="100px" :rules="rules" label-position="right">
           <el-form-item label="分栏" :label-width="100" prop="table">
             <el-select v-model="data.table" placeholder="选择上传的分栏">
-              <el-option label="2022年警钟长鸣" value="J2022"/>
-              <el-option label="2023年警钟长鸣" value="J2023"/>
-              <el-option label="2024年警钟长鸣" value="J2024"/>
-              <el-option label="+1" value="p1"/>
-              <el-option label="🐘超哥🐘" value="ruibin"/>
-              <el-option label="小团体" value="XTT"/>
-              <el-option label="DGQ" value="DGQ"/>
-              <el-option label="白字" value="baizi"/>
-              <el-option label="QUQU" value="QUQU"/>
+              <el-option label="2022年警钟长鸣" value="dgq_J2022" />
+              <el-option label="2023年警钟长鸣" value="dgq_J2023" />
+              <el-option label="2024年警钟长鸣" value="dgq_J2024" />
+              <el-option label="+1" value="dgq_p1" />
+              <el-option label="🐘超哥🐘" value="dgq_ruibin" />
+              <el-option label="小团体" value="dgq_XTT" />
+              <el-option label="DGQ" value="dgq_DGQ" />
+              <el-option label="白字" value="dgq_baizi" />
+              <el-option label="QUQU" value="dgq_QUQU" />
             </el-select>
           </el-form-item>
           <el-form-item label="弹幕内容" prop="barrage">
-            <el-input v-model="data.barrage" autocomplete="off"/>
+            <el-input v-model="data.barrage" autocomplete="off" />
           </el-form-item>
           <el-button type="primary" @click="saveBarrage" style="font-size: 20px;">
             投稿
@@ -97,44 +94,47 @@
   </div>
   <div class="el-footer">
     基于腾讯云服务器搭建<text style="font-size: 11px">(离服务器到期还有{{ ServerDate }}天)</text>
-    <text> 域名所有：<a href="https://yuba.douyu.com/user/main/lOdEpeOJzwnR" target="_blank">@瓜瓜的御用攻城狮</a></text>&nbsp;&nbsp;&nbsp;&nbsp;
+    <text> 域名所有：<a href="https://yuba.douyu.com/user/main/lOdEpeOJzwnR"
+        target="_blank">@瓜瓜的御用攻城狮</a></text>&nbsp;&nbsp;&nbsp;&nbsp;
     <a href="https://beian.miit.gov.cn/" target="_blank">桂ICP备2024022150号</a>
-    <text>&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://ywtb.mps.gov.cn/newhome/templates/Zwfw_Fwmh/img/main/foot-ga.png" alt=""><a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=45040302000258" target="_blank"> 桂公网安备45040302000258号</a></text>
+    <text>&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://ywtb.mps.gov.cn/newhome/templates/Zwfw_Fwmh/img/main/foot-ga.png"
+        alt=""><a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=45040302000258" target="_blank">
+        桂公网安备45040302000258号</a></text>
   </div>
 </template>
 
 
 <script setup>
-import {ref, reactive, computed, onMounted} from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 import request from "@/utils/request";
-import {ElMessage, ElNotification} from 'element-plus';
+import { ElMessage, ElNotification } from 'element-plus';
 import autoExecPng from "@/assets/autoexec.vue";
 // 获取IP
 
 
 const autoexec = () => {
   request.get("https://api.vvhan.com/api/visitor.info")
-      .then(res => {
-        const resData = res;
-        localStorage.setItem("ip", res.ip)
-        ElNotification({
-          icon: autoExecPng,
-          dangerouslyUseHTMLString: true,
-          title: '你好',
-          message:
-              "<p>欢迎来自<b>" +
-              resData.location +
-              "</b>的厕友<br/>" +
-              resData.system +
-              " " +
-              resData.browser +
-              " <br>IP: "+
-              resData.ip +
-              "</p>",
-          offset: 50,
-          duration: 10000
-        })
+    .then(res => {
+      const resData = res;
+      localStorage.setItem("ip", res.ip)
+      ElNotification({
+        icon: autoExecPng,
+        dangerouslyUseHTMLString: true,
+        title: '你好',
+        message:
+          "<p>欢迎来自<b>" +
+          resData.location +
+          "</b>的厕友<br/>" +
+          resData.system +
+          " " +
+          resData.browser +
+          " <br>IP: " +
+          resData.ip +
+          "</p>",
+        offset: 50,
+        duration: 10000
       })
+    })
 }
 autoexec()
 const searchQuery = ref('');
@@ -148,14 +148,14 @@ const DaoJiShi = ref(0);
 
 const TxServerDate = new Date('2025-02-20');
 const ServerDate = ref(0);
-
+const loading = ref(true)
 
 const rules = ({
   table: [
-    {required: true, message: '请选择分栏', trigger: 'blur'},
+    { required: true, message: '请选择分栏', trigger: 'blur' },
   ],
   barrage: [
-    {required: true, message: '请输入弹幕', trigger: 'blur'},
+    { required: true, message: '请输入弹幕', trigger: 'blur' },
   ]
 })
 
@@ -190,15 +190,16 @@ const data = reactive({
 
 const load = () => {
   request.get('/dgq/allBarrage/Page', {})
-      .then(res => {
-        // console.log(res);
-        data.tableData = res.data || [];
-        // console.log(data.tableData)
-        getRandomItem();
-      })
-      .catch(err => {
-        console.error('加载数据失败:', err);
-      });
+    .then(res => {
+      // console.log(res);
+      data.tableData = res.data || [];
+      loading.value = false
+      // console.log(data.tableData)
+      getRandomItem();
+    })
+    .catch(err => {
+      console.error('加载数据失败:', err);
+    });
 };
 
 load();
@@ -214,10 +215,10 @@ const getRandomItem = () => {
 // 过滤搜索结果
 const filteredItems = computed(() => {
   return searchQuery.value
-      ? data.tableData.filter(item =>
-          item.barrage.toLowerCase().includes(searchQuery.value.toLowerCase())
-      )
-      : [];
+    ? data.tableData.filter(item =>
+      item.barrage.toLowerCase().includes(searchQuery.value.toLowerCase())
+    )
+    : [];
 });
 
 
@@ -245,7 +246,7 @@ const copyText = (row) => {
     console.log('内容已复制到剪贴板');
     request.post('/dgq/addCnt', {
       PageNum: data.currentPage,
-      table: 'allBarrage',
+      table: 'allbarrage',
       id: row.id
     }).then(() => {
       setTimeout(() => load, 50); // 50 毫秒后执行 load
@@ -330,10 +331,12 @@ onMounted(() => {
   font-size: 17px;
   margin-left: -250px;
 }
+
 @media (min-width: 601px) {
-  .home{
+  .home {
     width: 60vw;
   }
+
   .el-footer {
     z-index: 200;
     height: 40px;
@@ -350,8 +353,8 @@ onMounted(() => {
 }
 
 @media (max-width: 600px) {
-  .el-notification{
-   width: 60%;
+  .el-notification {
+    width: 60%;
     height: auto;
   }
 
@@ -383,14 +386,17 @@ onMounted(() => {
     height: 60px;
     margin-left: 100px;
   }
+
   .dgq63136 {
     font-size: 17px;
     font-weight: bold;
   }
+
   .footer {
     margin-left: 0px;
     font-size: 14px;
   }
+
   .el-footer {
     text-align: center;
     font-family: Arial;

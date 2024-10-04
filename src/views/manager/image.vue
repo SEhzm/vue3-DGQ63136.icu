@@ -1,7 +1,7 @@
 <template>
   <div class="outer">
-    <span>时光相册</span><span style="font-size: 16px;">(点击放大图片)</span>
-    <em style="font-size: 14px;">如侵权，请右上角联系删除</em>
+    <span style="z-index: 3;">时光相册</span><span style="font-size: 16px;z-index: 3;">(点击放大图片)</span>
+    <em style="font-size: 14px;z-index: 3;">如侵权，请右上角联系删除</em>
   </div>
   <div class="image-list">
     <div v-for="(image, index) in image.outerImg" :key="index" class="image-block">
@@ -219,7 +219,6 @@ const saveComment = (Obimage) => {
 
 @media (max-width: 600px) {
   .image-list {
-
     width: 400px;
     display: flex;
     flex-wrap: wrap;

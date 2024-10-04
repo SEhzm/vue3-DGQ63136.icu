@@ -6,7 +6,7 @@
         投稿弹幕
       </el-button>
 
-      <el-table stripe :data="data.tableData" empty-text="我还没有加载完喔~~"
+      <el-table v-loading="loading" stripe :data="data.tableData" empty-text="我还没有加载完喔~~"
                 class="eldtable"
                 :header-cell-style="{color: '#ff0000', fontSize: '13px',whitespace:'normal !important'}"
                 :cell-style="{}" @row-click="copyText"
@@ -92,7 +92,7 @@ const data = reactive({
   table: '',
   barrage: '',
 })
-
+const loading = ref(true)
 const load = (pageNum = 1) => {
   request.get('/dgq/ruibin/Page', {
     params: {
@@ -103,6 +103,7 @@ const load = (pageNum = 1) => {
     // console.log(res)
     data.tableData = res.data?.list || []
     data.total = res.data?.total || 0
+    loading.value = false
     // console.log(data.tableData)
   }).catch(err => {
     console.error('加载数据失败:', err)

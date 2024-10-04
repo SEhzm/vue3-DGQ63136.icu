@@ -6,7 +6,7 @@
         投稿弹幕
       </el-button>
 
-      <el-table stripe :data="data.displayedData" empty-text="我还没有加载完喔~~"
+      <el-table v-loading="loading" stripe :data="data.displayedData" empty-text="我还没有加载完喔~~"
                 class="eldtable"
                 :header-cell-style="{color: '#ff0000', fontSize: '13px',whitespace:'normal !important'}"
                 :cell-style="{}" @row-click="copyText"
@@ -76,7 +76,7 @@ import request from "@/utils/request";
 import {ElNotification} from 'element-plus'
 
 
-
+const loading = ref(true)
 const rules = ({
   table: [
     {required: true, message: '请选择分栏', trigger: 'blur'},
@@ -109,6 +109,7 @@ const load = (pageNum = 1) => {
     data.tableData = res.data || [];
     data.total = data.tableData.length
     data.displayedData = data.tableData.slice(0, data.pageSize); 
+    loading.value = false;
     // console.log(data.tableData)
   }).catch(err => {
     console.error('加载数据失败:', err)
@@ -180,7 +181,7 @@ const copyText = (row) => {
     console.log('内容已复制到剪贴板');
     request.post('/dgq/addCnt', {
       PageNum: data.currentPage,
-      table: 'allBarrage',
+      table: 'allbarrage',
       id: row.id
     }).then(() => {
       setTimeout(() => load(data.currentPage), 50); // 50 毫秒后执行 load

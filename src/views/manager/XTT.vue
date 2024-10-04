@@ -1,35 +1,26 @@
 <template>
   <div>
     <div class="card">
-      <el-button type="primary" class="handleAdd"
-                 @click="handleAdd">
+      <el-button type="primary" class="handleAdd" @click="handleAdd">
         投稿弹幕
       </el-button>
 
-      <el-table stripe :data="data.tableData" empty-text="我还没有加载完喔~~"
-                class="eldtable"
-                :header-cell-style="{color: '#ff0000', fontSize: '13px',whitespace:'normal !important'}"
-                :cell-style="{}"  @row-click="copyText"
-      >
+      <el-table v-loading="loading" stripe :data="data.tableData" empty-text="我还没有加载完喔~~" class="eldtable"
+        :header-cell-style="{ color: '#ff0000', fontSize: '13px', whitespace: 'normal !important' }" :cell-style="{}"
+        @row-click="copyText">
         <el-table-column width="50" prop="id" label="序号"></el-table-column>
-        <el-table-column prop="barrage" min-width="90" label="弹幕"/>
+        <el-table-column prop="barrage" min-width="90" label="弹幕" />
         <el-table-column label="" align="center" width="85">
-            <el-button type="primary" label="操作" >复制</el-button>
+          <el-button type="primary" label="操作">复制</el-button>
         </el-table-column>
-                <el-table-column prop="cnt" label="复制次数" width="55"/>
+        <el-table-column prop="cnt" label="复制次数" width="55" />
       </el-table>
     </div>
     <div class="pagination-wrapper">
       <!-- 分页 -->
       <div>
-        <el-pagination
-            background
-            layout="prev, pager, next, jumper"
-            :total="data.total"
-            :pager-count=4
-            :page-size="data.pageSize"
-            @current-change="handlePageChange"
-        ></el-pagination>
+        <el-pagination background layout="prev, pager, next, jumper" :total="data.total" :pager-count=4
+          :page-size="data.pageSize" @current-change="handlePageChange"></el-pagination>
       </div>
     </div>
 
@@ -37,19 +28,19 @@
       <el-form :model="data" label-width="100px" :rules="rules" label-position="right">
         <el-form-item label="分栏" :label-width="100" prop="table">
           <el-select v-model="data.table" placeholder="选择上传的分栏">
-            <el-option label="2022年警钟长鸣" value="dgq_J2022"/>
-            <el-option label="2023年警钟长鸣" value="dgq_J2023"/>
-            <el-option label="2024年警钟长鸣" value="dgq_J2024"/>
-            <el-option label="+1" value="dgq_p1"/>
-            <el-option label="🐘超哥🐘" value="dgq_ruibin"/>
-            <el-option label="小团体" value="dgq_XTT"/>
-            <el-option label="DGQ" value="dgq_DGQ"/>
-            <el-option label="白字" value="dgq_baizi"/>
-            <el-option label="QUQU" value="dgq_QUQU"/>
+            <el-option label="2022年警钟长鸣" value="dgq_J2022" />
+            <el-option label="2023年警钟长鸣" value="dgq_J2023" />
+            <el-option label="2024年警钟长鸣" value="dgq_J2024" />
+            <el-option label="+1" value="dgq_p1" />
+            <el-option label="🐘超哥🐘" value="dgq_ruibin" />
+            <el-option label="小团体" value="dgq_XTT" />
+            <el-option label="DGQ" value="dgq_DGQ" />
+            <el-option label="白字" value="dgq_baizi" />
+            <el-option label="QUQU" value="dgq_QUQU" />
           </el-select>
         </el-form-item>
         <el-form-item label="弹幕内容" prop="barrage">
-          <el-input v-model="data.barrage" autocomplete="off"/>
+          <el-input v-model="data.barrage" autocomplete="off" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -68,17 +59,17 @@
 </template>
 
 <script setup>
-import {ref, reactive} from 'vue'
+import { ref, reactive } from 'vue'
 import request from "@/utils/request";
-import {ElNotification} from 'element-plus'
+import { ElNotification } from 'element-plus'
 import autoExecPng from "@/assets/autoexec.vue";
 
 const rules = ({
   table: [
-    {required: true, message: '请选择分栏', trigger: 'blur'},
+    { required: true, message: '请选择分栏', trigger: 'blur' },
   ],
   barrage: [
-    {required: true, message: '请输入弹幕', trigger: 'blur'},
+    { required: true, message: '请输入弹幕', trigger: 'blur' },
   ]
 })
 
@@ -90,9 +81,9 @@ const data = reactive({
   dialogFormVisible: false,
   table: '',
   barrage: '',
-  ip:'',
+  ip: '',
 })
-
+const loading = ref(true)
 const load = (pageNum = 1) => {
   request.get('/dgq/XTT/Page', {
     params: {
@@ -102,7 +93,8 @@ const load = (pageNum = 1) => {
   }).then(res => {
     // console.log(res)
     data.tableData = res.data?.list || []
-    data.total = res.data?.total || 0
+        data.total = res.data?.total || 0
+    loading.value = false
     // console.log(data.tableData)
   }).catch(err => {
     console.error('加载数据失败:', err)
@@ -226,6 +218,7 @@ const continuousSaveBarrage = () => {
   font-size: 18px;
   margin-left: 150px
 }
+
 .copyCount {
   font-size: 13px;
   color: red;
@@ -247,6 +240,7 @@ const continuousSaveBarrage = () => {
   .copyCount {
     margin-left: 77vw;
   }
+
   .eldtable {
     font-size: 16px;
     white-space: nowrap;
