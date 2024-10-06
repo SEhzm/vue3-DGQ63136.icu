@@ -47,8 +47,11 @@
         </div>
 
         <!-- 热门弹幕弹出框 -->
-        <el-dialog v-model="hotDialog" title="24h热门烂梗"><el-button style=""
-            @click="hotDialogOf7day = true, hotDialog = false">查看近七天热门</el-button>
+        <el-dialog v-model="hotDialog" title="24h热门烂梗" style="width: 100%"> 
+		<template #title>
+			<span>24h热门烂梗</span>
+			<el-button style="float: right;" @click="hotDialogOf7day = true, hotDialog = false">查看近七天热门</el-button>
+		</template>
           <el-table v-loading="loading" stripe :data="data.hotBarrageOf10" empty-text="我还没有加载完喔~~" class="eldtable"
             :header-cell-style="{ color: '#ff0000', fontSize: '13px', whitespace: 'normal !important' }"
             :cell-style="{ cursor: 'Pointer' }" @row-click="copyText">
@@ -69,7 +72,7 @@
         </el-dialog>
 
         <!-- 七天热门弹幕弹出框 -->
-        <el-dialog v-model="hotDialogOf7day" title="七天热门烂梗">
+        <el-dialog v-model="hotDialogOf7day" title="七天热门烂梗" style="width: 100%">
           <el-table v-loading="loading" stripe :data="data.hotBarrageOf7day" empty-text="我还没有加载完喔~~" class="eldtable"
             :header-cell-style="{ color: '#ff0000', fontSize: '13px', whitespace: 'normal !important' }"
             :cell-style="{ cursor: 'Pointer' }" @row-click="copyText">
@@ -135,7 +138,7 @@
             <span>时光相册</span>
           </el-menu-item>
 
-          <el-sub-menu index="2">
+          <el-sub-menu index="3">
             <template #title>
               <el-icon style="color: black">
                 <notebook />
@@ -143,13 +146,13 @@
               <span style="color: black">警钟长鸣</span>
             </template>
 
-            <el-menu-item class="custom-menu-item" index="/JZCM">
+            <el-menu-item  index="/JZCM">
               <!-- ====一级长鸣==== -->
               <img src="@/assets/imgs/jz.png" alt="警钟" class="menu-icon" />
               <span>全部警钟长鸣</span>
             </el-menu-item>
 
-            <el-menu-item index="/2022">
+            <el-menu-item index="/2022" class="custom-menu-item">
               <!-- ====二级长鸣==== -->
               <img src="@/assets/imgs/jz.png" alt="警钟" class="menu-icon" />
               <span>2022年警钟长鸣</span>
@@ -404,7 +407,7 @@ const wxurl =
   "https://pic.imgdb.cn/item/66dd952dd9c307b7e9321a73.png";
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @media (min-width: 601px) {
 
   .fade-enter-active,
@@ -446,6 +449,7 @@ const wxurl =
   .el-sub-menu .el-menu-item {
     color: black;
     background-color: transparent !important;
+    border-radius: 5px;
   }
 
 
@@ -453,6 +457,7 @@ const wxurl =
   .el-sub-menu .el-menu-item.is-active {
     background-color: rgba(255, 255, 255, 0.5) !important;
     color: black;
+    border-radius: 5px;
   }
 
   .el-menu.el-menu--vertical.v-enter-to {
@@ -465,7 +470,11 @@ const wxurl =
     background: linear-gradient(270deg, #F2F7FC 0%, #FEFEFE 100%) !important;
   }
 
-
+  .custom-menu-item{
+    color: black;
+    background-color: transparent !important;
+    border-radius: 5px;
+  }
   .header {
     height: 55px;
     opacity: 1;
@@ -551,7 +560,7 @@ const wxurl =
 
 @media (max-width: 600px) {
   .hotBarrageSpan {
-    color: black;
+    color: #e4d6b8;
     border-bottom: 1px solid #e4d6b8;
     padding-bottom: 1px;
   }
