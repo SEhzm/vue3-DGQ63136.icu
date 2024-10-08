@@ -10,7 +10,7 @@ const app = createApp(App)
 
 import StarrySky from '@/views/StarrySky.vue';
 import audioPlay from './components/audioPlayer.vue';
-import videoPlay from './components/VideoPlayer.vue';
+
 
 app.use(router)
 app.use(ElementPlus, {
@@ -24,7 +24,7 @@ setInterval(() => {
 
 app.component('StarrySky', StarrySky);
 app.component('audioPlay', audioPlay);
-app.component('videoPlay', videoPlay);
+
 
 app.mount('#app')
 

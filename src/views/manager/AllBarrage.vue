@@ -1,40 +1,29 @@
 <template>
   <div>
     <div class="card">
-      <el-button type="primary" class="handleAdd"
-                 @click="handleAdd">
+      <el-button type="primary" class="handleAdd" @click="handleAdd">
         投稿弹幕
       </el-button>
 
-      <el-table v-loading="loading" stripe :data="data.displayedData" empty-text="我还没有加载完喔~~"
-                class="eldtable"
-                :header-cell-style="{color: '#ff0000', fontSize: '13px',whitespace:'normal !important'}"
-                :cell-style="{}" @row-click="copyText"
-      >
+      <el-table v-loading="loading" stripe :data="data.tableData" empty-text="我还没有加载完喔~~" class="eldtable"
+        :header-cell-style="{ color: '#ff0000', fontSize: '13px', whitespace: 'normal !important' }" :cell-style="{}"  @row-click="copyText">
         <el-table-column width="50" prop="id" label="序号"></el-table-column>
-        <el-table-column prop="barrage" min-width="90" label="弹幕"/>
+        <el-table-column prop="barrage" min-width="90" label="弹幕" />
         <el-table-column label="" align="center" width="85">
             <el-button type="primary" label="操作" >复制</el-button>
         </el-table-column>
-        <el-table-column prop="cnt" label="复制次数" width="55"/>
+        <el-table-column prop="cnt" label="" width="65" />
       </el-table>
     </div>
 
     <div class="pagination-wrapper">
       <!-- 分页 -->
       <div>
-        <el-pagination
-            background
-            layout="prev, pager, next, jumper"
-            :total="data.total"
-            :pager-count=4
-            :page-size="data.pageSize"
-            @current-change="handlePageChange"
-        ></el-pagination>
+        <el-pagination background layout="prev, pager, next, jumper" :total="data.total" 
+        :pager-count=4 :page-size="data.pageSize"
+          @current-change="handlePageChange"></el-pagination>
       </div>
     </div>
-
-    <el-backtop :right="50" :bottom="50"/>
 
     <el-dialog v-model="data.dialogFormVisible" draggable title="投稿弹幕" width="82%">
       <el-form :model="data" label-width="100px" :rules="rules" label-position="right">
@@ -52,7 +41,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="弹幕内容" prop="barrage">
-          <el-input v-model="data.barrage" autocomplete="off"/>
+          <el-input v-model="data.barrage" autocomplete="off" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -71,45 +60,41 @@
 </template>
 
 <script setup>
-import {ref, reactive} from 'vue'
+import { ref, reactive } from 'vue'
 import request from "@/utils/request";
-import {ElNotification} from 'element-plus'
-
-
+import { ElNotification } from 'element-plus'
+import autoExecPng from "@/assets/autoexec.vue";
 const loading = ref(true)
 const rules = ({
   table: [
-    {required: true, message: '请选择分栏', trigger: 'blur'},
+    { required: true, message: '请选择分栏', trigger: 'blur' },
   ],
   barrage: [
-    {required: true, message: '请输入弹幕', trigger: 'blur'},
+    { required: true, message: '请输入弹幕', trigger: 'blur' },
   ]
 })
 
 const data = reactive({
   tableData: [],
   total: 0,
-  displayedData: [], // 当前展示的数据
-  pageSize: 200,
+  pageSize: 200, //每页个数
   currentPage: 1, //起始页码
   dialogFormVisible: false,
   table: '',
   barrage: '',
-  ip: '',
-  loadingMore: false, // 控制是否正在加载更多数据
 })
 
 const load = (pageNum = 1) => {
-  request.get('/dgq/allBarrage/Page', {
+  request.get('/dgq/all/Page', {
     params: {
-      status: 0
+      pageNum: pageNum,
+      pageSize: data.pageSize
     }
   }).then(res => {
     // console.log(res)
-    data.tableData = res.data || [];
-    data.total = data.tableData.length
-    data.displayedData = data.tableData.slice(0, data.pageSize); 
-    loading.value = false;
+    data.tableData = res.data?.list || []
+    data.total = res.data?.total || 0
+    loading.value = false
     // console.log(data.tableData)
   }).catch(err => {
     console.error('加载数据失败:', err)
@@ -118,46 +103,12 @@ const load = (pageNum = 1) => {
 
 load(data.currentPage)
 
-//回顶部
-const scrollToTop = () => {
-  window.scrollTo({
-    // top: document.documentElement.offsetHeight, //回到底部
-    top: 0, //回到顶部
-    left: 0,
-    behavior: "smooth", //smooth 平滑；auto:瞬间
-  });
-};
- 
-onMounted(() => {
-  // 页面滚动窗口监听事件
-  window.onscroll = function () {
-    // 获取浏览器卷去的高度
-    let high = document.documentElement.scrollTop || document.body.scrollTop; //兼容各浏览器
-    if (high >= 900) {
-      totop.value.style.display = "block";
-    } else {
-      totop.value.style.display = "none";
-    }
-  };
-});
-
-load(data.currentPage)
-
 const handlePageChange = (page) => {
-  loaded(page);
-  scrollToTop();
+  data.currentPage = page
+  load(page)
 }
 
-const loaded =(n) => {
-  if (data.tableData.length > 0) {
-    data.displayedData = [];
-    data.displayedData = data.tableData.slice(0+(n-1)*(data.pageSize), n*(data.pageSize)); 
-
-  }
-};
-
 const open2 = () => {
-  load()
   ElNotification({
     message: '复制成功',
     type: 'success',
@@ -203,7 +154,6 @@ const handleAdd = () => {
   data.barrage = ''
   data.dialogFormVisible = true
 }
-
 //提交并关闭
 const saveBarrage = () => {
   if (data.table === '' || data.barrage === '') {
@@ -266,6 +216,7 @@ const continuousSaveBarrage = () => {
   font-size: 18px;
   margin-left: 150px
 }
+
 .copyCount {
   font-size: 13px;
   color: red;
@@ -287,6 +238,7 @@ const continuousSaveBarrage = () => {
   .copyCount {
     margin-left: 77vw;
   }
+
   .eldtable {
     font-size: 16px;
     white-space: nowrap;

@@ -26,33 +26,36 @@
 
     <div class="card" style="line-height: 0px; margin-top: 8px;">
       <div>
-        <el-button type="primary" @click="getRandomItem">点我随机一条弹幕</el-button>
-        <el-table v-loading="loading" v-if="randomlySelectedItem" :data="[randomlySelectedItem]" style="font-family: 微软雅黑; font-size: 20px;"
-          :header-cell-style="{ fontSize: '14px', whitespace: 'normal !important' }" @row-click="copyText">
+        <el-button type="primary" @click="getRandOne">点我随机一条弹幕</el-button>
+        <el-table v-loading="loading" :data="data.tableData" style="font-family: 微软雅黑; font-size: 20px;"
+          :header-cell-style="{ fontSize: '14px', whitespace: 'normal !important' }" :cell-style="{ cursor: 'Pointer' }"
+          @row-click="copyText">
           <el-table-column prop="barrage" label="弹幕"></el-table-column>
           <el-table-column label="" align="center" width="85">
-              <el-button type="primary">复制</el-button>
+            <el-button type="primary">复制</el-button>
           </el-table-column>
         </el-table>
-        <div v-else>
-          <p>未选择随机项</p>
-        </div>
       </div>
     </div>
 
-    <div class="card" style="line-height: 45px; margin-top: 10px; margin-bottom: 10px; min-height: 80px;">
+    <div class="card" style="line-height: 50px; margin-top: 10px; margin-bottom: 10px; min-height: 80px;">
       <div>
         <span style="position: absolute; font-size: 22px; margin-top: -20px; color: blue;">
-          --------搜索在这，🦐吗---------
+          --------需点击右侧搜索按钮---------
         </span>
-        <el-input v-model="searchQuery" placeholder="搜索弹幕..." style="font-size: 30px; margin-top: 30px;">
+        <el-input v-model="searchQuery" :placeholder=searchBarrageMeg clearable
+          style="background-color: yellow;font-size: 16px; margin-top: 30px;" @input="onSearchQueryChange">
+          <template #append>
+            <el-button type="primary" @click="queryBarrage"><el-icon>
+                <Search />
+              </el-icon></el-button>
+          </template>
         </el-input>
-        <el-table v-loading="loading" v-if="searchQuery" :data="filteredItems" stripe @row-click="copyText">
+        <el-table v-loading="loading" v-if="isInput" :data="data.filteredItems" stripe @row-click="copyText"
+          style="font-size: 19px;" :cell-style="{ cursor: 'Pointer' }">
           <el-table-column prop="barrage" label="弹幕"></el-table-column>
           <el-table-column label="" align="center" width="85">
-            <template #default="scope">
-              <el-button type="primary" @click="copyText(scope.row)">复制</el-button>
-            </template>
+            <el-button type="primary">复制</el-button>
           </el-table-column>
         </el-table>
       </div>
@@ -109,8 +112,15 @@ import { ref, reactive, computed, onMounted } from 'vue';
 import request from "@/utils/request";
 import { ElMessage, ElNotification } from 'element-plus';
 import autoExecPng from "@/assets/autoexec.vue";
-// 获取IP
-
+const loading = ref(true)
+const isInput = ref(false)
+const data = reactive({
+  getRandOne: [],
+  filteredItems: [],
+  tableData: [],
+  table: '',
+  barrage: '',
+})
 
 const autoexec = () => {
   request.get("https://api.vvhan.com/api/visitor.info")
@@ -138,7 +148,6 @@ const autoexec = () => {
 }
 autoexec()
 const searchQuery = ref('');
-const randomlySelectedItem = ref(null);
 
 const targetDate = new Date('2041-06-07');
 const diudiugaokao = ref(0);
@@ -148,7 +157,7 @@ const DaoJiShi = ref(0);
 
 const TxServerDate = new Date('2025-02-20');
 const ServerDate = ref(0);
-const loading = ref(true)
+
 
 const rules = ({
   table: [
@@ -158,6 +167,18 @@ const rules = ({
     { required: true, message: '请输入弹幕', trigger: 'blur' },
   ]
 })
+
+//搜索
+const queryBarrage = () => {
+  console.log(searchQuery.value)
+  request.post('/dgq/Query', {
+    QueryBarrage: searchQuery.value
+  }).then(res => {
+    isInput.value = true;
+    loading.value = false;
+    data.filteredItems = res.data || [];
+  })
+}
 
 //提交
 const saveBarrage = () => {
@@ -169,7 +190,6 @@ const saveBarrage = () => {
       table: data.table,
       barrage: data.barrage
     }).then(res => {
-      load()
       data.dialogFormVisible = false;
       data.barrage = '';
       if (res.code === '200') {
@@ -181,12 +201,18 @@ const saveBarrage = () => {
   }
 }
 
+const getRandOne = () => {
+  request.get('/dgq/getRandOne')
+    .then(res => {
+      data.tableData = [res.data];
+      // console.log(res)
+      loading.value = false;
+    }).catch(err => {
+      console.error("随机失败")
+    })
+}
+getRandOne();
 
-const data = reactive({
-  tableData: [],
-  table: '',
-  barrage: '',
-})
 
 const load = () => {
   request.get('/dgq/allBarrage/Page', {})
@@ -195,31 +221,15 @@ const load = () => {
       data.tableData = res.data || [];
       loading.value = false
       // console.log(data.tableData)
-      getRandomItem();
     })
     .catch(err => {
       console.error('加载数据失败:', err);
     });
 };
 
-load();
 
-//在数组中随机弹幕
-const getRandomItem = () => {
-  if (data.tableData.length > 0) {
-    const randomIndex = Math.floor(Math.random() * data.tableData.length);
-    randomlySelectedItem.value = data.tableData[randomIndex];
-  }
-};
 
-// 过滤搜索结果
-const filteredItems = computed(() => {
-  return searchQuery.value
-    ? data.tableData.filter(item =>
-      item.barrage.toLowerCase().includes(searchQuery.value.toLowerCase())
-    )
-    : [];
-});
+
 
 
 const open2 = () => {
@@ -249,7 +259,7 @@ const copyText = (row) => {
       table: 'allbarrage',
       id: row.id
     }).then(() => {
-      setTimeout(() => load, 50); // 50 毫秒后执行 load
+      console.log("复制成功")
     });
   } catch (err) {
     // 复制失败，可以显示错误信息
@@ -259,7 +269,10 @@ const copyText = (row) => {
   document.body.removeChild(tempInput); // 清理临时元素
 };
 
-
+const onSearchQueryChange = () => {
+  data.filteredItems = [];
+  isInput.value = false;
+};
 
 
 const calculateCountdown = () => {

@@ -8,9 +8,10 @@
             <p class="header-title">斗鱼63136弹幕收集</p>
           </a>
           <div class="header-actions">
-            <img src="@/assets/imgs/hot.png" alt="热门" style="width: 24px;height: 24px;cursor:pointer;margin-right: 10px"
-              class="hotBarrageImg" @click="hotDialog = true">
-            <div @click="hotDialog = true" class="hotBarrage"
+            <img v-if="$route.name !== 'image'" src="@/assets/imgs/hot.png" alt="热门"
+              style="width: 24px;height: 24px;cursor:pointer;margin-right: 10px" class="hotBarrageImg"
+              @click="hotDialog = true">
+            <div v-if="$route.name !== 'image'" @click="hotDialog = true" class="hotBarrage"
               style="cursor:pointer;width:300px;overflow: hidden; text-overflow: ellipsis;color: black;white-space: nowrap;">
               <transition name="fade">
                 <span :key="currentBarrageIndex" class="hotBarrageSpan">热门：{{
@@ -18,11 +19,12 @@
               </transition>
             </div>
             <div style="margin-right: 20px;" class="elinput">
-              <el-input v-model="searchQuery" clearable placeholder='搜索烂梗...' style="font-size: 18px;">
-                <template #prefix>
-                  <el-icon>
-                    <search />
-                  </el-icon>
+              <el-input v-model="searchQuery" placeholder="搜索烂梗" clearable
+              style="" @input="onSearchQueryChange">
+                <template #append>
+                  <el-button type="primary" @click="queryBarrage"><el-icon>
+                <Search />
+              </el-icon></el-button>
                 </template>
               </el-input>
             </div>
@@ -47,11 +49,11 @@
         </div>
 
         <!-- 热门弹幕弹出框 -->
-        <el-dialog v-model="hotDialog" title="24h热门烂梗" style="width: 100%"> 
-		<template #title>
-			<span>24h热门烂梗</span>
-			<el-button style="float: right;" @click="hotDialogOf7day = true, hotDialog = false">查看近七天热门</el-button>
-		</template>
+        <el-dialog v-model="hotDialog" title="24h热门烂梗" style="width: 100%">
+          <template #title>
+            <span>24h热门烂梗</span>
+            <el-button style="float: right;" @click="hotDialogOf7day = true, hotDialog = false">查看近七天热门</el-button>
+          </template>
           <el-table v-loading="loading" stripe :data="data.hotBarrageOf10" empty-text="我还没有加载完喔~~" class="eldtable"
             :header-cell-style="{ color: '#ff0000', fontSize: '13px', whitespace: 'normal !important' }"
             :cell-style="{ cursor: 'Pointer' }" @row-click="copyText">
@@ -92,11 +94,19 @@
           </el-table>
         </el-dialog>
 
-        <div class="QueryTable" v-if="searchQuery">
-          <el-table v-loading="loading" :data="filteredItems" stripe @row-click="copyToQueryTableText"
+        <div class="QueryTable" v-if="isInput">
+          <el-button class="close-button" @click="closeQueryTable"><svg t="1725098483582" class="icon"
+              viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4538" width="16"
+              height="16">
+              <path d="M0 0h1024v1024H0z" fill="#FF0033" fill-opacity="0" p-id="4539"></path>
+              <path
+                d="M240.448 168l2.346667 2.154667 289.92 289.941333 279.253333-279.253333a42.666667 42.666667 0 0 1 62.506667 58.026666l-2.133334 2.346667-279.296 279.210667 279.274667 279.253333a42.666667 42.666667 0 0 1-58.005333 62.528l-2.346667-2.176-279.253333-279.253333-289.92 289.962666a42.666667 42.666667 0 0 1-62.506667-58.005333l2.154667-2.346667 289.941333-289.962666-289.92-289.92a42.666667 42.666667 0 0 1 57.984-62.506667z"
+                fill="#111111" p-id="4540"></path>
+            </svg></el-button>
+          <el-table v-loading="loading" :data="data.filteredItems" stripe @row-click="copyToQueryTableText"
             style="cursor:pointer" empty-text="可能没有这条烂梗或请手动刷新页面">
             <el-table-column prop="barrage" label="弹幕"></el-table-column>
-            <el-table-column label="" align="center" width="85">
+            <el-table-column label align="center" width="85">
               <el-button type="primary">复制</el-button>
             </el-table-column>
           </el-table>
@@ -146,7 +156,7 @@
               <span style="color: black">警钟长鸣</span>
             </template>
 
-            <el-menu-item  index="/JZCM">
+            <el-menu-item index="/JZCM">
               <!-- ====一级长鸣==== -->
               <img src="@/assets/imgs/jz.png" alt="警钟" class="menu-icon" />
               <span>全部警钟长鸣</span>
@@ -231,8 +241,10 @@ import { ElMessage, ElNotification } from 'element-plus';
 const hotDialog = ref(false)
 const hotDialogOf7day = ref(false)
 const loading = ref(true)
+const isInput = ref(false)
 const searchQuery = ref('');
 const data = reactive({
+  filteredItems: [],
   tableData: [],
   table: '',
   barrage: '',
@@ -258,6 +270,18 @@ const table = [
 ];
 const route = useRoute();
 const router = useRouter();
+//搜索
+const queryBarrage = () => {
+  console.log(searchQuery.value)
+  request.post('/dgq/Query', {
+    QueryBarrage: searchQuery.value
+  }).then(res => {
+    isInput.value = true;
+    loading.value = false;
+    data.filteredItems = res.data || [];
+  })
+}
+
 const load = () => {
   request.get('/dgq/allBarrage/Page', {})
     .then(res => {
@@ -270,7 +294,7 @@ const load = () => {
     });
 };
 
-load();
+
 const hotBarrageOf10 = () => {
   request.get('/dgq/hotBarrageOfAll')
     .then(res => {
@@ -310,17 +334,6 @@ onUnmounted(() => {
   clearInterval(intervalId);
 });
 
-
-
-// 过滤搜索结果
-const filteredItems = computed(() => {
-  const query = searchQuery.value?.toLowerCase();
-  if (!query) return [];
-  return data.tableData.filter(item => {
-    const itemStr = `${item.name}${item.barrage}${item.description}`.toLowerCase();
-    return itemStr.includes(query);
-  });
-});
 const open2 = () => {
   ElMessage({
     message: '复制成功',
@@ -386,12 +399,39 @@ const copyText = (row) => {
   }
   document.body.removeChild(tempInput); // 清理临时元素
 };
+//定时一小时弹出支持我！！！
+setTimeout(function () {
+  // IE浏览器
+  if (document.all) {
+    const myDiv = document.getElementById("myDiv") as HTMLElement | null;
+    if (myDiv) {
+      myDiv.click();
+    }
+  }
+  // 其它浏览器
+  else {
+    const myDiv = document.getElementById("myDiv") as HTMLElement | null;
+    if (myDiv) {
+      const e = document.createEvent("MouseEvents");
+      e.initEvent("click", true, true);
+      myDiv.dispatchEvent(e);
+    }
+  }
+}, 60 * 60 * 1000); // 一小时
 function navigateTo(path: string): void {
   router.push(path);
 }
 
 const isCollapse = ref(false);
+const onSearchQueryChange = () => {
+  data.filteredItems = [];
+  isInput.value = false;
+};
 
+const closeQueryTable = () => {
+  searchQuery.value = '';
+  isInput.value=false;
+};
 const complaintButton = () => {
   window.open("https://www.wjx.cn/vm/rQUgnS0.aspx#");
 };
@@ -408,6 +448,13 @@ const wxurl =
 </script>
 
 <style lang="scss" scoped>
+.close-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  z-index: 10;
+  border: none;
+}
 @media (min-width: 601px) {
 
   .fade-enter-active,
@@ -470,11 +517,12 @@ const wxurl =
     background: linear-gradient(270deg, #F2F7FC 0%, #FEFEFE 100%) !important;
   }
 
-  .custom-menu-item{
+  .custom-menu-item {
     color: black;
     background-color: transparent !important;
     border-radius: 5px;
   }
+
   .header {
     height: 55px;
     opacity: 1;
