@@ -87,7 +87,7 @@ const loading = ref(true)
 const data = reactive({
   tableData: [],
   total: 0,
-  pageSize: 15, //每页个数
+  pageSize: 50, //每页个数
   currentPage: 1, //起始页码
   dialogFormVisible: false,
   table: '',

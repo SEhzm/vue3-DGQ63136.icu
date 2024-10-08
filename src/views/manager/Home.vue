@@ -212,7 +212,7 @@ const getRandOne = () => {
     })
 }
 getRandOne();
-
+var searchBarrageMeg = ref('搜索烂梗...');
 
 const load = () => {
   request.get('/dgq/allBarrage/Page', {})

@@ -300,6 +300,7 @@ const hotBarrageOf10 = () => {
     .then(res => {
       data.hotBarrageOf10 = res.data.slice(0, 10) || [];
       // console.log(data.hotBarrageOf10)
+      loading.value = false;
     }).catch(err => {
       console.error('加载数据失败:', err);
     })
@@ -309,6 +310,7 @@ const hotBarrageOf7 = () => {
   request.get('/dgq/hotBarrageOf7Day')
     .then(res => {
       data.hotBarrageOf7day = res.data || [];
+      loading.value = false;
     }).catch(err => {
       console.error('加载数据失败:', err);
     })
