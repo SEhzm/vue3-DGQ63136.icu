@@ -10,8 +10,9 @@
 
     </div>
     <div class="card" style="line-height: 30px;margin-top: 10px;">
-      <div><b>
-          <em style="font-size: 17px;color: red;">新增时光相册2015年-2024年(可评论)，新增在线投稿弹幕(可直接查看，不用审核版)! 可以听小团体生日歌。</em></b>
+      <div>
+          <p style="font-size: 15px">新增时光相册2015年-2024年(可评论)，新增在线投稿弹幕(可直接查看，不用审核版)! 可以听小团体生日歌。</p>
+          <b><p style="font-size: 18px;color: red;">最新推出了油猴Tampermonkey插件，可以在直播间直接搜索进行复制和一键发送，<a href="https://dgq63136.icu/#/Tampermonkey" target="_blank">点我安装！</a></p></b>
       </div>
     </div>
 
@@ -351,6 +352,7 @@ onMounted(() => {
   }
 
   .el-footer {
+  pointer-events: none; /* 禁用事件处理 */
     z-index: 200;
     height: 40px;
     line-height: 40px;
@@ -363,6 +365,9 @@ onMounted(() => {
     letter-spacing: 1px;
     margin-left: -153px;
   }
+    .el-footer a {
+  pointer-events: auto;
+}
 }
 
 @media (max-width: 600px) {

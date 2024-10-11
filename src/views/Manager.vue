@@ -32,6 +32,9 @@
             <el-button type="primary" @click="complaintButton" class="complaint-button">
               <span>上传照片<br>建议/提交BUG</span>
             </el-button>
+            <a href="https://dgq63136.icu/#/Tampermonkey">
+              <img src="https://pic.imgdb.cn/item/6704f830d29ded1a8c738f70.png" alt="gitee" class="icon-img" />
+            </a>
             <a href="https://gitee.com/hzming1/dgq63136-vue3-springboot" target="_blank">
               <img src="@/assets/imgs/gitee.png" alt="gitee" class="icon-img" />
             </a>
@@ -42,9 +45,9 @@
               <img src="@/assets/imgs/github.png" alt="github" class="icon-img" />
             </a>
             <el-image class="icon-img-rounded" :src="url" :hide-on-click-modal="true" :zoom-rate="1.2" :max-scale="7"
-              lazy :min-scale="0.2" :preview-src-list="['zfb.jpg']" :initial-index="4" fit="cover" />
+              lazy :min-scale="0.2" :preview-src-list="['http://cdn.dgq63136.icu/zfb.jpg']" :initial-index="4" fit="cover" />
             <el-image class="icon-img-rounded" :src="wxurl" :hide-on-click-modal="true" :zoom-rate="1.2" lazy
-              :max-scale="7" :min-scale="0.2" :preview-src-list="['wx.jpg']" :initial-index="4" fit="cover" />
+              :max-scale="7" :min-scale="0.2" :preview-src-list="['http://cdn.dgq63136.icu/wx.jpg']" :initial-index="4" fit="cover" />
           </div>
         </div>
 
@@ -52,7 +55,7 @@
         <el-dialog v-model="hotDialog" title="24h热门烂梗" style="width: 100%">
           <template #title>
             <span>24h热门烂梗</span>
-            <el-button style="float: right;" @click="hotDialogOf7day = true, hotDialog = false">查看近七天热门</el-button>
+            <el-button style="float: right;" @click="openHotDialogOf7day">查看近七天热门</el-button>
           </template>
           <el-table v-loading="loading" stripe :data="data.hotBarrageOf10" empty-text="我还没有加载完喔~~" class="eldtable"
             :header-cell-style="{ color: '#ff0000', fontSize: '13px', whitespace: 'normal !important' }"
@@ -114,9 +117,13 @@
       </div>
     </div>
 
-    <div class="tab"> <!--    移动端-->
-      <div :class="`tab1 ${item.path === route.path ? 'selected' : 'none'}`" v-for="item in table" :key="item.path"
-        @click="navigateTo(item.path)"> {{ item.text }}
+    <div class="tab">
+      <!-- 移动端 -->
+      <div class="tab-container">
+        <div :class="`tab1 ${item.path === route.path ? 'selected' : 'none'}`" v-for="(item, index) in table"
+          :key="item.path" @click="navigateTo(item.path)">
+          {{ item.text }}
+        </div>
       </div>
     </div>
 
@@ -315,7 +322,11 @@ const hotBarrageOf7 = () => {
       console.error('加载数据失败:', err);
     })
 }
-hotBarrageOf7()
+const openHotDialogOf7day = () => {
+  hotDialog.value = false;
+  hotDialogOf7day.value = true;
+  hotBarrageOf7();
+}
 const currentBarrageIndex = ref(0);
 let intervalId;
 
@@ -716,65 +727,75 @@ const wxurl =
   }
 
   //移动端
-  .tab {
+ .tab {
     display: flex;
     overflow-x: scroll;
     white-space: nowrap;
-    //关掉滑动条
-    // scrollbar-width: none;
-    // -ms-overflow-style: none;
+    scrollbar-width: none; // 确保 Firefox 也隐藏滚动条
+    -ms-overflow-style: none; // IE 和 Edge
+    -webkit-overflow-scrolling: touch; // 启用原生滚动效果
+    touch-action: pan-x; // 允许水平滚动，阻止其他触摸行为
+  }
 
-    &::-webkit-scrollbar {
-      /* Webkit browsers (Chrome, Safari) */
-      height: 8px;
+  .tab-container {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+  }
+
+  .tab1 {
+    position: relative;
+    white-space: nowrap;
+    padding: 10px 5px;
+    margin-right: 10px;
+    border-radius: 15px 15px 0 0;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    color: #000000;
+    background-color: #fff;
+    flex-shrink: 0; // 防止缩小
+    touch-action: pan-x;
+  }
+
+  .tab1::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 100%;
+    background-color: transparent;
+    transition: all 0.3s ease;
+  }
+
+  .none {
+    background-color: #93a2b9;
+    padding: 10px;
+  }
+
+  .tab1:hover,
+  .selected {
+    color: #fff;
+    background-color: #007bff;
+    
+
+    &::before {
+      background-color: #007bff;
     }
+    padding-left: 15px; /* 左侧 padding 增加 10px */
+    padding-right: 15px; /* 右侧 padding 增加 10px */
+  }
 
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
+  .tab::-webkit-scrollbar {
+    /* Webkit browsers (Chrome, Safari) */
+    height: 8px;
+  }
 
-    &::-webkit-scrollbar-thumb {
-      background-color: rgba(0, 0, 0, 0.2);
-      border-radius: 10px;
-    }
+  .tab::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
-    &>div {
-      position: relative;
-      white-space: nowrap;
-      padding: 10px 15px;
-      margin-right: 10px;
-      border-radius: 15px 15px 0 0;
-      transition: all 0.3s ease;
-      font-size: 15px;
-      color: #000000;
-      background-color: #fff;
-
-      &::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        bottom: -2px;
-        width: 100%;
-        background-color: transparent;
-        transition: all 0.3s ease;
-      }
-    }
-
-    .none {
-      background-color: #93a2b9;
-      padding: 10px;
-    }
-
-    &>div:hover,
-    &>.selected {
-      color: #fff;
-      background-color: #007BFF;
-
-      &::before {
-        background-color: #007BFF;
-      }
-
-    }
+  .tab::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
   }
 
   //移动端
