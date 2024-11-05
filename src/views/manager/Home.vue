@@ -4,7 +4,7 @@
       <div>
         <b class="header-text">🎂🎂🎂🎂生日快乐冬瓜强🎂🎂🎂🎂
           <!--          <br>距离丢丢高考还有{{ diudiugaokao }}天-->
-          <br> 距离2023年10月23日04:07分，冬瓜强自爆爆皮过长 一周年还有{{ DaoJiShi }}天，警钟长鸣！
+          <br> 距离2022年11月16日晚20:40分冬瓜强5EPL0.17rating 两周年还有{{ DaoJiShi }}天，警钟长鸣！
           <img src="https://pic.imgdb.cn/item/6607ee8f9f345e8d03ae39d8.png" alt="捏狗头" class="dog_head"></b>
       </div>
 
@@ -153,7 +153,7 @@ const searchQuery = ref('');
 const targetDate = new Date('2041-06-07');
 const diudiugaokao = ref(0);
 
-const DaoJiShiDate = new Date('2024-10-23');
+const DaoJiShiDate = new Date('2024-11-16');
 const DaoJiShi = ref(0);
 
 const TxServerDate = new Date('2025-02-20');
