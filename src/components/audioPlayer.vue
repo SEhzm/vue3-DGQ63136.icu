@@ -1,5 +1,7 @@
 <template>
-  <div id="aplayer" style="border-radius: 10px; "></div>
+  <div id="app">
+    <div id="aplayer"></div>
+  </div>
 </template>
 
 
@@ -15,7 +17,7 @@ export default {
   },
   data() {
     return {
-      audio: [
+      allAudio: [
         {
           name: "嘉宾",//歌名
           artist: '冬瓜强',//歌手
@@ -65,19 +67,25 @@ export default {
           cover: 'https://imge.kugou.com/stdmusic/20160907/20160907190357712844.jpg',//音乐封面地址
           lrc: '[00:00:01] 音质有点差，见谅！ '
         }
-      ]
+      ],
+	  aplayer: null
     }
   },
-  methods: {
-    addMyAudio() {
-      const ap = new APlayer({
+ methods: {
+    initializeAPlayer() {
+      this.aplayer = new APlayer({
         container: document.getElementById('aplayer'),
-        audio: this.audio,
+        audio: this.allAudio,
+        autoplay: false, // 确保不自动播放
         lrcType: 2,
         mutex: true,
-        volume: 0.5,
-      })
+        volume: 0.5
+      });
     }
+  },
+  mounted() {
+    // 页面加载时初始化 APlayer，但不加载第一首歌
+    this.initializeAPlayer();
   }
 }
 </script>

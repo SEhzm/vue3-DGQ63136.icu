@@ -142,7 +142,7 @@ const copyText = (row) => {
     console.log('内容已复制到剪贴板');
     request.post('/dgq/addCnt', {
       PageNum: data.currentPage,
-      table: 'J2023',
+      table: 'j2023',
       id: row.id
     }).then(() => {
       setTimeout(() => load(data.currentPage), 50); // 50 毫秒后执行 load
