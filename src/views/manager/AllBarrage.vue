@@ -29,9 +29,9 @@
       <el-form :model="data" label-width="100px" :rules="rules" label-position="right">
         <el-form-item label="分栏" :label-width="100" prop="table">
           <el-select v-model="data.table" placeholder="选择上传的分栏">
-            <el-option label="2022年警钟长鸣" value="dgq_J2022"/>
-            <el-option label="2023年警钟长鸣" value="dgq_J2023"/>
-            <el-option label="2024年警钟长鸣" value="dgq_J2024"/>
+            <el-option label="2022年警钟长鸣" value="dgq_j2022"/>
+            <el-option label="2023年警钟长鸣" value="dgq_j2023"/>
+            <el-option label="2024年警钟长鸣" value="dgq_j2024"/>
             <el-option label="+1" value="dgq_p1"/>
             <el-option label="🐘超哥🐘" value="dgq_ruibin"/>
             <el-option label="小团体" value="dgq_XTT"/>

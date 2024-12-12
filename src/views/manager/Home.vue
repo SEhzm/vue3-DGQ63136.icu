@@ -4,7 +4,7 @@
       <div>
         <b class="header-text">🎂🎂🎂🎂生日快乐冬瓜强🎂🎂🎂🎂
           <!--          <br>距离丢丢高考还有{{ diudiugaokao }}天-->
-          <br> 距离2022年11月16日晚20:40分冬瓜强5EPL0.17rating 两周年还有{{ DaoJiShi }}天，警钟长鸣！
+          <br> 距离2023年12月22日1:59，冬瓜强搂喜欢算，差3块葬送8千存款 一周年还有{{ DaoJiShi }}天，警钟长鸣！
           <img src="https://pic.imgdb.cn/item/6607ee8f9f345e8d03ae39d8.png" alt="捏狗头" class="dog_head"></b>
       </div>
 
@@ -68,9 +68,9 @@
         <el-form :model="data" label-width="100px" :rules="rules" label-position="right">
           <el-form-item label="分栏" :label-width="100" prop="table">
             <el-select v-model="data.table" placeholder="选择上传的分栏">
-              <el-option label="2022年警钟长鸣" value="dgq_J2022" />
-              <el-option label="2023年警钟长鸣" value="dgq_J2023" />
-              <el-option label="2024年警钟长鸣" value="dgq_J2024" />
+              <el-option label="2022年警钟长鸣" value="dgq_j2022" />
+              <el-option label="2023年警钟长鸣" value="dgq_j2023" />
+              <el-option label="2024年警钟长鸣" value="dgq_j2024" />
               <el-option label="+1" value="dgq_p1" />
               <el-option label="🐘超哥🐘" value="dgq_ruibin" />
               <el-option label="小团体" value="dgq_XTT" />
@@ -153,7 +153,7 @@ const searchQuery = ref('');
 const targetDate = new Date('2041-06-07');
 const diudiugaokao = ref(0);
 
-const DaoJiShiDate = new Date('2024-11-16');
+const DaoJiShiDate = new Date('2024-12-22');
 const DaoJiShi = ref(0);
 
 const TxServerDate = new Date('2025-02-20');
