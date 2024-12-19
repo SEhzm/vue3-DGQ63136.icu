@@ -84,7 +84,7 @@ const data = reactive({
 })
 
 const load = (pageNum = 1) => {
-  request.get('/dgq/j2022/Page', {
+  request.get('/dgq/J2022/Page', {
     params: {
       pageNum: pageNum,
       pageSize: data.pageSize

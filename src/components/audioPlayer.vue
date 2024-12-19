@@ -79,7 +79,8 @@ export default {
         autoplay: false, // 确保不自动播放
         lrcType: 2,
         mutex: true,
-        volume: 0.5
+        volume: 0.5,
+        preload: 'none'
       });
     }
   },

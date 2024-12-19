@@ -96,7 +96,7 @@ const data = reactive({
 
 const load = async (pageNum = 1) => {
   try {
-    const res = await request.get('/dgq/j2024/Page', {
+    const res = await request.get('/dgq/J2024/Page', {
       params: {
         pageNum: pageNum,
         pageSize: data.pageSize
