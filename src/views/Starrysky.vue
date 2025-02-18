@@ -24,7 +24,7 @@
 import {onMounted, ref, onBeforeUnmount} from 'vue'
 // 用于存储元素X和Y位置的响应性引用
 const x = ref(74);
-const y = ref(200);
+const y = ref(200); 
 const isAudioVisible = ref(true);
 // 是否正在拖动的标志
 const isDragging = ref(false);
