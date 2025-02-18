@@ -34,7 +34,7 @@ jobs:
         run: npm install
 
       - name: 打包项目
-        run: npm run build:prod
+        run: npm run build
 
       - name: 检查打包输出
         run: ls -la ./dist
