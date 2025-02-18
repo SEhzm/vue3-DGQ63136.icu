@@ -45,5 +45,5 @@ jobs:
         with:
           token: ${{ secrets.ACCESS_TOKEN }}
           branch: gh-pages
-          folder: dgq63136.cn/dist
+          folder: dist
           clean: true
