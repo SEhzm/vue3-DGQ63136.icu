@@ -430,7 +430,7 @@ setTimeout(function () {
       myDiv.dispatchEvent(e);
     }
   }
-}, 60 * 60 * 1000); // 一小时
+}, 60 * 10 * 1000); // 10分钟
 function navigateTo(path: string): void {
   router.push(path);
 }

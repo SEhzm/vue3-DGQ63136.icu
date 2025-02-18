@@ -2,9 +2,9 @@
   <div class="home">
     <div class="card" style="line-height: 25px;margin-top: 50px;">
       <div>
-        <b class="header-text">🎂🎂🎂🎂生日快乐冬瓜强🎂🎂🎂🎂
+        <b class="header-text">🎉🎉🎉🎉新年快乐🎉🎉🎉🎉
           <!--          <br>距离丢丢高考还有{{ diudiugaokao }}天-->
-          <br> 距离2023年12月22日1:59，冬瓜强搂喜欢算，差3块葬送8千存款 一周年还有{{ DaoJiShi }}天，警钟长鸣！
+          <br> 距离2023年2月17号17点45分 阿胖锐评冬瓜强因为阿胖不陪他打针半夜一两点掉小珍珠 两周年还有{{ DaoJiShi }}天，警钟长鸣！
           <img src="https://pic.imgdb.cn/item/6607ee8f9f345e8d03ae39d8.png" alt="捏狗头" class="dog_head"></b>
       </div>
 
@@ -153,7 +153,7 @@ const searchQuery = ref('');
 const targetDate = new Date('2041-06-07');
 const diudiugaokao = ref(0);
 
-const DaoJiShiDate = new Date('2024-12-22');
+const DaoJiShiDate = new Date('2025-02-17');
 const DaoJiShi = ref(0);
 
 const TxServerDate = new Date('2025-02-20');

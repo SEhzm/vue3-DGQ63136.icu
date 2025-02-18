@@ -1,0 +1,52 @@
+name: dgq63136.cn-自动化部署
+
+on:
+  # 监听push操作
+  push:
+    branches:
+      - master # 这里只配置了main分支，所以只有推送main分支才会触发以下任务
+  pull_request:
+
+permissions:
+  contents: write
+  pages: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+
+    steps:
+      - name: 读取仓库
+        uses: actions/checkout@v4
+
+      # 删除 assets 文件夹
+#      - name: Remove assets folder
+#        run: rm -rf ./zxxx-ui/dist/assets
+
+      - name: 设置Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: 安装依赖
+        run: npm install
+        working-directory: dgq63136.cn
+
+      - name: 打包项目
+        run: npm run build:prod
+        working-directory: dgq63136.cn
+
+      - name: 检查打包输出
+        run: ls -la ./dist
+        working-directory: dgq63136.cn
+
+      - name: 部署
+        uses: JamesIves/github-pages-deploy-action@v4
+        if: github.ref == 'refs/heads/master'
+        with:
+          token: ${{ secrets.ACCESS_TOKEN }}
+          branch: gh-pages
+          folder: dgq63136.cn/dist
+          clean: true
