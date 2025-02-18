@@ -39,7 +39,7 @@ jobs:
       - name: 检查打包输出
         run: ls -la ./dist
 
-      - name: 部署 
+      - name: 部署
         uses: JamesIves/github-pages-deploy-action@v4
         if: github.ref == 'refs/heads/master'
         with:
