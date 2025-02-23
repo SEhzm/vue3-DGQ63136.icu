@@ -32,12 +32,12 @@
             <el-button type="primary" @click="complaintButton" class="complaint-button">
               <span>上传照片<br>建议/提交BUG</span>
             </el-button>
-            <a href="https://dgq63136.icu/#/Tampermonkey">
+            <a href="https://dgq63136.cn/#/Tampermonkey">
               <img src="https://pic.imgdb.cn/item/6704f830d29ded1a8c738f70.png" alt="gitee" class="icon-img" />
             </a>
-            <a href="https://gitee.com/hzming1/dgq63136-vue3-springboot" target="_blank">
+            <!-- <a href="https://gitee.com/hzming1/dgq63136-vue3-springboot" target="_blank">
               <img src="@/assets/imgs/gitee.png" alt="gitee" class="icon-img" />
-            </a>
+            </a> -->
             <a href="https://yuba.douyu.com/user/main/lOdEpeOJzwnR" target="_blank">
               <img src="@/assets/imgs/douyu.png" alt="douyu" class="icon-img" />
             </a>
@@ -45,9 +45,9 @@
               <img src="@/assets/imgs/github.png" alt="github" class="icon-img" />
             </a>
             <el-image class="icon-img-rounded" :src="url" :hide-on-click-modal="true" :zoom-rate="1.2" :max-scale="7"
-              lazy :min-scale="0.2" :preview-src-list="['http://cdn.dgq63136.icu/zfb.jpg']" :initial-index="4" fit="cover" />
+              lazy :min-scale="0.2" :preview-src-list="['http://cdn.hguofichp.cn/zfb.jpg']" :initial-index="4" fit="cover" />
             <el-image class="icon-img-rounded" :src="wxurl" :hide-on-click-modal="true" :zoom-rate="1.2" lazy
-              :max-scale="7" :min-scale="0.2" :preview-src-list="['http://cdn.dgq63136.icu/wx.jpg']" :initial-index="4" fit="cover" />
+              :max-scale="7" :min-scale="0.2" :preview-src-list="['http://cdn.hguofichp.cn/wx.jpg']" :initial-index="4" fit="cover" />
           </div>
         </div>
 

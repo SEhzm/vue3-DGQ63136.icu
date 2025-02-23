@@ -19,7 +19,7 @@
     <div class="card" style="line-height: 30px; margin-top:8px ;">
       <p>你好，各位白字。 <br>
         这是一个收集厕所弹幕的网站: <span class="dgq63136">
-          <a href="https://dgq63136.icu" style="color: red;">DGQ63136.icu
+          <a href="https://dgq63136.cn" style="color: red;">DGQ63136.cn
             <img src="https://pic.imgdb.cn/item/6607ee8f9f345e8d03ae393c.png" alt="鸡毙你" class="biabiabia"></a></span>
         <br>
       </p>
