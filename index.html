@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 
 <head>
     <meta charset="UTF-8">
     <link rel="icon" href="/favicon.ico">
     <!--    <meta name="viewport" content=" width=720,initial-scale=1.0">-->
     <meta name="viewport" content="initial-scale=1.0">
-    <title>DY63136</title>
+    <title>斗鱼63136弹幕库</title>
 
     <script>
         var _hmt = _hmt || [];
@@ -22,15 +22,39 @@
             cursor: url(shit.cur), auto;
         }
     </style>
-
-    <script type="text/javascript" src="//api.tongjiniao.com/c?_=701206101773561856" async></script>
-
+<script type="text/javascript" src="//api.tongjiniao.com/c?_=701206101773561856" async></script>
 </head>
 
 <body>
     <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-    <div class="ccxx">
+    <script type="module" src="/src/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mouse-firework@0.1.0/dist/index.umd.min.js"></script>
+    <script>
+        firework({
+            "excludeElements": ["a"],
+            "particles": [
+                {
+                    "shape": "circle",
+                    "move": ["emit"],
+                    "easing": "easeOutExpo",
+                    "colors": [
+                        "#ff324a",
+                        "#31ffa6",
+                        "#206eff",
+                        "#ffff99"
+                    ],
+                    "number": 30,
+                    "duration": [1200, 1800],
+                    "shapeOptions": {
+                        "radius": [16, 32]
+                    }
+    
+                }]
+        }
+        )
+    </script>
+
+    <!-- <div class="ccxx">
         <script type="text/javascript">
 
             !function () {
@@ -150,7 +174,7 @@
                 }, 100);
             }();
         </script>
-    </div>
+    </div> -->
     <style>
         @media (max-width: 600px) {
             .ccxx {
@@ -159,5 +183,4 @@
         }
     </style>
 </body>
-
 </html>

@@ -15,9 +15,35 @@ a {
     text-decoration: none;
 }
 .card {
-    z-index: 12;
+    z-index: 1;
     background-color: #fff;
     border-radius: 5px;
     padding: 10px;
     box-shadow: 0 0 10px rgba(0,0,0,.1);
+}
+.cardTable {
+    z-index: 1;
+    background-color: #fff;
+    border-radius: 5px;
+    padding: 0 5px 10px 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,.1);
+}
+
+.mini-firework {
+    overflow: hidden;
+    border-radius: 50%;
+    mask-image: radial-gradient(circle at center, 
+        rgba(0,0,0,1) 40%, 
+        rgba(0,0,0,0) 70%
+    );
+}
+
+/* 新年限定烟花 */
+.mini-firework {
+    overflow: hidden;
+    border-radius: 50%;
+    mask-image: radial-gradient(circle at center, 
+        rgba(0,0,0,1) 40%, 
+        rgba(0,0,0,0) 70%
+    );
 }

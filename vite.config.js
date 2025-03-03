@@ -1,18 +1,26 @@
-import {fileURLToPath, URL} from 'node:url'
+import {
+    fileURLToPath,
+    URL
+} from 'node:url'
 
-import {defineConfig} from 'vite'
+import {
+    defineConfig
+} from 'vite'
 import vue from '@vitejs/plugin-vue'
 // 导入对应包
 
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
-import {ElementPlusResolver} from 'unplugin-vue-components/resolvers'
+import {
+    ElementPlusResolver
+} from 'unplugin-vue-components/resolvers'
 import IconsResolver from 'unplugin-icons/resolver'
 import ElementPlus from 'unplugin-element-plus/vite'
 
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig({ 
+    base: '/',
     plugins: [
         vue(),
         AutoImport({
@@ -23,9 +31,9 @@ export default defineConfig({
                     prefix: 'Icon',
                 }),
                 // 自动导入 Element Plus 相关函数，如：ElMessage, ElMessageBox... (带样式)
-                ElementPlusResolver(
-                    {importStyle: 'sass'}
-                )
+                ElementPlusResolver({
+                    importStyle: 'sass'
+                })
             ],
         }),
         Components({
@@ -35,9 +43,10 @@ export default defineConfig({
                     enabledCollections: ['ep'],
                 }),
                 // 自动导入 Element Plus 组件
-                ElementPlusResolver(
-                    {importStyle: 'sass'}
-                )],
+                ElementPlusResolver({
+                    importStyle: 'sass'
+                })
+            ],
         }),
 
         // 按需定制主题配置
@@ -47,7 +56,8 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            '@': fileURLToPath(new URL('./src', import.meta.url))
+            '@': fileURLToPath(new URL('./src',
+                import.meta.url))
         }
     },
     css: {
@@ -79,13 +89,18 @@ export default defineConfig({
     },
     // devServer: {
     //     proxy: {
-    //         '/api': {//获取路径中包含了/api的请求，与axios请求同步增加
-    //             target: 'https://localhost:9090',//后台服务所在的源
-    //             changeOrigin: true,//修改源
-    //             rewrite: (path) => path.replace(/^\/api/, '')///api替换为''
+    //         '/api': {
+    //             target: 'https://s5k.cn',
+    //             changeOrigin: true,
+    //             secure: false,
+    //             ws: true,
+    //             logLevel: 'debug',
+    //             pathRewrite: {
+    //                 '^/api': ''
+    //             },
+    //             credentials: true // 允许携带凭据
     //         }
     //     }
     // },
 
 })
-
