@@ -6,7 +6,7 @@ export const API = {
     GET_HOT_MEME_24h: '/dgq/hotBarrageOf24H',       // 获取24小时热门烂梗
     GET_HOT_MEME_7D: '/dgq/hotBarrageOf7Day',       // 获取7天热门烂梗
     SEARCH_MEME: '/dgq/Query',                      // 根据关键词搜索烂梗
-    GET_ALL_MEME: '/dgq/Page?tags=1000',            // 获取全部烂梗分页
+    GET_ALL_MEME: '/dgq/Page?',                     // 获取全部烂梗分页
     GET_SORTED_ALL_MEME: '/dgq/sortAllBarrage',     // 获取排序后的全部烂梗
     GET_FK_DGQ_MEME: '/dgq/Page?tags=01',           // 获取喷冬瓜强篇烂梗1
     GET_FK_CHAOGE_MEME: '/dgq/Page?tags=07',        // 获取喷超哥篇烂梗7
