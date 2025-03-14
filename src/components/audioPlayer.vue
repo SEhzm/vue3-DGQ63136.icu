@@ -86,8 +86,9 @@
           autoplay: false, // 确保不自动播放
           lrcType: 2,
           mutex: true,
-          volume: 0.5,
-          preload: 'none'
+          volume: 0.7,
+          preload: 'none', // 不自动加载音频
+          fixed: true
         });
       }
     },
@@ -99,5 +100,5 @@
   </script>
   
   <style>
-  
+
   </style>

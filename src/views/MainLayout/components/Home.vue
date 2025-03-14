@@ -21,7 +21,7 @@
                     <a href="https://dgq63136.cn">dgq63136.cn</a>
                 </span>
                 尽情欣赏你们的烂梗吧。
-                <br><b>为了更深入了解用户的需求以及作者需编写论文，特开展 dgq36136.cn 用户调研 <a style="color: blue;cursor: pointer;" @click="simulateClick">点击我参加</a>
+                <br><b>为了更深入了解用户的需求，特开展 dgq36136.cn 用户调研 <a style="color: blue;cursor: pointer;" @click="simulateClick">点击我参加</a>
                 为了感谢您抽出宝贵的时间参与调研.</b>
             </p>
         </div>
@@ -480,12 +480,13 @@ const copyMeme = throttle(copyToClipboard, limitedCopy, 2000);
 const likeMeme = throttle(copyToClipboard, limitedLike, 2000);
 
 async function copyMeme_countPlus1(meme) {
-    const memeText = meme.content;
+    const memeText = meme.barrage;
     const res = copyMeme(memeText);
     if (!res || res === 'limitedSuccess') return;
     copySuccess();
-        await queryBarrage();
-        return;
+    httpInstance.get(API.INCREASE_COPY_COUNT+`/` +meme.id);
+    queryBarrage();
+    return;
     plus1Error();
 }
 //like复用copy

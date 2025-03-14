@@ -1,6 +1,6 @@
 <template>
     <el-popover placement="left" title="参加调研,非常感谢您！" :width="200" trigger="hover" :visible="diaochaSetTime"
-        content="急需了解用户的需求以及作者需编写论文，完成后抽奖">
+        content="急需了解用户的需求">
         <template #reference>
             <el-button id="diaocha" type="plain" @mouseover="diaochaSetTime = 1000" @click="dialogVisible = 'true'"
                 style="position: fixed;top: 60%;right: 0;writing-mode: vertical-rl;text-orientation: upright;white-space: nowrap;height: 70px;width: 30px;z-index: 1000;">用户调研</el-button>
@@ -8,7 +8,7 @@
     </el-popover>
     <el-dialog v-model="dialogVisible" style="position: fixed;bottom: 0;right: 0;" draggable="true" title="用户调研"
         width="100%">
-        <iframe src='https://f.wps.cn/g/GLeSOK3F/' width='100%' height='650' frameborder='0'></iframe>
+        <iframe src='https://f.wps.cn/g/H1CiodIz/' width='100%' height='650' frameborder='0'></iframe>
     </el-dialog>
     <div id="bg">
         <div class="body" id="bodyId">
@@ -31,10 +31,10 @@
         </el-button>
     </div>
     <!--音乐播放器-->
-    <div class="draggable audit-draggable" :style="{ left: `${audioX}vw`, top: `${audioY}px` }"
-        @mousedown="startDrag($event, 'audio')" v-show="isAudioVisible">
+    <!-- <div class="draggable audit-draggable" :style="{ left: `${audioX}vw`, top: `${audioY}px` }"
+        @mousedown="startDrag($event, 'audio')" v-show="isAudioVisible"> -->
         <audioPlay></audioPlay>
-        <el-button class="close-button" @click="closeVideo">
+        <!-- <el-button class="close-button" @click="closeVideo">
             <svg t="1725098483582" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
                 p-id="4538" width="16" height="16">
                 <path d="M0 0h1024v1024H0z" fill="#FF0033" fill-opacity="0" p-id="4539"></path>
@@ -42,8 +42,8 @@
                     d="M240.448 168l2.346667 2.154667 289.92 289.941333 279.253333-279.253333a42.666667 42.666667 0 0 1 62.506667 58.026666l-2.133334 2.346667-279.296 279.210667 279.274667 279.253333a42.666667 42.666667 0 0 1-58.005333 62.528l-2.346667-2.176-279.253333-279.253333-289.92 289.962666a42.666667 42.666667 0 0 1-62.506667-58.005333l2.154667-2.346667 289.941333-289.962666-289.92-289.92a42.666667 42.666667 0 0 1 57.984-62.506667z"
                     fill="#111111" p-id="4540"></path>
             </svg>
-        </el-button>
-    </div>
+        </el-button> -->
+    <!-- </div> -->
 </template>
 
 <script setup>
