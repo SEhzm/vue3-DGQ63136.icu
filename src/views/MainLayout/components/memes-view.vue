@@ -24,12 +24,14 @@
                     </el-button>
                 </h4>
 
+                <!-- 预设标签 -->
                 <div class="preset-tags-container">
                     <div class="preset-tags">
                         <el-tag round v-for="(tag, index) in presetTags" :key="index" closable
                             @close="removeTagFromPreset(tag)" @click="removeTagFromPreset(tag)"
                             style=" padding:15px; cursor: pointer;font-size: 16px;" type="primary">
-                            {{ tag.label }}
+                            <img v-if="tag.iconUrl" :src="tag.iconUrl" style=" width: 22px; height: 25px; object-fit: cover;vertical-align: middle;" />
+                            <span style="vertical-align: middle;"> {{ tag.label }}</span>
                         </el-tag>
                     </div>
                 </div>
@@ -49,7 +51,8 @@
                 <div class="added-tags">
                     <el-tag round v-for="(tag, index) in addedTags" :key="index" closable @click="removeTag(tag)"
                         @close="removeTag(tag)" style="padding:15px; cursor: pointer;font-size: 16px;" effect="dark">
-                        {{ tag.label }}
+                        <img v-if="tag.iconUrl" :src="tag.iconUrl" style=" width: 22px; height: 22px; object-fit: cover;vertical-align: middle;" />
+                        <span style="vertical-align: middle;"> {{ tag.label }}</span>
                     </el-tag>
                 </div>
             </div>
@@ -81,8 +84,8 @@
                                         style="margin-right: 8px;">
                                         <el-tag round effect="dark" :style="{ fontSize: '16px', cursor: 'pointer' }">
                                             <img v-if="item.iconUrl" :src="item.iconUrl"
-                                                style=" width: 16px; height: 16px; object-fit: cover;vertical-align: middle;" />
-                                            {{ item.label }}
+                                                style=" width: 16px; height: 22px; object-fit: cover;vertical-align: middle;" />
+                                                <span style="vertical-align: middle;"> {{ item.label }}</span>
                                         </el-tag>
                                     </div>
                                 </div>
@@ -98,7 +101,7 @@
                 <el-table-column align="center" width="100">
                     <template #default="scope">
                         <el-button type="primary" class="copy-btn" @click.stop="copyMeme_countPlus1(scope.row)">复制
-                            🎈<flip-num :num="scope.row.copyCount" /></el-button>
+                            🌈<flip-num :num="scope.row.copyCount" /></el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -121,7 +124,7 @@ import { MemeCategory } from '@/constants/backend';
 import { getMemeList } from '@/apis/getMeme';
 import { throttle } from '@/utils/throttle';
 import { copyToClipboard, copySuccess, limitedCopy, limitedLike} from '@/utils/clipboard';
-import { copyCountPlus1, likeCountPlus1, plus1Error ,likePlus1Error} from '@/apis/setMeme';
+import { copyCountPlus1, plus1Error } from '@/apis/setMeme';
 import { API } from '@/constants/backend';
 import submissionDialog from '@/components/submission-dialog.vue';
 import flipNum from '@/components/flip-num.vue';
@@ -258,26 +261,7 @@ async function copyMeme_countPlus1(meme: Meme) {
     }
     plus1Error();
 }
-//like复用copy
-async function likeMeme_countPlus1(meme: Meme) {
-    const memeText = meme.content;
-    /**
-     * 三种返回值情况
-     * 1. false，代表错误了，用户没能正确复制到剪贴板
-     *    由第一个回调函数copyToClipboard里自行捕获到错误并且出弹窗提醒
-     * 2. 'limitedSuccess'，表示byd在连续点击，被节流函数制裁了
-     *    由第二个回调函数limitedCopy里出弹窗提醒
-     * 3. true，这是正常复制，自行处理，这里出个弹窗提醒并且向后端发请求让复制次数+1
-     */
-    const res = likeMeme(memeText);
-    if (!res || res === 'limitedSuccess') return;
-    // copySuccess();
-    if (await likeCountPlus1(meme.id)) {
-        await refreshMeme(currentPage.value);
-        return;
-    }
-    likePlus1Error();
-}
+
 const dialogFormVisible = ref(false);
 
 // 弹出投稿弹窗按钮
@@ -287,9 +271,10 @@ const handleSubmit = () => {
 
 const getDict = () => {
     httpInstance.get('/dgq/dictList').then(res => {
-        if (res.code === '200') {
+        if (res.code === 200) {
             dictData.value = res.data;
             presetTags.value = res.data.map(item => ({
+                iconUrl: item.iconUrl,
                 label: item.dictLabel,
                 value: item.dictValue
             }));
@@ -331,6 +316,7 @@ const removeTag = (tag) => {
 
 // 添加标签的点击事件
 const removeTagFromPreset = (tag) => {
+    
     // 当删除预设标签时，将其移到已添加标签
     if (!addedTags.value.some(t => t.value === tag.value)) {
         addedTags.value.push(tag);
@@ -347,7 +333,7 @@ const handleTouchStart = (row: any) => {
 
 const handleTouchEnd = (row: any) => {
     const touchEndTime = Date.now();
-    if (touchEndTime - row.touchStartTime > 200) { //200ms 长按时长
+    if (touchEndTime - row.touchStartTime > 100) { //100ms 长按时长
         row.popoverVisible = true;
         setTimeout(()=>{
             row.popoverVisible=false
@@ -393,7 +379,7 @@ const handleTouchEnd = (row: any) => {
 
 .memes-view {
     width: 100%;
-    
+    display: flex;
     flex-wrap: wrap;
     justify-content: center;
 

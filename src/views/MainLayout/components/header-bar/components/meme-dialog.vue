@@ -24,7 +24,7 @@
                                             <el-tag round effect="dark"
                                                 :style="{ fontSize: '16px', cursor: 'pointer' }">
                                                 <img v-if="item.iconUrl" :src="item.iconUrl" style=" width: 16px; height: 16px; object-fit: cover;vertical-align: middle;" />
-                                                {{ item.label }}
+                                                <span style="vertical-align: middle;"> {{ item.label }}</span>
                                             </el-tag>
                                         </div>
                                     </div>
@@ -50,11 +50,10 @@
 <script setup lang="ts">
 import { throttle } from '@/utils/throttle';
 import { copyToClipboard, copySuccess, limitedCopy ,likeSuccess} from '@/utils/clipboard';
-import { copyCountPlus1, likeCountPlus1, plus1Error ,likePlus1Error} from '@/apis/setMeme';
+import { copyCountPlus1, plus1Error } from '@/apis/setMeme';
 import flipNum from '@/components/flip-num.vue';
 import httpInstance from '@/apis/httpInstance';
 import { ref } from 'vue';
-import LikeNum from '@/components/like-num.vue';
 
 /**
  * 组件输入:
@@ -99,25 +98,12 @@ async function copyMeme_countPlus1(meme: Meme) {
     }
     plus1Error();
 }
-//like复用copy
-async function likeMeme_countPlus1(meme: Meme) {
-    console.log(meme);
-    
-    const memeText = meme.content;
-    const res = likeMeme(memeText);
-    if (!res || res === 'limitedSuccess') return;
-    likeSuccess();
-    if (await likeCountPlus1(meme.id)) {
-        emit('refresh');
-        return;
-    }
-    likePlus1Error();
-}
+
 const dictData = ref([]);
 
 const getDict = () => {
     httpInstance.get('/dgq/dictList').then(res => {
-        if (res.code === '200') {
+        if (res.code === 200) {
             dictData.value = res.data;
         }
     }).catch(err => {
@@ -150,7 +136,7 @@ const handleTouchStart = (row: any) => {
 
 const handleTouchEnd = (row: any) => {
     const touchEndTime = Date.now();
-    if (touchEndTime - row.touchStartTime > 200) { //200ms 长按时长
+    if (touchEndTime - row.touchStartTime > 100) { //100ms 长按时长
         row.popoverVisible = true;
         setTimeout(()=>{
             row.popoverVisible=false

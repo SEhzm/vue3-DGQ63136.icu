@@ -54,7 +54,7 @@ export async function submitMeme(category: string, meme: string) {
             table: category,
             barrage: meme,
         });
-        if (res.code === '500') {
+        if (res.code === 500) {
             console.log('烂梗已经有了，勿重复提交');
             ElNotification({
                 title: '烂梗已经有了',
@@ -63,7 +63,7 @@ export async function submitMeme(category: string, meme: string) {
             });
             return false;
         }
-        else if(res.code !== '200') {
+        else if(res.code !== 200) {
             console.log('烂梗投稿失败');
             return false;
         }
