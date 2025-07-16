@@ -1,5 +1,5 @@
 <template>
-    <el-popover placement="left" title="参加调研,非常感谢您！" :width="200" trigger="hover" :visible="diaochaSetTime"
+    <!-- <el-popover placement="left" title="参加调研,非常感谢您！" :width="200" trigger="hover" :visible="diaochaSetTime"
         content="急需了解用户的需求">
         <template #reference>
             <el-button id="diaocha" type="plain" @mouseover="diaochaSetTime = 1000" @click="dialogVisible = 'true'"
@@ -9,7 +9,7 @@
     <el-dialog v-model="dialogVisible" style="position: fixed;bottom: 0;right: 0;" draggable="true" title="用户调研"
         width="100%">
         <iframe src='https://f.wps.cn/g/H1CiodIz/' width='100%' height='650' frameborder='0'></iframe>
-    </el-dialog>
+    </el-dialog> -->
     <div id="bg">
         <div class="body" id="bodyId">
             <div class="stars" ref="starsRef">

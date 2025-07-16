@@ -31,6 +31,7 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import HeaderBar from '@/views/MainLayout/components/header-bar/header-bar.vue';
 import FooterBar from '@/views/MainLayout/components/footer-bar.vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -41,6 +42,20 @@ const router = useRouter();
 function navigateTo(path: string) {
     router.push(path);
 }
+onMounted(() => {
+    /**
+     * ================================================================
+     * 首屏加载完之后去除loading页
+     */
+    const loadingDOM = document.querySelector('#global-loading');
+    if (loadingDOM) {
+        loadingDOM.classList.add('fade-out');
+        setTimeout(() => loadingDOM.remove(), 500);
+    }
+    /**
+     * ================================================================
+     */
+});
 </script>
 
 <style lang="scss" scoped>

@@ -3,12 +3,12 @@ import { SERVER_ADDRESS } from '@/constants/backend';
 import { getCookie, setCookie } from '@/utils/cookieUtils';
 
 const httpInstance = axios.create({
-    baseURL: SERVER_ADDRESS,
-    // baseURL: "http://127.0.0.1:10086",
+   baseURL: SERVER_ADDRESS,
+    //  baseURL: "http://127.0.0.1:10086",
     timeout: 60000, // 默认超时时间
 });
 
-export const sbVersion = '25.03.03';
+export const sbVersion = '25.07.16';
 
 /**
  * 后端使用siteToken来统计UV PV IP日均 
