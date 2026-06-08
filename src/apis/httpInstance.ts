@@ -40,7 +40,7 @@ httpInstance.interceptors.request.use(
     (config) => {
         const siteToken = getSiteToken();
         config.headers['siteToken'] = siteToken;
-        // 添加请求来源标识（C端网站）
+        
         config.headers['dpahjdoiaw'] = 'eAR48ZFJwfRTy6SyQPFj';
         return config;
     },
