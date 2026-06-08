@@ -41,7 +41,7 @@ httpInstance.interceptors.request.use(
         const siteToken = getSiteToken();
         config.headers['siteToken'] = siteToken;
         // 添加请求来源标识（C端网站）
-        config.headers['dpahjdoiaw'] = 'website';
+        config.headers['dpahjdoiaw'] = 'eAR48ZFJwfRTy6SyQPFj';
         return config;
     },
     (e) => Promise.reject(e)
