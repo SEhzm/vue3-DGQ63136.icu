@@ -1,6 +1,6 @@
 <template>
     <div class="card">
-        <h1>因为GreasyFork被墙，<a href="https://cdn.hguofichp.cn/dgq63136.cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86-2025.07.016.01.user.js">点击我下载最新的油猴插件</a>，你只需要将下载的文件拖入油猴管理面板即可</h1>
+        <h1>因为GreasyFork被墙，<a href="https://web-static-res-edge-speedtest-b1-hk.dahi.edu.eu.org/scripts/511991/dgq63136cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86.user.js">点击我下载最新的油猴插件</a>，你只需要将下载的文件拖入油猴管理面板即可</h1>
         </div>
     <div class="card" v-if="page == 1">
         <h1>
@@ -16,7 +16,7 @@
         <img src="https://pic.imgdb.cn/item/670503ddd29ded1a8c7f24a8.jpg" alt="">
         <h3><br>3、在弹出框选择添加程序</h3>
         <h3><br>4、打开<a
-                href="https://greasyfork.org/zh-CN/scripts/511991-dgq63136-icu%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86" target="_blank">dgq63136.cn斗鱼冬瓜强弹幕烂梗收集搜索脚本</a>
+                href="https://web-static-res-edge-speedtest-b1-hk.dahi.edu.eu.org/scripts/511991/dgq63136cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86.user.js" target="_blank">dgq63136.cn斗鱼冬瓜强弹幕烂梗收集搜索脚本</a>
         </h3>
         <h3><br>5、点击安装</h3>
         <img src="https://pic.imgdb.cn/item/67067f0dd29ded1a8cb47e8a.jpg" alt="">
@@ -45,7 +45,7 @@
         <img src="https://pic.imgdb.cn/item/670504bdd29ded1a8c802798.jpg" alt="">
         <h3><br>4、打开
             <a
-                href="https://greasyfork.org/zh-CN/scripts/511991-dgq63136-icu%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86" target="_blank">dgq63136.cn斗鱼冬瓜强弹幕烂梗收集搜索脚本</a>
+                href="https://web-static-res-edge-speedtest-b1-hk.dahi.edu.eu.org/scripts/511991/dgq63136cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86.user.js" target="_blank">dgq63136.cn斗鱼冬瓜强弹幕烂梗收集搜索脚本</a>
         </h3>
         <h3><br>5、点击安装</h3>
         <img src="https://pic.imgdb.cn/item/67067f0dd29ded1a8cb47e8a.jpg" alt="">
@@ -76,7 +76,7 @@
         <img src="https://pic.imgdb.cn/item/670504bdd29ded1a8c802798.jpg" alt="">
         <h3><br>4、打开
             <a
-                href="https://greasyfork.org/zh-CN/scripts/511991-dgq63136-icu%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86" target="_blank">dgq63136.cn斗鱼冬瓜强弹幕烂梗收集搜索脚本</a>
+                href="https://web-static-res-edge-speedtest-b1-hk.dahi.edu.eu.org/scripts/511991/dgq63136cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86.user.js" target="_blank">dgq63136.cn斗鱼冬瓜强弹幕烂梗收集搜索脚本</a>
         </h3>
         <h3><br>5、点击安装</h3>
         <img src="https://pic.imgdb.cn/item/67067f0dd29ded1a8cb47e8a.jpg" alt="">
