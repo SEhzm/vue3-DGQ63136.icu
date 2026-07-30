@@ -1,9 +1,8 @@
 import axios from 'axios';
-import { SERVER_ADDRESS } from '@/constants/backend';
 import { getCookie, setCookie } from '@/utils/cookieUtils';
 
 const httpInstance = axios.create({
-   baseURL: SERVER_ADDRESS,
+   baseURL: '/api',
     //  baseURL: "http://127.0.0.1:10086",
     timeout: 60000, // 默认超时时间
 });

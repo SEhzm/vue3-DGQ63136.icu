@@ -19,7 +19,7 @@ import IconsResolver from 'unplugin-icons/resolver'
 import ElementPlus from 'unplugin-element-plus/vite'
 
 // https://vitejs.dev/config/
-export default defineConfig({ 
+export default defineConfig({
     base: '/',
     plugins: [
         vue(),
@@ -93,20 +93,30 @@ export default defineConfig({
             }
         }
     },
-    // devServer: {
-    //     proxy: {
-    //         '/api': {
-    //             target: 'https://s5k.cn',
-    //             changeOrigin: true,
-    //             secure: false,
-    //             ws: true,
-    //             logLevel: 'debug',
-    //             pathRewrite: {
-    //                 '^/api': ''
-    //             },
-    //             credentials: true // 允许携带凭据
-    //         }
-    //     }
-    // },
+    server: {
+        open: true,
+        host: '0.0.0.0',
+        port: 5173,
+        proxy: {
+            '/api': {
+                target: 'https://hguofichp.cn:10086',
+                changeOrigin: true,
+                secure: false,
+                ws: true,
+                rewrite: (path) => path.replace(/^\/api/, ''),
+                configure: (proxy, options) => {
+                    proxy.on('error', (err, req, res) => {
+                        console.log('proxy error', err);
+                    });
+                    proxy.on('proxyReq', (proxyReq, req, res) => {
+                        console.log('Sending Request to the Target:', req.method, req.url);
+                    });
+                    proxy.on('proxyRes', (proxyRes, req, res) => {
+                        console.log('Received Response from the Target:', proxyRes.statusCode, req.url);
+                    });
+                }
+            }
+        }
+    },
 
 })
