@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
+    "verify": "node tools/verify-install-page.mjs && vite build",
     "preview": "vite preview"
   },
   "dependencies": {

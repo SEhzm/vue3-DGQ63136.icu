@@ -1,105 +1,331 @@
 <template>
-    <div class="card">
-        <h1>因为GreasyFork被墙，<a href="https://web-static-res-edge-speedtest-b1-hk.dahi.edu.eu.org/scripts/511991/dgq63136cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86.user.js">点击我下载最新的油猴插件</a>，你只需要将下载的文件拖入油猴管理面板即可</h1>
-        </div>
-    <div class="card" v-if="page == 1">
-        <h1>
-            这是Edge浏览器安装油猴脚本的教程   &nbsp;&nbsp;&nbsp;&nbsp;
-            
-            <el-button type="success" v-if="page == 1" @click="changePage(2)">切换谷歌Chrome内核浏览器教程</el-button>
-            <el-button type="success" v-if="page !== 1" @click="changePage(1)">切换Edge浏览器教程</el-button>
-            <el-button type="success" v-if="page != 3" @click="changePage(3)">以上教程都不能安装！</el-button>
-        </h1><h2><br>如果你已经有了油猴可以直接跳到第 4 步</h2>
-        <h3><br>1、进入油猴脚本官网：<a href="https://www.tampermonkey.net/" target="_blank"> www.tampermonkey.net</a></h3>
-        <img src="https://pic.imgdb.cn/item/670503ddd29ded1a8c7f249b.jpg" alt="1">
-        <h3><br>2、进入微软edge商店，点击获取</h3>
-        <img src="https://pic.imgdb.cn/item/670503ddd29ded1a8c7f24a8.jpg" alt="">
-        <h3><br>3、在弹出框选择添加程序</h3>
-        <h3><br>4、打开<a
-                href="https://web-static-res-edge-speedtest-b1-hk.dahi.edu.eu.org/scripts/511991/dgq63136cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86.user.js" target="_blank">dgq63136.cn斗鱼冬瓜强弹幕烂梗收集搜索脚本</a>
-        </h3>
-        <h3><br>5、点击安装</h3>
-        <img src="https://pic.imgdb.cn/item/67067f0dd29ded1a8cb47e8a.jpg" alt="">
-        <h3><br>6、再次点击安装</h3>
-        <img src="https://pic.imgdb.cn/item/67067f0dd29ded1a8cb47e97.png" alt="">
-        <h3><br>6、直播间输入框左侧出现“厕纸” ， 说明安装成功</h3>
-        <img src="https://pic.imgdb.cn/item/67067fbdd29ded1a8cb50937.png" alt="">
-        <h3><br>7、可以直接复制和一键发送! 注意：在插件复制，复制次数不增加</h3>
-        <img src="https://pic.imgdb.cn/item/67067f0dd29ded1a8cb47e7d.jpg" alt=""><br>
-        <img src="https://pic.imgdb.cn/item/6704f9bbd29ded1a8c75276a.png" alt=""><br>
-        <img src="https://pic.imgdb.cn/item/6704f9bbd29ded1a8c752773.png" alt="">
+    <div class="install-page">
+        <section class="card install-hero">
+            <div>
+                <p class="eyebrow">63136 弹幕插件</p>
+                <h1>一键安装插件</h1>
+                <p class="hero-desc">
+                    安装后打开斗鱼直播间，输入框旁会出现“厕纸”按钮，可以搜索、发送、投稿和收藏 63136 烂梗弹幕。
+                </p>
+                <div class="version-row">
+                    <span>当前插件版本号</span>
+                    <strong>{{ currentPluginVersion }}</strong>
+                    <em>更新日期：{{ currentPluginDate }}</em>
+                </div>
+            </div>
+            <div class="hero-actions">
+                <a class="primary-action" :href="userscriptInstallUrl" target="_blank" rel="noopener noreferrer">
+                    一键安装弹幕插件
+                </a>
+                <a class="secondary-action" :href="tampermonkeyUrl" target="_blank" rel="noopener noreferrer">
+                    安装油猴管理器
+                </a>
+                <a class="text-action" :href="greasyForkUrl" target="_blank" rel="noopener noreferrer">
+                    打开 Greasy Fork 备用页
+                </a>
+            </div>
+        </section>
+
+        <section class="card quick-guide">
+            <h2>安装顺序</h2>
+            <div class="steps">
+                <div v-for="step in installSteps" :key="step.title" class="step-item">
+                    <span>{{ step.index }}</span>
+                    <div>
+                        <h3>{{ step.title }}</h3>
+                        <p>{{ step.desc }}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card history-card">
+            <div class="section-heading">
+                <h2>更新历史</h2>
+                <p>按插件和网站可见版本整理，方便判断要不要更新。</p>
+            </div>
+            <div class="history-list">
+                <article v-for="item in updateHistory" :key="item.version" class="history-item">
+                    <div class="history-meta">
+                        <strong>{{ item.version }}</strong>
+                        <span>{{ item.date }}</span>
+                    </div>
+                    <ul>
+                        <li v-for="change in item.changes" :key="change">{{ change }}</li>
+                    </ul>
+                </article>
+            </div>
+        </section>
     </div>
-    <div v-if="page == 2" class="card">
-        <h1>
-            这是谷歌Chrome浏览器安装油猴脚本的教程 &nbsp;&nbsp;
-            <el-button type="success" v-if="page != 2" @click="changePage(2)">切换谷歌Chrome内核浏览器教程</el-button>
-            <el-button type="success" v-if="page != 1" @click="changePage(1)">切换Edge浏览器教程</el-button>
-            <el-button type="success" v-if="page != 3" @click="changePage(3)">以上教程都不能安装！</el-button>
-        </h1>
-        <h3><br>1、进入油猴脚本官网：<a href="https://www.tampermonkey.net/" target="_blank">www.tampermonkey.net</a>点击右侧下载</h3>
-        <img src="https://pic.imgdb.cn/item/6704e6ddd29ded1a8c6322a2.jpg" alt="1">
-        <h3><br>2、进入 设置-扩展程序-管理扩展程序</h3>
-        <img src="https://pic.imgdb.cn/item/670504bdd29ded1a8c8027ac.png" alt="">
-        <h3><br>3、将下载好的crx文件拖入扩展程序中</h3>
-        <img src="https://pic.imgdb.cn/item/6704e6ddd29ded1a8c6322b9.png" alt="">
-        <img src="https://pic.imgdb.cn/item/670504bdd29ded1a8c802798.jpg" alt="">
-        <h3><br>4、打开
-            <a
-                href="https://web-static-res-edge-speedtest-b1-hk.dahi.edu.eu.org/scripts/511991/dgq63136cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86.user.js" target="_blank">dgq63136.cn斗鱼冬瓜强弹幕烂梗收集搜索脚本</a>
-        </h3>
-        <h3><br>5、点击安装</h3>
-        <img src="https://pic.imgdb.cn/item/67067f0dd29ded1a8cb47e8a.jpg" alt="">
-        <h3><br>6、再次点击安装</h3>
-        <img src="https://pic.imgdb.cn/item/67067f0dd29ded1a8cb47e97.png" alt="">
-        <h3><br>6、直播间输入框上方出现“厕纸” ， 说明安装成功</h3>
-        <img src="https://pic.imgdb.cn/item/67067fbdd29ded1a8cb50937.png" alt="">
-        <h3><br>7、可以直接复制和一键发送! 注意：在插件复制，复制次数不增加</h3>
-        <img src="https://pic.imgdb.cn/item/67067f0dd29ded1a8cb47e7d.jpg" alt=""><br>
-        <img src="https://pic.imgdb.cn/item/6704f9bbd29ded1a8c75276a.png" alt=""><br>
-        <img src="https://pic.imgdb.cn/item/6704f9bbd29ded1a8c752773.png" alt="">
-    </div>
-    <div v-if="page == 3" class="card">
-        <h1>
-            这是终极安装油猴脚本的教程 &nbsp;&nbsp;
-            <el-button type="success" v-if="page != 2" @click="changePage(2)">切换谷歌Chrome内核浏览器教程</el-button>
-            <el-button type="success" v-if="page != 1" @click="changePage(1)">切换Edge浏览器教程</el-button>
-            <el-button type="success" v-if="page != 3" @click="changePage(3)">以上教程都不能安装！</el-button>
-        </h1>
-        <h3><br>1、网盘下载油猴插件crx: &nbsp;<a href="https://wwe.lanzoui.com/irNjUtgyxpc" target="_blank">https://wwe.lanzoui.com/irNjUtgyxpc</a></h3>
-        <img src="https://pic.imgdb.cn/item/6704e792d29ded1a8c63b824.jpg" alt="1">
-        <h3><br>2、解压压缩包，得到crx文件</h3>
-        <img src="https://pic.imgdb.cn/item/6704e792d29ded1a8c63b82d.jpg" alt="">
-        <h3><br>2、进入 设置-扩展程序-管理扩展程序</h3>
-        <img src="https://pic.imgdb.cn/item/670504bdd29ded1a8c8027ac.png" alt="">
-        <h3><br>3、将解压好的crx文件拖入扩展程序中</h3>
-        <img src="https://pic.imgdb.cn/item/6704e6ddd29ded1a8c6322b9.png" alt="">
-        <img src="https://pic.imgdb.cn/item/670504bdd29ded1a8c802798.jpg" alt="">
-        <h3><br>4、打开
-            <a
-                href="https://web-static-res-edge-speedtest-b1-hk.dahi.edu.eu.org/scripts/511991/dgq63136cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86.user.js" target="_blank">dgq63136.cn斗鱼冬瓜强弹幕烂梗收集搜索脚本</a>
-        </h3>
-        <h3><br>5、点击安装</h3>
-        <img src="https://pic.imgdb.cn/item/67067f0dd29ded1a8cb47e8a.jpg" alt="">
-        <h3><br>6、再次点击安装</h3>
-        <img src="https://pic.imgdb.cn/item/67067f0dd29ded1a8cb47e97.png" alt="">
-        <h3><br>6、直播间输入框上方出现“厕纸” ， 说明安装成功</h3>
-        <img src="https://pic.imgdb.cn/item/67067fbdd29ded1a8cb50937.png" alt="">
-        <h3><br>7、可以直接复制和一键发送! 注意：在插件复制，复制次数不增加</h3>
-        <img src="https://pic.imgdb.cn/item/67067f0dd29ded1a8cb47e7d.jpg" alt=""><br>
-        <img src="https://pic.imgdb.cn/item/6704f9bbd29ded1a8c75276a.png" alt=""><br>
-        <img src="https://pic.imgdb.cn/item/6704f9bbd29ded1a8c752773.png" alt="">
-    </div>
-  </template>
-  
-  <script setup>
-  import { ref } from 'vue';
-  const page = ref(1);
-  const changePage = (newPage) => {
-    console.log(page.value)
-    page.value = newPage;
-  }
-  </script>
-  
-  <style scoped>
-  
-  </style>
+</template>
+
+<script setup>
+const currentPluginVersion = 'v2026.08.11.01';
+const currentPluginDate = '2026-08-11';
+const userscriptInstallUrl =
+    'https://web-static-res-edge-speedtest-b1-hk.dahi.edu.eu.org/scripts/511991/dgq63136cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86.user.js';
+const tampermonkeyUrl = 'https://www.tampermonkey.net/';
+const greasyForkUrl =
+    'https://greasyfork.org/zh-CN/scripts/511991-dgq63136-cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86';
+
+const installSteps = [
+    {
+        index: '1',
+        title: '先安装油猴管理器',
+        desc: '如果浏览器已经装过 Tampermonkey，可以直接跳到下一步。',
+    },
+    {
+        index: '2',
+        title: '点击一键安装弹幕插件',
+        desc: '浏览器会打开 .user.js 安装页，在油猴确认页点击安装即可。',
+    },
+    {
+        index: '3',
+        title: '回到斗鱼直播间验证',
+        desc: '打开斗鱼直播间，输入框旁出现“厕纸”按钮就说明安装成功。',
+    },
+];
+
+const updateHistory = [
+    {
+        date: '2026-08-11',
+        version: 'v2026.08.11.01',
+        changes: [
+            '新增弹幕一键投稿，斗鱼弹幕旁和搜索结果里都可以投稿到 63136。',
+            '新增本地收藏，喜欢的弹幕可保存到当前浏览器油猴数据里。',
+            '新增插件更新提示，远端版本更新时在插件面板顶部提醒。',
+            '修复更新跳转地址双 https 问题。',
+        ],
+    },
+    {
+        date: '2026-07-31',
+        version: 'v26.07.31',
+        changes: ['弹幕插件适配斗鱼新 UI，恢复直播间内搜索、复制和一键发送入口。'],
+    },
+    {
+        date: '2026-07-05',
+        version: 'v2026.07.05.01',
+        changes: ['Greasy Fork 脚本基础版本，支持在斗鱼直播间打开 63136 面板搜索和发送弹幕。'],
+    },
+    {
+        date: '2025-07-16',
+        version: 'v2025.07.16.01',
+        changes: ['网站首页加入油猴插件下载入口，提供直播间搜索、复制和一键发送能力。'],
+    },
+    {
+        date: '2025-03-14',
+        version: 'v2025.03.14',
+        changes: ['修复复制弹幕时出现 undefined 的问题。'],
+    },
+];
+</script>
+
+<style scoped>
+.install-page {
+    display: grid;
+    gap: 14px;
+}
+
+:global(.chat-room-draggable),
+:global(.aplayer),
+:global(.version) {
+    display: none !important;
+}
+
+.install-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px;
+    align-items: center;
+}
+
+.eyebrow {
+    color: #1976d2;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+h1,
+h2,
+h3,
+p {
+    margin: 0;
+}
+
+h1 {
+    color: #111;
+    font-size: 32px;
+    line-height: 1.2;
+}
+
+h2 {
+    color: #111;
+    font-size: 22px;
+    line-height: 1.25;
+}
+
+h3 {
+    color: #111;
+    font-size: 15px;
+    line-height: 1.3;
+}
+
+.hero-desc {
+    max-width: 760px;
+    margin-top: 10px;
+    color: #333;
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.version-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-top: 16px;
+}
+
+.version-row span,
+.version-row em {
+    color: #555;
+    font-size: 13px;
+    font-style: normal;
+}
+
+.version-row strong {
+    border-radius: 5px;
+    background: #e8f2ff;
+    color: #125ea8;
+    font-size: 16px;
+    padding: 6px 10px;
+}
+
+.hero-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 190px;
+}
+
+.primary-action,
+.secondary-action,
+.text-action {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 42px;
+    border-radius: 5px;
+    padding: 0 16px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.primary-action {
+    color: #fff;
+    background: #1976d2;
+}
+
+.secondary-action {
+    color: #1976d2;
+    border: 1px solid #1976d2;
+    background: #fff;
+}
+
+.text-action {
+    color: #555;
+    background: #f3f5f7;
+}
+
+.steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.step-item {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 10px;
+    min-height: 96px;
+    border: 1px solid #e6eef7;
+    border-radius: 6px;
+    padding: 12px;
+    background: #fbfdff;
+}
+
+.step-item span {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #1976d2;
+    color: #fff;
+    font-weight: 700;
+}
+
+.step-item p,
+.section-heading p {
+    margin-top: 6px;
+    color: #555;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.history-list {
+    display: grid;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.history-item {
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr);
+    gap: 14px;
+    border-top: 1px solid #edf0f2;
+    padding-top: 12px;
+}
+
+.history-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.history-meta strong {
+    color: #125ea8;
+    font-size: 15px;
+}
+
+.history-meta span {
+    color: #777;
+    font-size: 13px;
+}
+
+.history-item ul {
+    margin: 0;
+    padding-left: 18px;
+    color: #333;
+    line-height: 1.65;
+}
+
+@media (max-width: 600px) {
+    .install-hero,
+    .steps,
+    .history-item {
+        grid-template-columns: 1fr;
+    }
+
+    h1 {
+        font-size: 26px;
+    }
+
+    .hero-actions {
+        min-width: 0;
+    }
+}
+</style>
