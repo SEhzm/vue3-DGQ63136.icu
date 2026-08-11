@@ -30,9 +30,11 @@ import ZbjHuPen_icon from '@/assets/icons/ZbjHuPen_icon.svg';
 import JZ_icon from '@/assets/icons/jz.png';
 import Z_icon from '@/assets/icons/Z_icon.png';
 import cg_icon from '@/assets/icons/cg.svg';
+import install_icon from '@/assets/icons/install_icon.svg';
 export const MemeCategory = [
     { path: '/home', text: '首页', icon: home_icon },
     { path: '/memes/AllBarrage', text: '全部烂梗', icon: all_icon, api: API.GET_ALL_MEME, category: 'allbarrage' },
+    { path: '/Tampermonkey', text: '一键安装插件', icon: install_icon },
     { path: '/image', text: '时光相册', icon: image_icon },
     { path: '/memes/FKDGQ', text: '喷冬瓜强篇', icon: dgq_icon, api: API.GET_FK_DGQ_MEME, category: 'penDGQ' },
     { path: '/memes/ZbjHuPen', text: '直播间互喷+1篇', icon: ZbjHuPen_icon, api: API.GET_FK_EACHOTHER_MEME, category: 'ZbjHuPen' },

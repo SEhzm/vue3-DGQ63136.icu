@@ -8,10 +8,10 @@
             <div>
                 <b>
                     <p class="announcement">
-                        新增时光相册(可评论)，新增在线投稿弹幕。冬瓜强帅照可以在上方上传照片上传至相册,最新推出了<a href="https://cdn.hguofichp.cn/dgq63136.cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86-2025.07.016.01.user.js">油猴Tampermonkey插件</a>，可以在直播间直接搜索进行复制和一键发送
+                        新增时光相册(可评论)，新增在线投稿弹幕。冬瓜强帅照可以在上方上传照片上传至相册,最新推出了<a href="https://update.greasyfork.org/scripts/511991/dgq63136cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86.user.js">油猴Tampermonkey插件</a>，可以在直播间直接搜索进行复制和一键发送
                     </p>
                     <p class="announcement">
-                        <a href="https://web-static-res-edge-speedtest-b1-hk.dahi.edu.eu.org/scripts/511991/dgq63136cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86.user.js" target="_blank">油猴插件已更新，适配斗鱼新UI</a>
+                        <a href="https://update.greasyfork.org/scripts/511991/dgq63136cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86.user.js" target="_blank">油猴插件已更新，适配斗鱼新UI</a>
                     </p>
                 </b>
             </div>
