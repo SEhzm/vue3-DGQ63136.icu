@@ -60,10 +60,10 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'v2026.08.11.01';
+const currentPluginVersion = 'v2026.08.11.02';
 const currentPluginDate = '2026-08-11';
 const userscriptInstallUrl =
-    'https://update.greasyfork.org/scripts/511991/dgq63136cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86.user.js';
+    'https://cdn.hguofichp.cn/dgq63136.cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86-2026.08.11.02.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
 const greasyForkUrl =
     'https://greasyfork.org/zh-CN/scripts/511991-dgq63136-cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86';
@@ -89,7 +89,7 @@ const installSteps = [
 const updateHistory = [
     {
         date: '2026-08-11',
-        version: 'v2026.08.11.01',
+        version: 'v2026.08.11.02',
         changes: [
             '新增弹幕一键投稿，斗鱼弹幕旁和搜索结果里都可以投稿到 63136。',
             '新增本地收藏，喜欢的弹幕可保存到当前浏览器油猴数据里。',

@@ -8,7 +8,7 @@ const page = readFileSync(resolve(root, "src/views/MainLayout/components/Tamperm
 const home = readFileSync(resolve(root, "src/views/MainLayout/components/Home.vue"), "utf8");
 
 const scriptUrl =
-  "https://update.greasyfork.org/scripts/511991/dgq63136cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86.user.js";
+  "https://cdn.hguofichp.cn/dgq63136.cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86-2026.08.11.02.user.js";
 const staleInstallHosts = ["web-static-res-edge-speedtest-b1-hk.dahi.edu.eu.org", "cdn.hguofichp.cn/dgq63136.cn"];
 
 assert.ok(constants.includes("path: '/Tampermonkey'"), "left menu should include Tampermonkey route");
