@@ -15,7 +15,22 @@ assert.ok(constants.includes("path: '/Tampermonkey'"), "left menu should include
 assert.ok(constants.includes("text: '一键安装插件'"), "left menu label should be 一键安装插件");
 
 assert.ok(page.includes("currentPluginVersion"), "page should expose current plugin version");
-assert.ok(page.includes("v2026.08.11.02"), "page should show latest plugin version");
+const displayedVersions = [
+  ...page.matchAll(/\b(?:currentPluginVersion\s*=\s*|version:\s*)'([^']+)'/g),
+].map((match) => match[1]);
+assert.deepEqual(
+  displayedVersions,
+  ["V0.0.5", "V0.0.5", "V0.0.4", "V0.0.3", "V0.0.2", "V0.0.1"],
+  "plugin versions should be sequential V0.0.x values from latest to oldest",
+);
+for (const version of displayedVersions) {
+  assert.match(version, /^V\d+\.\d+\.\d+$/, "plugin version should be uppercase V plus three numeric parts");
+}
+assert.doesNotMatch(
+  page,
+  /\b(?:currentPluginVersion\s*=\s*|version:\s*)'v(?:\d{2,4}\.)/i,
+  "displayed plugin versions should not use date-style version strings",
+);
 assert.ok(page.includes(scriptUrl), "page should link to current userscript install URL");
 assert.ok(page.includes("一键安装插件"), "page should have a primary install button");
 assert.ok(page.includes("安装油猴管理器"), "page should have Tampermonkey install entry");

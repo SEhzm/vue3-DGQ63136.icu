@@ -60,7 +60,7 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'v2026.08.11.02';
+const currentPluginVersion = 'V0.0.5';
 const currentPluginUpdatedAt = '2026-08-11 18:24';
 const userscriptInstallUrl =
     'https://cdn.hguofichp.cn/dgq63136.cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86-2026.08.11.02.user.js';
@@ -88,7 +88,7 @@ const installSteps = [
 
 const updateHistory = [
     {
-        version: 'v2026.08.11.02',
+        version: 'V0.0.5',
         updatedAt: '2026-08-11 18:24',
         changes: [
             '新增弹幕一键投稿，斗鱼弹幕旁和搜索结果里都可以投稿到 63136。',
@@ -98,22 +98,22 @@ const updateHistory = [
         ],
     },
     {
-        version: 'v26.07.31',
+        version: 'V0.0.4',
         updatedAt: '2026-07-31 00:00',
         changes: ['弹幕插件适配斗鱼新 UI，恢复直播间内搜索、复制和一键发送入口。'],
     },
     {
-        version: 'v2026.07.05.01',
+        version: 'V0.0.3',
         updatedAt: '2026-07-05 00:00',
         changes: ['Greasy Fork 脚本基础版本，支持在斗鱼直播间打开 63136 面板搜索和发送弹幕。'],
     },
     {
-        version: 'v2025.07.16.01',
+        version: 'V0.0.2',
         updatedAt: '2025-07-16 21:59',
         changes: ['网站首页加入油猴插件下载入口，提供直播间搜索、复制和一键发送能力。'],
     },
     {
-        version: 'v2025.03.14',
+        version: 'V0.0.1',
         updatedAt: '2025-03-14 14:37',
         changes: ['修复复制弹幕时出现 undefined 的问题。'],
     },
