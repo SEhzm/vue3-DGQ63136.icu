@@ -23,7 +23,7 @@ const displayedVersions = [
 ].map((match) => match[1]);
 assert.deepEqual(
   displayedVersions,
-  ["V0.0.9", "V0.0.9", "V0.0.8", "V0.0.7", "V0.0.6", "V0.0.5", "V0.0.4", "V0.0.3", "V0.0.2", "V0.0.1"],
+  ["V0.0.10", "V0.0.10", "V0.0.9", "V0.0.8", "V0.0.7", "V0.0.6", "V0.0.5", "V0.0.4", "V0.0.3", "V0.0.2", "V0.0.1"],
   "plugin versions should be sequential V0.0.x values from latest to oldest",
 );
 for (const version of displayedVersions) {
@@ -42,7 +42,7 @@ assert.ok(page.includes("updateHistory"), "page should render plugin update hist
 assert.ok(page.includes("更新历史"), "page should title the update history section");
 assert.ok(page.includes("版本号：") && page.includes("更新时间："), "history should label version and update time");
 assert.ok(page.includes("version") && page.includes("updatedAt") && page.includes("changes"), "history items should include update time, version and changes fields");
-assert.match(page, /2026-08-12 01:46/, "latest update time should show year-month-day hour:minute");
+assert.match(page, /2026-08-12 02:45/, "latest update time should show year-month-day hour:minute");
 assert.match(page, /updatedAt: '\d{4}-\d{2}-\d{2} \d{2}:\d{2}'/, "history update time should use YYYY-MM-DD HH:mm");
 assert.ok(page.includes("弹幕一键投稿") && page.includes("本地收藏"), "history should include latest feature changes");
 assert.ok(home.includes(scriptUrl), "home install links should use current userscript install URL");

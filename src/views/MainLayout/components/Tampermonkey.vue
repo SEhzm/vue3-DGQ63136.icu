@@ -60,8 +60,8 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.0.9';
-const currentPluginUpdatedAt = '2026-08-12 01:46';
+const currentPluginVersion = 'V0.0.10';
+const currentPluginUpdatedAt = '2026-08-12 02:45';
 const userscriptInstallUrl =
     'https://cdn.hguofichp.cn/dgq63136.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
@@ -87,6 +87,16 @@ const installSteps = [
 ];
 
 const updateHistory = [
+    {
+        version: 'V0.0.10',
+        updatedAt: '2026-08-12 02:45',
+        changes: [
+            '热榜弹幕已经来自弹幕库，移除热榜里的投稿按钮，只保留发送和收藏。',
+            '插件内点击复制或发送成功后，会调用网站现有计数接口，方便后端热门统计使用。',
+            '设置里的布局模式改为标准 / 紧凑按钮，避免原生下拉显示不完整。',
+            'Greasy Fork 技术 @version 更新为 2026.08.12.03。',
+        ],
+    },
     {
         version: 'V0.0.9',
         updatedAt: '2026-08-12 01:46',
