@@ -60,8 +60,8 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.0.8';
-const currentPluginUpdatedAt = '2026-08-12 00:43';
+const currentPluginVersion = 'V0.0.9';
+const currentPluginUpdatedAt = '2026-08-12 01:46';
 const userscriptInstallUrl =
     'https://cdn.hguofichp.cn/dgq63136.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
@@ -87,6 +87,15 @@ const installSteps = [
 ];
 
 const updateHistory = [
+    {
+        version: 'V0.0.9',
+        updatedAt: '2026-08-12 01:46',
+        changes: [
+            '重排插件浮窗首屏，顶部直接显示 63136 弹幕库和 V0.0.9 版本号。',
+            '搜索 / 分类 / 热榜 / 最近 / 收藏 / 设置入口前置，快捷标签、随机和查看及投稿分类更明显。',
+            'Greasy Fork 技术 @version 更新为 2026.08.12.02。',
+        ],
+    },
     {
         version: 'V0.0.8',
         updatedAt: '2026-08-12 00:43',
