@@ -60,10 +60,10 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.0.5';
-const currentPluginUpdatedAt = '2026-08-11 18:24';
+const currentPluginVersion = 'V0.0.7';
+const currentPluginUpdatedAt = '2026-08-12 00:00';
 const userscriptInstallUrl =
-    'https://cdn.hguofichp.cn/dgq63136.cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86-2026.08.11.02.user.js';
+    'https://cdn.hguofichp.cn/dgq63136.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
 const greasyForkUrl =
     'https://greasyfork.org/zh-CN/scripts/511991-dgq63136-cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86';
@@ -88,34 +88,63 @@ const installSteps = [
 
 const updateHistory = [
     {
+        version: 'V0.0.7',
+        updatedAt: '2026-08-12 00:00',
+        changes: [
+            '递增 Greasy Fork 脚本版本号到 0.0.7，解决代码变更后 @version 未增加导致用户无法自动更新的问题。',
+            '同步插件面板显示版本为 V0.0.7。',
+        ],
+    },
+    {
+        version: 'V0.0.6',
+        updatedAt: '2026-08-11 23:21',
+        changes: [
+            '完成浮窗效率改造，新增搜索、分类、热榜、最近、收藏、设置六个入口。',
+            '新增最近使用、分类排序参数、随机来一条、快捷标签、热度详情、收藏分类筛选、发送前确认、快捷键和紧凑模式。',
+            '更新提示改为显示当前版本、最新版本和更新内容卡片。',
+        ],
+    },
+    {
         version: 'V0.0.5',
-        updatedAt: '2026-08-11 18:24',
+        updatedAt: '2026-08-11 21:11',
+        changes: [
+            '分类浏览列表显示接口返回的投稿时间，热梗列表显示接口返回的热门时间。',
+            '时间统一展示为年-月-日 时:分，方便判断弹幕更新时间。',
+        ],
+    },
+    {
+        version: 'V0.0.4',
+        updatedAt: '2026-08-11 21:03',
+        changes: [
+            '把面板“投稿分类”改为“查看及投稿分类”。',
+            '选择分类后可以直接分页查看该分类弹幕，每页显示 5 条。',
+        ],
+    },
+    {
+        version: 'V0.0.3',
+        updatedAt: '2026-08-11 20:36',
+        changes: [
+            '新增热门弹幕折叠入口。',
+            '支持查看 24 小时热门和 7 天热门弹幕。',
+        ],
+    },
+    {
+        version: 'V0.0.2',
+        updatedAt: '2026-08-11 18:19',
+        changes: [
+            '投稿分类改为插件内部菜单。',
+            '旧默认分类自动迁移为“喷冬瓜强”，并优化弹幕增强监听。',
+        ],
+    },
+    {
+        version: 'V0.0.1',
+        updatedAt: '2026-08-11 16:59',
         changes: [
             '新增弹幕一键投稿，斗鱼弹幕旁和搜索结果里都可以投稿到 63136。',
             '新增本地收藏，喜欢的弹幕可保存到当前浏览器油猴数据里。',
             '新增插件更新提示，远端版本更新时在插件面板顶部提醒。',
             '修复更新跳转地址双 https 问题。',
         ],
-    },
-    {
-        version: 'V0.0.4',
-        updatedAt: '2026-07-31 00:00',
-        changes: ['弹幕插件适配斗鱼新 UI，恢复直播间内搜索、复制和一键发送入口。'],
-    },
-    {
-        version: 'V0.0.3',
-        updatedAt: '2026-07-05 00:00',
-        changes: ['Greasy Fork 脚本基础版本，支持在斗鱼直播间打开 63136 面板搜索和发送弹幕。'],
-    },
-    {
-        version: 'V0.0.2',
-        updatedAt: '2025-07-16 21:59',
-        changes: ['网站首页加入油猴插件下载入口，提供直播间搜索、复制和一键发送能力。'],
-    },
-    {
-        version: 'V0.0.1',
-        updatedAt: '2025-03-14 14:37',
-        changes: ['修复复制弹幕时出现 undefined 的问题。'],
     },
 ];
 </script>
