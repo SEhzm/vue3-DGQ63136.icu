@@ -60,8 +60,8 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.1.0';
-const currentPluginUpdatedAt = '2026-08-12 03:05';
+const currentPluginVersion = 'V0.1.1';
+const currentPluginUpdatedAt = '2026-08-12 03:35';
 const userscriptInstallUrl =
     'https://cdn.hguofichp.cn/dgq63136.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
@@ -87,6 +87,17 @@ const installSteps = [
 ];
 
 const updateHistory = [
+    {
+        version: 'V0.1.1',
+        updatedAt: '2026-08-12 03:35',
+        changes: [
+            '顶部“更新”按钮改为先检测当前插件版本，再弹出提示小窗口。',
+            '检测到新版本时才可以点击“更新”，没有新版本时更新按钮不可点击。',
+            '提示小窗口保留“访问”按钮，可以直接打开插件网站。',
+            'Greasy Fork 技术 @version 更新为 2026.08.12.05。',
+            '@呆物麋羊',
+        ],
+    },
     {
         version: 'V0.1.0',
         updatedAt: '2026-08-12 03:05',
