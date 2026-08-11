@@ -60,8 +60,8 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.1.1';
-const currentPluginUpdatedAt = '2026-08-12 03:35';
+const currentPluginVersion = 'V0.1.2';
+const currentPluginUpdatedAt = '2026-08-12 03:45';
 const userscriptInstallUrl =
     'https://cdn.hguofichp.cn/dgq63136.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
@@ -87,6 +87,16 @@ const installSteps = [
 ];
 
 const updateHistory = [
+    {
+        version: 'V0.1.2',
+        updatedAt: '2026-08-12 03:45',
+        changes: [
+            '修复斗鱼弹幕列表快捷按钮显示位置，只给普通聊天弹幕显示投 / +1。',
+            '公告、欢迎提示、直播间规则、看点卡片等非普通弹幕不再显示投 / +1。',
+            'Greasy Fork 技术 @version 更新为 2026.08.12.06。',
+            '@呆物麋羊',
+        ],
+    },
     {
         version: 'V0.1.1',
         updatedAt: '2026-08-12 03:35',
