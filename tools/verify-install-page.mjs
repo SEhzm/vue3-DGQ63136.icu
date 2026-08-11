@@ -23,9 +23,10 @@ const displayedVersions = [
 ].map((match) => match[1]);
 assert.deepEqual(
   displayedVersions,
-  ["V0.0.10", "V0.0.10", "V0.0.9", "V0.0.8", "V0.0.7", "V0.0.6", "V0.0.5", "V0.0.4", "V0.0.3", "V0.0.2", "V0.0.1"],
-  "plugin versions should be sequential V0.0.x values from latest to oldest",
+  ["V0.1.0", "V0.1.0", "V0.0.9", "V0.0.8", "V0.0.7", "V0.0.6", "V0.0.5", "V0.0.4", "V0.0.3", "V0.0.2", "V0.0.1"],
+  "plugin versions should advance from V0.0.9 to V0.1.0 and then list older versions",
 );
+assert.ok(!displayedVersions.includes("V0.0.10"), "V0.0.9 should advance to V0.1.0, not V0.0.10");
 for (const version of displayedVersions) {
   assert.match(version, /^V\d+\.\d+\.\d+$/, "plugin version should be uppercase V plus three numeric parts");
 }
@@ -42,9 +43,10 @@ assert.ok(page.includes("updateHistory"), "page should render plugin update hist
 assert.ok(page.includes("更新历史"), "page should title the update history section");
 assert.ok(page.includes("版本号：") && page.includes("更新时间："), "history should label version and update time");
 assert.ok(page.includes("version") && page.includes("updatedAt") && page.includes("changes"), "history items should include update time, version and changes fields");
-assert.match(page, /2026-08-12 02:45/, "latest update time should show year-month-day hour:minute");
+assert.match(page, /2026-08-12 03:05/, "latest update time should show year-month-day hour:minute");
 assert.match(page, /updatedAt: '\d{4}-\d{2}-\d{2} \d{2}:\d{2}'/, "history update time should use YYYY-MM-DD HH:mm");
 assert.ok(page.includes("弹幕一键投稿") && page.includes("本地收藏"), "history should include latest feature changes");
+assert.ok(page.includes("右侧元素被裁切"), "latest history should mention the floating panel clipping fix");
 assert.ok(home.includes(scriptUrl), "home install links should use current userscript install URL");
 for (const staleHost of staleInstallHosts) {
   assert.ok(!page.includes(staleHost), `page should not include stale install host: ${staleHost}`);

@@ -60,8 +60,8 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.0.10';
-const currentPluginUpdatedAt = '2026-08-12 02:45';
+const currentPluginVersion = 'V0.1.0';
+const currentPluginUpdatedAt = '2026-08-12 03:05';
 const userscriptInstallUrl =
     'https://cdn.hguofichp.cn/dgq63136.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
@@ -88,13 +88,16 @@ const installSteps = [
 
 const updateHistory = [
     {
-        version: 'V0.0.10',
-        updatedAt: '2026-08-12 02:45',
+        version: 'V0.1.0',
+        updatedAt: '2026-08-12 03:05',
         changes: [
+            '按版本规则从 V0.0.9 进位到 V0.1.0。',
             '热榜弹幕已经来自弹幕库，移除热榜里的投稿按钮，只保留发送和收藏。',
             '插件内点击复制或发送成功后，会调用网站现有计数接口，方便后端热门统计使用。',
             '设置里的布局模式改为标准 / 紧凑按钮，避免原生下拉显示不完整。',
-            'Greasy Fork 技术 @version 更新为 2026.08.12.03。',
+            '恢复斗鱼弹幕列表每条弹幕后面的投 / +1 快捷按钮。',
+            '修复插件浮窗在窄屏下快捷标签、筛选按钮等右侧元素被裁切的问题。',
+            'Greasy Fork 技术 @version 更新为 2026.08.12.04。',
         ],
     },
     {
