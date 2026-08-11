@@ -10,7 +10,7 @@
                 <div class="version-row">
                     <span>当前插件版本号</span>
                     <strong>{{ currentPluginVersion }}</strong>
-                    <em>更新日期：{{ currentPluginDate }}</em>
+                    <em>更新时间：{{ currentPluginUpdatedAt }}</em>
                 </div>
             </div>
             <div class="hero-actions">
@@ -47,8 +47,8 @@
             <div class="history-list">
                 <article v-for="item in updateHistory" :key="item.version" class="history-item">
                     <div class="history-meta">
-                        <strong>{{ item.version }}</strong>
-                        <span>{{ item.date }}</span>
+                        <strong>版本号：{{ item.version }}</strong>
+                        <span>更新时间：{{ item.updatedAt }}</span>
                     </div>
                     <ul>
                         <li v-for="change in item.changes" :key="change">{{ change }}</li>
@@ -61,7 +61,7 @@
 
 <script setup>
 const currentPluginVersion = 'v2026.08.11.02';
-const currentPluginDate = '2026-08-11';
+const currentPluginUpdatedAt = '2026-08-11 18:24';
 const userscriptInstallUrl =
     'https://cdn.hguofichp.cn/dgq63136.cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86-2026.08.11.02.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
@@ -88,8 +88,8 @@ const installSteps = [
 
 const updateHistory = [
     {
-        date: '2026-08-11',
         version: 'v2026.08.11.02',
+        updatedAt: '2026-08-11 18:24',
         changes: [
             '新增弹幕一键投稿，斗鱼弹幕旁和搜索结果里都可以投稿到 63136。',
             '新增本地收藏，喜欢的弹幕可保存到当前浏览器油猴数据里。',
@@ -98,23 +98,23 @@ const updateHistory = [
         ],
     },
     {
-        date: '2026-07-31',
         version: 'v26.07.31',
+        updatedAt: '2026-07-31 00:00',
         changes: ['弹幕插件适配斗鱼新 UI，恢复直播间内搜索、复制和一键发送入口。'],
     },
     {
-        date: '2026-07-05',
         version: 'v2026.07.05.01',
+        updatedAt: '2026-07-05 00:00',
         changes: ['Greasy Fork 脚本基础版本，支持在斗鱼直播间打开 63136 面板搜索和发送弹幕。'],
     },
     {
-        date: '2025-07-16',
         version: 'v2025.07.16.01',
+        updatedAt: '2025-07-16 21:59',
         changes: ['网站首页加入油猴插件下载入口，提供直播间搜索、复制和一键发送能力。'],
     },
     {
-        date: '2025-03-14',
         version: 'v2025.03.14',
+        updatedAt: '2025-03-14 14:37',
         changes: ['修复复制弹幕时出现 undefined 的问题。'],
     },
 ];
@@ -284,7 +284,7 @@ h3 {
 
 .history-item {
     display: grid;
-    grid-template-columns: 160px minmax(0, 1fr);
+    grid-template-columns: 210px minmax(0, 1fr);
     gap: 14px;
     border-top: 1px solid #edf0f2;
     padding-top: 12px;

@@ -21,7 +21,10 @@ assert.ok(page.includes("一键安装插件"), "page should have a primary insta
 assert.ok(page.includes("安装油猴管理器"), "page should have Tampermonkey install entry");
 assert.ok(page.includes("updateHistory"), "page should render plugin update history");
 assert.ok(page.includes("更新历史"), "page should title the update history section");
-assert.ok(page.includes("version") && page.includes("date") && page.includes("changes"), "history items should include date, version and changes fields");
+assert.ok(page.includes("版本号：") && page.includes("更新时间："), "history should label version and update time");
+assert.ok(page.includes("version") && page.includes("updatedAt") && page.includes("changes"), "history items should include update time, version and changes fields");
+assert.match(page, /2026-08-11 18:24/, "latest update time should show year-month-day hour:minute");
+assert.match(page, /updatedAt: '\d{4}-\d{2}-\d{2} \d{2}:\d{2}'/, "history update time should use YYYY-MM-DD HH:mm");
 assert.ok(page.includes("弹幕一键投稿") && page.includes("本地收藏"), "history should include latest feature changes");
 assert.ok(home.includes(scriptUrl), "home install links should use current userscript install URL");
 for (const staleHost of staleInstallHosts) {
