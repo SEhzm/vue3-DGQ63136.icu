@@ -60,8 +60,8 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.0.7';
-const currentPluginUpdatedAt = '2026-08-12 00:00';
+const currentPluginVersion = 'V0.0.8';
+const currentPluginUpdatedAt = '2026-08-12 00:43';
 const userscriptInstallUrl =
     'https://cdn.hguofichp.cn/dgq63136.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
@@ -87,6 +87,14 @@ const installSteps = [
 ];
 
 const updateHistory = [
+    {
+        version: 'V0.0.8',
+        updatedAt: '2026-08-12 00:43',
+        changes: [
+            '兼容 Greasy Fork 线上旧日期版本，脚本内部 @version 改为 2026.08.12.01，避免再次出现版本号未增加提示。',
+            '插件面板和网站安装页继续显示用户版本 V0.0.8。',
+        ],
+    },
     {
         version: 'V0.0.7',
         updatedAt: '2026-08-12 00:00',
