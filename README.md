@@ -1,97 +1,52 @@
-<p align="center">
-    <a href="https://github.com/sehzm/sb6657">
-        <img src="https://apic.douyucdn.cn/upload/avatar_v3/201905/badbf01f7ab943358bf78bcd9245305f_big.jpg" width="150" height="150"/>
-    </a>
-    <h3 align="center">sb6657.cn</h3>
-    <br>
-    <p align="center">
-        <a href="https://github.com/sehzm/sb6657"><img src="https://img.shields.io/github/languages/code-size/sehzm/sb6657?color=blueviolet"></a>
-        <a href="https://github.com/sehzm/sb6657"><img src="https://img.shields.io/github/stars/sehzm/sb6657?color=green"></a>
-        <a href="https://github.com/sehzm/sb6657"><img src="https://img.shields.io/github/commit-activity/m/sehzm/sb6657?color=9cf"></a>
-        <a href="https://github.com/sehzm/sb6657"><img src="https://img.shields.io/github/last-commit/sehzm/sb6657"></a>
-        <a href="https://github.com/sehzm/sb6657"><img src="https://img.shields.io/github/languages/count/sehzm/sb6657
-"></a>
-        <p align="center"">
-    这是一个斗鱼TV主播玩机器的弹幕收集网站项目，玩小将的在线记事本        
-</p>
+# DGQ63136.cn 前端源码
 
+斗鱼 63136 弹幕库网站前端，包含首页、弹幕库浏览、一键安装插件页面和相关静态资源。
 
-## 🌐 官方网站
+## 线上地址
 
-[https://sb6657.cn](https://sb6657.cn)
+- 网站入口：https://dgq63136.cn/
+- 一键安装插件页：https://dgq63136.cn/#/Tampermonkey
+- 插件主下载地址：https://cdn.hguofichp.cn/dgq63136.user.js
 
-## 简介
+## 目录说明
 
-这是一个斗鱼TV主播玩机器的弹幕收集网站项目，玩小将的在线记事本。
-
-网站地址：**sb6657.cn**
-
-请使用Edge浏览器，chrome浏览器，QQ浏览器，Safari浏览器等浏览器访问。
-
-## 🏆sb6657.cn已收集2600+条有意思的弹幕，日访问量2000+，IP数1000+
-
-------
-
-### 🎯目标
-
-1.旨在收集好玩的，有意思的弹幕。
-
-2.方便水友复制弹幕，增加直播间趣味性。
-
-------
-
-### 技术栈
-前端：
-Vue3 + Vite + axios + elementUIPlus + Typescript
-
-后端：
-SpringBoot + MyBatis + MySQL + Redis
-
-弹幕管理端：
-
-基于若依vue3框架二次开发
-
-## 声明
-
-目前本页面是个人开发，可能存在未发现的bug，请勿吐槽😚。
-
-**仅供学习，请勿直接拿走应用于其他直播间，引用请注明出处**
-
-作者：
-
-斗鱼ID：瓜瓜的御用攻城狮
-
-QQ：2693445032
-
-VX：H2693445032
-
-## 🎈后端暂不开源！获取请联系上方咨询
-
-------
-
-### 启动
-
+```text
+.
+├── .github/workflows/        # GitHub Pages 自动部署
+├── docs/                     # 项目说明、更新日志、油猴脚本文档
+├── public/                   # 静态资源
+├── releases/V0.1.3/          # 当前可交付源码压缩包
+├── src/                      # Vue3 前端源码
+├── tools/                    # 安装页静态验证脚本
+├── index.html
+├── package.json
+├── package-lock.json
+└── vite.config.js
 ```
-cd vue
+
+根目录不再放历史 zip 包；可交付压缩包统一放到 `releases/V版本号/`。本地编辑器目录 `.idea/`、`node_modules/`、`dist/` 和临时 zip 不提交到仓库。
+
+## 本地开发
+
+```powershell
+npm install
 npm run dev
 ```
 
-------
+## 验证和构建
 
-### 打包
-
-```
-npm run build
+```powershell
+npm run verify
 ```
 
-### 后端启动：
+`npm run verify` 会先检查一键安装插件页面的版本号、安装链接、更新历史和签名规则，再执行 Vite 构建。
 
+## 当前插件页版本
 
-(1.测试) ：注释yml中ssl,httpInstance.ts中调整baseURL
+- 当前展示版本：`V0.1.3`
+- 更新时间：`2026-08-12 04:20`
+- 更新历史署名规则：用户本人更新只写单独一行 `@呆物麋羊`，不要写成 `@呆物麋羊 更新`。
 
-(2.上线)：放开yml注释,httpInstance.ts中调整baseURL
+## 安全说明
 
-2.配置跨域设置(非必须)
-
-有建议或BUG请提交在[这里提交建议和bug](https://www.wjx.cn/vm/QmBulzI.aspx#)
-
+本仓库是公开前端源码仓库，不提交 Cookie、token、CDN 密钥、后台账号、日志、缓存、浏览器会话或任何私人配置。`.env.development` 和 `.env.production` 只包含公开访问地址和开发代理配置。
