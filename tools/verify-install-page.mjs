@@ -47,6 +47,7 @@ assert.match(page, /2026-08-12 03:05/, "latest update time should show year-mont
 assert.match(page, /updatedAt: '\d{4}-\d{2}-\d{2} \d{2}:\d{2}'/, "history update time should use YYYY-MM-DD HH:mm");
 assert.ok(page.includes("弹幕一键投稿") && page.includes("本地收藏"), "history should include latest feature changes");
 assert.ok(page.includes("右侧元素被裁切"), "latest history should mention the floating panel clipping fix");
+assert.ok(page.includes("@呆物麋羊 更新"), "user-authored update history should include @呆物麋羊 更新");
 assert.ok(home.includes(scriptUrl), "home install links should use current userscript install URL");
 for (const staleHost of staleInstallHosts) {
   assert.ok(!page.includes(staleHost), `page should not include stale install host: ${staleHost}`);
