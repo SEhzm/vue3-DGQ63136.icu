@@ -23,8 +23,8 @@ const displayedVersions = [
 ].map((match) => match[1]);
 assert.deepEqual(
   displayedVersions,
-  ["V0.1.2", "V0.1.2", "V0.1.1", "V0.1.0", "V0.0.9", "V0.0.8", "V0.0.7", "V0.0.6", "V0.0.5", "V0.0.4", "V0.0.3", "V0.0.2", "V0.0.1"],
-  "plugin versions should advance from V0.0.9 to V0.1.0 and continue to V0.1.2",
+  ["V0.1.3", "V0.1.3", "V0.1.2", "V0.1.1", "V0.1.0", "V0.0.9", "V0.0.8", "V0.0.7", "V0.0.6", "V0.0.5", "V0.0.4", "V0.0.3", "V0.0.2", "V0.0.1"],
+  "plugin versions should advance from V0.0.9 to V0.1.0 and continue to V0.1.3",
 );
 assert.ok(!displayedVersions.includes("V0.0.10"), "V0.0.9 should advance to V0.1.0, not V0.0.10");
 for (const version of displayedVersions) {
@@ -43,12 +43,13 @@ assert.ok(page.includes("updateHistory"), "page should render plugin update hist
 assert.ok(page.includes("更新历史"), "page should title the update history section");
 assert.ok(page.includes("版本号：") && page.includes("更新时间："), "history should label version and update time");
 assert.ok(page.includes("version") && page.includes("updatedAt") && page.includes("changes"), "history items should include update time, version and changes fields");
-assert.match(page, /2026-08-12 03:45/, "latest update time should show year-month-day hour:minute");
+assert.match(page, /2026-08-12 04:20/, "latest update time should show year-month-day hour:minute");
 assert.match(page, /updatedAt: '\d{4}-\d{2}-\d{2} \d{2}:\d{2}'/, "history update time should use YYYY-MM-DD HH:mm");
 assert.ok(page.includes("弹幕一键投稿") && page.includes("本地收藏"), "history should include latest feature changes");
 assert.ok(page.includes("右侧元素被裁切"), "latest history should mention the floating panel clipping fix");
 assert.ok(page.includes("顶部“更新”按钮改为先检测当前插件版本"), "latest history should mention update detection dialog");
 assert.ok(page.includes("只给普通聊天弹幕显示投 / +1"), "latest history should mention ordinary barrage quick action fix");
+assert.ok(page.includes("把插件按钮文字“投/+1”一起发出去的问题"), "latest history should mention plus-one button text leak fix");
 assert.ok(page.includes("@呆物麋羊"), "user-authored update history should include @呆物麋羊 signature");
 assert.ok(!page.includes("@呆物麋羊 更新"), "signature should not include update wording");
 assert.ok(home.includes(scriptUrl), "home install links should use current userscript install URL");

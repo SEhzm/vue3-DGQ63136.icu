@@ -60,8 +60,8 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.1.2';
-const currentPluginUpdatedAt = '2026-08-12 03:45';
+const currentPluginVersion = 'V0.1.3';
+const currentPluginUpdatedAt = '2026-08-12 04:20';
 const userscriptInstallUrl =
     'https://cdn.hguofichp.cn/dgq63136.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
@@ -87,6 +87,15 @@ const installSteps = [
 ];
 
 const updateHistory = [
+    {
+        version: 'V0.1.3',
+        updatedAt: '2026-08-12 04:20',
+        changes: [
+            '修复点击斗鱼弹幕列表 +1 时，把插件按钮文字“投/+1”一起发出去的问题。',
+            'Greasy Fork 技术 @version 更新为 2026.08.12.07。',
+            '@呆物麋羊',
+        ],
+    },
     {
         version: 'V0.1.2',
         updatedAt: '2026-08-12 03:45',
