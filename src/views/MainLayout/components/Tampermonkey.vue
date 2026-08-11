@@ -15,7 +15,7 @@
             </div>
             <div class="hero-actions">
                 <a class="primary-action" :href="userscriptInstallUrl" target="_blank" rel="noopener noreferrer">
-                    一键安装弹幕插件
+                    一键安装插件
                 </a>
                 <a class="secondary-action" :href="tampermonkeyUrl" target="_blank" rel="noopener noreferrer">
                     安装油猴管理器
@@ -63,7 +63,7 @@
 const currentPluginVersion = 'v2026.08.11.01';
 const currentPluginDate = '2026-08-11';
 const userscriptInstallUrl =
-    'https://web-static-res-edge-speedtest-b1-hk.dahi.edu.eu.org/scripts/511991/dgq63136cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86.user.js';
+    'https://update.greasyfork.org/scripts/511991/dgq63136cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
 const greasyForkUrl =
     'https://greasyfork.org/zh-CN/scripts/511991-dgq63136-cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86';
@@ -76,7 +76,7 @@ const installSteps = [
     },
     {
         index: '2',
-        title: '点击一键安装弹幕插件',
+        title: '点击一键安装插件',
         desc: '浏览器会打开 .user.js 安装页，在油猴确认页点击安装即可。',
     },
     {
