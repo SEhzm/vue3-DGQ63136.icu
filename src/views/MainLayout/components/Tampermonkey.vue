@@ -71,8 +71,8 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.1.5';
-const currentPluginUpdatedAt = '2026-08-12 17:30';
+const currentPluginVersion = 'V0.1.6';
+const currentPluginUpdatedAt = '2026-08-12 18:10';
 const userscriptInstallUrl =
     'https://cdn.hguofichp.cn/dgq63136.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
@@ -99,12 +99,23 @@ const installSteps = [
 
 const updateHistory = [
     {
+        version: 'V0.1.6',
+        updatedAt: '2026-08-12 18:10',
+        changes: [
+            '撤回弹幕列表按批次处理的方案，改为鼠标悬停到哪条弹幕才处理哪条。',
+            '详情浮层继续按 DouyuEx 的方式定点监听斗鱼弹幕详情容器，浮层出现后再补投 / +1。',
+            '减少插件平时对浏览器性能的占用，避免影响斗鱼页面和其他插件。',
+            'Greasy Fork 技术 @version 更新为 2026.08.12.10。',
+            '@呆物麋羊',
+        ],
+    },
+    {
         version: 'V0.1.5',
         updatedAt: '2026-08-12 17:30',
         changes: [
             '学习 DouyuEx 的弹幕详情浮层处理方式，详情区域单独监听，让投 / +1 更快出现。',
             '弹幕列表改为优先处理新增节点，不再在每次页面变化时反复扫描整段列表。',
-            '限制监听范围，并限制每帧最多处理 80 条弹幕，降低浏览器性能占用。',
+            '限制弹幕监听范围，降低浏览器性能占用。',
             'Greasy Fork 技术 @version 更新为 2026.08.12.09。',
             '@呆物麋羊',
         ],
