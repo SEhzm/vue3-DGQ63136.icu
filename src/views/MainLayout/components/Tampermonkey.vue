@@ -29,11 +29,26 @@
         <section class="card permission-tip">
             <div class="tip-badge">重要提醒</div>
             <div>
-                <h2>装完油猴后，把“允许用户脚本”打开</h2>
+                <h2>装完油猴后，把两个权限开关都打开</h2>
                 <p>
-                    有些浏览器里即使已经装好 Tampermonkey，如果这个开关没开，插件还是不会运行。
-                    先打开这个权限，再点上面的“一键安装插件”。
+                    有些浏览器里即使已经装好 Tampermonkey，如果扩展详情里的权限开关没开，插件还是不会运行。
+                    先打开下面两个开关，再点上面的“一键安装插件”。
                 </p>
+                <div class="permission-guide">
+                    <div v-for="step in permissionSteps" :key="step.title" class="permission-step">
+                        <span>{{ step.index }}</span>
+                        <div>
+                            <h3>{{ step.title }}</h3>
+                            <p>{{ step.desc }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="permission-checks">
+                    <strong>安装后这样确认：</strong>
+                    <ul>
+                        <li v-for="item in permissionChecks" :key="item">{{ item }}</li>
+                    </ul>
+                </div>
             </div>
         </section>
 
@@ -95,6 +110,35 @@ const installSteps = [
         title: '回到斗鱼直播间验证',
         desc: '打开斗鱼直播间，输入框旁出现“厕纸”按钮就说明安装成功。',
     },
+];
+
+const permissionSteps = [
+    {
+        index: '1',
+        title: '打开浏览器扩展管理',
+        desc: 'Chrome / Edge 可以在地址栏输入 chrome://extensions 或 edge://extensions，也可以从右上角扩展图标进入管理页面。',
+    },
+    {
+        index: '2',
+        title: '找到 Tampermonkey',
+        desc: '确认油猴扩展是开启状态；如果看不到 Tampermonkey，先点上方“安装油猴管理器”。',
+    },
+    {
+        index: '3',
+        title: '打开两个权限开关',
+        desc: '进入 Tampermonkey 详情页，把“允许用户脚本 / Allow user scripts”和“在 InPrivate 中允许”两个开关都打开。',
+    },
+    {
+        index: '4',
+        title: '回到本页安装插件',
+        desc: '开关打开后，再点击“一键安装插件”，油猴安装页出现后点安装或更新。',
+    },
+];
+
+const permissionChecks = [
+    '打开斗鱼直播间，聊天输入框旁能看到“厕纸”按钮。',
+    '点开“厕纸”能看到搜索、分类、热榜、最近、收藏、设置。',
+    '如果仍然没有显示，刷新斗鱼直播间，或回到扩展管理页确认 Tampermonkey、“允许用户脚本 / Allow user scripts”和“在 InPrivate 中允许”都已开启。',
 ];
 
 const updateHistory = [
@@ -322,6 +366,55 @@ const updateHistory = [
     border-left: 4px solid #1976d2;
 }
 
+.permission-guide {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.permission-step {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 9px;
+    min-height: 112px;
+    border: 1px solid #dcecff;
+    border-radius: 6px;
+    padding: 10px;
+    background: #f7fbff;
+}
+
+.permission-step span {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #e8f2ff;
+    color: #125ea8;
+    font-weight: 800;
+}
+
+.permission-checks {
+    margin-top: 12px;
+    border-radius: 6px;
+    padding: 10px 12px;
+    background: #fffaf0;
+    color: #4b3a12;
+}
+
+.permission-checks strong {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.permission-checks ul {
+    margin: 0;
+    padding-left: 18px;
+    line-height: 1.6;
+}
+
 .tip-badge {
     width: fit-content;
     padding: 4px 10px;
@@ -463,6 +556,7 @@ h3 {
 }
 
 .step-item p,
+.permission-step p,
 .section-heading p {
     margin-top: 6px;
     color: #555;
@@ -509,6 +603,8 @@ h3 {
 
 @media (max-width: 600px) {
     .install-hero,
+    .permission-tip,
+    .permission-guide,
     .steps,
     .history-item {
         grid-template-columns: 1fr;
