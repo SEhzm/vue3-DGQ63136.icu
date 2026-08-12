@@ -71,8 +71,8 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.1.9';
-const currentPluginUpdatedAt = '2026-08-12 23:35';
+const currentPluginVersion = 'V0.2.0';
+const currentPluginUpdatedAt = '2026-08-13 00:33';
 const userscriptInstallUrl =
     'https://cdn.hguofichp.cn/dgq63136.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
@@ -98,6 +98,16 @@ const installSteps = [
 ];
 
 const updateHistory = [
+    {
+        version: 'V0.2.0',
+        updatedAt: '2026-08-13 00:33',
+        changes: [
+            '修复更新检测弹窗把油猴技术版本显示成 V2026 日期版本的问题。',
+            '更新检测继续使用油猴 @version 判断是否需要升级，弹窗和顶部提示优先显示用户可见版本号。',
+            'Greasy Fork 技术 @version 更新为 2026.08.13.01。',
+            '@呆物麋羊',
+        ],
+    },
     {
         version: 'V0.1.9',
         updatedAt: '2026-08-12 23:35',
