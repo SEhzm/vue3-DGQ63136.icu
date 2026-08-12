@@ -60,8 +60,8 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.1.3';
-const currentPluginUpdatedAt = '2026-08-12 04:20';
+const currentPluginVersion = 'V0.1.4';
+const currentPluginUpdatedAt = '2026-08-12 04:45';
 const userscriptInstallUrl =
     'https://cdn.hguofichp.cn/dgq63136.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
@@ -87,6 +87,16 @@ const installSteps = [
 ];
 
 const updateHistory = [
+    {
+        version: 'V0.1.4',
+        updatedAt: '2026-08-12 04:45',
+        changes: [
+            '缩小弹幕增强监听范围，只监听弹幕列表和弹幕详情区域，避免影响 DouyuEx 修改播放器。',
+            '列表快捷按钮样式改为插件自有选择器，减少和斗鱼/DouyuEx 页面样式冲突。',
+            'Greasy Fork 技术 @version 更新为 2026.08.12.08。',
+            '@呆物麋羊',
+        ],
+    },
     {
         version: 'V0.1.3',
         updatedAt: '2026-08-12 04:20',
@@ -216,11 +226,17 @@ const updateHistory = [
     gap: 14px;
 }
 
+:global(.chat-room-draggable),
+:global(.aplayer),
+:global(.version) {
+    display: none !important;
+}
+
 .install-hero {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 18px;
+    align-items: center;
 }
 
 .eyebrow {
@@ -291,8 +307,6 @@ h3 {
     flex-direction: column;
     gap: 10px;
     min-width: 190px;
-    margin-left: auto;
-    margin-right: 15%;
 }
 
 .primary-action,
