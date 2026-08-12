@@ -39,6 +39,7 @@ assert.ok(page.includes(scriptUrl), "page should link to current userscript inst
 assert.ok(page.includes(greasyForkUrl), "page should keep Greasy Fork as backup install page");
 assert.ok(page.includes("一键安装插件"), "page should have a primary install button");
 assert.ok(page.includes("安装油猴管理器"), "page should have Tampermonkey install entry");
+assert.ok(page.includes("允许用户脚本"), "page should remind users to enable Tampermonkey user scripts");
 assert.ok(page.includes("updateHistory"), "page should render plugin update history");
 assert.ok(page.includes("更新历史"), "page should title the update history section");
 assert.ok(page.includes("版本号：") && page.includes("更新时间："), "history should label version and update time");

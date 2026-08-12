@@ -26,6 +26,17 @@
             </div>
         </section>
 
+        <section class="card permission-tip">
+            <div class="tip-badge">重要提醒</div>
+            <div>
+                <h2>装完油猴后，把“允许用户脚本”打开</h2>
+                <p>
+                    有些浏览器里即使已经装好 Tampermonkey，如果这个开关没开，插件还是不会运行。
+                    先打开这个权限，再点上面的“一键安装插件”。
+                </p>
+            </div>
+        </section>
+
         <section class="card quick-guide">
             <h2>安装顺序</h2>
             <div class="steps">
@@ -72,7 +83,7 @@ const installSteps = [
     {
         index: '1',
         title: '先安装油猴管理器',
-        desc: '如果浏览器已经装过 Tampermonkey，可以直接跳到下一步。',
+        desc: '如果浏览器已经装过 Tampermonkey，可以直接跳到下一步；记得把“允许用户脚本”打开。',
     },
     {
         index: '2',
@@ -237,6 +248,25 @@ const updateHistory = [
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 18px;
     align-items: center;
+}
+
+.permission-tip {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 14px;
+    align-items: start;
+    border-left: 4px solid #1976d2;
+}
+
+.tip-badge {
+    width: fit-content;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(25, 118, 210, 0.1);
+    color: #1976d2;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
 .eyebrow {

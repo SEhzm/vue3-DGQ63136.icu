@@ -7,6 +7,7 @@
 - 网站入口：https://dgq63136.cn/
 - 一键安装插件页：https://dgq63136.cn/#/Tampermonkey
 - 插件主下载地址：https://cdn.hguofichp.cn/dgq63136.user.js
+- 安装提醒：有些浏览器即使装好 Tampermonkey，也要手动打开“允许用户脚本”，否则插件不会运行。
 
 ## 目录说明
 
