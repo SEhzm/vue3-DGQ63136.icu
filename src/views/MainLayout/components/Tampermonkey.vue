@@ -71,8 +71,8 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.1.8';
-const currentPluginUpdatedAt = '2026-08-12 22:55';
+const currentPluginVersion = 'V0.1.9';
+const currentPluginUpdatedAt = '2026-08-12 23:35';
 const userscriptInstallUrl =
     'https://cdn.hguofichp.cn/dgq63136.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
@@ -98,6 +98,16 @@ const installSteps = [
 ];
 
 const updateHistory = [
+    {
+        version: 'V0.1.9',
+        updatedAt: '2026-08-12 23:35',
+        changes: [
+            '修复打开插件更新提示后，斗鱼播放器底部控制栏按钮可能点击无反应的问题。',
+            '更新提示改为非阻塞小窗口，不再用全屏遮罩拦住播放器弹幕开关、清晰度和全屏按钮。',
+            'Greasy Fork 技术 @version 更新为 2026.08.12.13。',
+            '@呆物麋羊',
+        ],
+    },
     {
         version: 'V0.1.8',
         updatedAt: '2026-08-12 22:55',
