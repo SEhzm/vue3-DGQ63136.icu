@@ -71,8 +71,8 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.1.7';
-const currentPluginUpdatedAt = '2026-08-12 18:45';
+const currentPluginVersion = 'V0.1.8';
+const currentPluginUpdatedAt = '2026-08-12 22:55';
 const userscriptInstallUrl =
     'https://cdn.hguofichp.cn/dgq63136.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
@@ -98,6 +98,17 @@ const installSteps = [
 ];
 
 const updateHistory = [
+    {
+        version: 'V0.1.8',
+        updatedAt: '2026-08-12 22:55',
+        changes: [
+            '旧版用户打开插件浮窗时，会自动检测 CDN 上的最新 .user.js 版本。',
+            '检测到新版本会直接弹出更新提示窗口，点击更新即可安装 CDN 最新文件。',
+            '自动检测结果本地缓存 1 小时，反复打开和关闭浮窗不会重复消耗 CDN 流量。',
+            'Greasy Fork 技术 @version 更新为 2026.08.12.12。',
+            '@呆物麋羊',
+        ],
+    },
     {
         version: 'V0.1.7',
         updatedAt: '2026-08-12 18:45',
