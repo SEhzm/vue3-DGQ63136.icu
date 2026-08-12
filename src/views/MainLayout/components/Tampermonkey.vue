@@ -217,10 +217,10 @@ const updateHistory = [
 }
 
 .install-hero {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 18px;
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
+    gap: 18px;
 }
 
 .eyebrow {
@@ -291,6 +291,8 @@ h3 {
     flex-direction: column;
     gap: 10px;
     min-width: 190px;
+    margin-left: auto;
+    margin-right: 15%;
 }
 
 .primary-action,
