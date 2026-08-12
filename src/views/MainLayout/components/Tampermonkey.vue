@@ -71,8 +71,8 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.1.6';
-const currentPluginUpdatedAt = '2026-08-12 18:10';
+const currentPluginVersion = 'V0.1.7';
+const currentPluginUpdatedAt = '2026-08-12 18:45';
 const userscriptInstallUrl =
     'https://cdn.hguofichp.cn/dgq63136.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
@@ -98,6 +98,17 @@ const installSteps = [
 ];
 
 const updateHistory = [
+    {
+        version: 'V0.1.7',
+        updatedAt: '2026-08-12 18:45',
+        changes: [
+            '优化进入斗鱼直播间时的启动性能，打开直播间先只挂厕纸入口。',
+            '完整浮窗、分类接口、更新检测和在线统计延后到用户第一次打开面板后再加载。',
+            '减少工具栏查找时的深度 DOM 扫描，避免和斗鱼播放器首屏加载抢资源。',
+            'Greasy Fork 技术 @version 更新为 2026.08.12.11。',
+            '@呆物麋羊',
+        ],
+    },
     {
         version: 'V0.1.6',
         updatedAt: '2026-08-12 18:10',
