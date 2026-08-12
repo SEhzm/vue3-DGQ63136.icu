@@ -27,3 +27,6 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+# Release packages belong under releases/Vx.y.z/
+/*.zip
