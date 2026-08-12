@@ -216,12 +216,6 @@ const updateHistory = [
     gap: 14px;
 }
 
-:global(.chat-room-draggable),
-:global(.aplayer),
-:global(.version) {
-    display: none !important;
-}
-
 .install-hero {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
