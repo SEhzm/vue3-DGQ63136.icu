@@ -41,10 +41,14 @@ assert.ok(page.includes("一键安装插件"), "page should have a primary insta
 assert.ok(page.includes("安装油猴管理器"), "page should have Tampermonkey install entry");
 assert.ok(page.includes("允许用户脚本"), "page should remind users to enable Tampermonkey user scripts");
 assert.ok(page.includes("permissionSteps"), "page should include a detailed user-script permission tutorial");
+assert.ok(page.includes("requiredSwitches"), "page should show the two required browser switches separately");
 assert.ok(page.includes("chrome://extensions") && page.includes("edge://extensions"), "permission tutorial should include Chrome and Edge extension manager URLs");
 assert.ok(page.includes("Allow user scripts"), "permission tutorial should include the English switch wording");
 assert.ok(page.includes("在 InPrivate 中允许"), "permission tutorial should tell users to enable InPrivate access too");
 assert.ok(page.includes("两个开关都打开"), "permission tutorial should clearly say both switches are required");
+assert.ok(page.includes("详细信息") && page.includes("详情"), "permission tutorial should tell users to open extension details");
+assert.ok(page.includes("两个开关都打开"), "permission tutorial should include the exact step to enable both switches");
+assert.ok(page.includes("index: '5'"), "permission tutorial should include a five-step flow");
 assert.ok(page.includes("安装后这样确认"), "permission tutorial should include post-install checks");
 assert.ok(page.includes("聊天输入框旁能看到“厕纸”按钮"), "permission tutorial should tell users how to verify plugin startup");
 assert.ok(page.includes("updateHistory"), "page should render plugin update history");

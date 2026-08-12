@@ -34,6 +34,15 @@
                     有些浏览器里即使已经装好 Tampermonkey，如果扩展详情里的权限开关没开，插件还是不会运行。
                     先打开下面两个开关，再点上面的“一键安装插件”。
                 </p>
+                <div class="switch-list">
+                    <div v-for="item in requiredSwitches" :key="item.name" class="switch-item">
+                        <span></span>
+                        <div>
+                            <strong>{{ item.name }}</strong>
+                            <p>{{ item.desc }}</p>
+                        </div>
+                    </div>
+                </div>
                 <div class="permission-guide">
                     <div v-for="step in permissionSteps" :key="step.title" class="permission-step">
                         <span>{{ step.index }}</span>
@@ -98,7 +107,7 @@ const installSteps = [
     {
         index: '1',
         title: '先安装油猴管理器',
-        desc: '如果浏览器已经装过 Tampermonkey，可以直接跳到下一步；记得把“允许用户脚本”打开。',
+        desc: '如果浏览器已经装过 Tampermonkey，可以直接跳到下一步；记得先按上方教程把两个权限开关打开。',
     },
     {
         index: '2',
@@ -112,24 +121,40 @@ const installSteps = [
     },
 ];
 
+const requiredSwitches = [
+    {
+        name: '允许用户脚本 / Allow user scripts',
+        desc: '不开这个，Tampermonkey 可能无法运行自己安装的脚本。',
+    },
+    {
+        name: '在 InPrivate 中允许',
+        desc: '不开这个，部分浏览器或隐私窗口里插件不会生效。',
+    },
+];
+
 const permissionSteps = [
     {
         index: '1',
-        title: '打开浏览器扩展管理',
-        desc: 'Chrome / Edge 可以在地址栏输入 chrome://extensions 或 edge://extensions，也可以从右上角扩展图标进入管理页面。',
+        title: '进入扩展管理页',
+        desc: 'Edge 在地址栏输入 edge://extensions；Chrome 在地址栏输入 chrome://extensions，然后按回车。',
     },
     {
         index: '2',
-        title: '找到 Tampermonkey',
-        desc: '确认油猴扩展是开启状态；如果看不到 Tampermonkey，先点上方“安装油猴管理器”。',
+        title: '找到油猴扩展',
+        desc: '在扩展列表里找到 Tampermonkey，先确认右侧总开关是开启状态。',
     },
     {
         index: '3',
-        title: '打开两个权限开关',
-        desc: '进入 Tampermonkey 详情页，把“允许用户脚本 / Allow user scripts”和“在 InPrivate 中允许”两个开关都打开。',
+        title: '进入详细信息',
+        desc: '点击 Tampermonkey 卡片上的“详细信息”或“详情”，进入扩展详情页面。',
     },
     {
         index: '4',
+        title: '两个开关都打开',
+        desc: '在详情页往下找，把“允许用户脚本 / Allow user scripts”和“在 InPrivate 中允许”都打开。',
+    },
+    {
+        index: '5',
         title: '回到本页安装插件',
         desc: '开关打开后，再点击“一键安装插件”，油猴安装页出现后点安装或更新。',
     },
@@ -368,9 +393,53 @@ const updateHistory = [
 
 .permission-guide {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 10px;
     margin-top: 14px;
+}
+
+.switch-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.switch-item {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+    min-height: 74px;
+    border: 1px solid #d7eadc;
+    border-radius: 6px;
+    padding: 10px 12px;
+    background: #f7fff9;
+}
+
+.switch-item span {
+    position: relative;
+    width: 34px;
+    height: 20px;
+    border-radius: 999px;
+    background: #36b36b;
+}
+
+.switch-item span::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+}
+
+.switch-item strong {
+    display: block;
+    color: #1f7a42;
+    font-size: 14px;
 }
 
 .permission-step {
@@ -556,6 +625,7 @@ h3 {
 }
 
 .step-item p,
+.switch-item p,
 .permission-step p,
 .section-heading p {
     margin-top: 6px;
@@ -605,6 +675,7 @@ h3 {
     .install-hero,
     .permission-tip,
     .permission-guide,
+    .switch-list,
     .steps,
     .history-item {
         grid-template-columns: 1fr;
