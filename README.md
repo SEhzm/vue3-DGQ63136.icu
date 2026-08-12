@@ -16,7 +16,6 @@
 ├── .github/workflows/        # GitHub Pages 自动部署
 ├── docs/                     # 项目说明、更新日志、油猴脚本文档
 ├── public/                   # 静态资源
-├── releases/V0.1.4/          # 当前可交付源码压缩包
 ├── src/                      # Vue3 前端源码
 ├── tools/                    # 安装页静态验证脚本
 ├── index.html
@@ -25,7 +24,7 @@
 └── vite.config.js
 ```
 
-根目录不再放历史 zip 包；可交付压缩包统一放到 `releases/V版本号/`。本地编辑器目录 `.idea/`、`node_modules/`、`dist/` 和临时 zip 不提交到仓库。
+插件交付物只使用 `.user.js` 文件，下载地址固定指向 `https://cdn.hguofichp.cn/dgq63136.user.js`；网站仓库不再保存插件源码 zip 或页面源码 zip。本地编辑器目录 `.idea/`、`node_modules/`、`dist/` 和临时 zip 不提交到仓库。
 
 ## 本地开发
 
