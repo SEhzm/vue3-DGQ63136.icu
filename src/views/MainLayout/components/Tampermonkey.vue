@@ -26,6 +26,41 @@
             </div>
         </section>
 
+        <section class="card permission-tip">
+            <div class="tip-badge">重要提醒</div>
+            <div>
+                <h2>装完油猴后，把两个权限开关都打开</h2>
+                <p>
+                    有些浏览器里即使已经装好 Tampermonkey，如果扩展详情里的权限开关没开，插件还是不会运行。
+                    先打开下面两个开关，再点上面的“一键安装插件”。
+                </p>
+                <div class="switch-list">
+                    <div v-for="item in requiredSwitches" :key="item.name" class="switch-item">
+                        <span></span>
+                        <div>
+                            <strong>{{ item.name }}</strong>
+                            <p>{{ item.desc }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="permission-guide">
+                    <div v-for="step in permissionSteps" :key="step.title" class="permission-step">
+                        <span>{{ step.index }}</span>
+                        <div>
+                            <h3>{{ step.title }}</h3>
+                            <p>{{ step.desc }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="permission-checks">
+                    <strong>安装后这样确认：</strong>
+                    <ul>
+                        <li v-for="item in permissionChecks" :key="item">{{ item }}</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
         <section class="card quick-guide">
             <h2>安装顺序</h2>
             <div class="steps">
@@ -60,10 +95,9 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.1.4';
-const currentPluginUpdatedAt = '2026-08-12 04:45';
-const userscriptInstallUrl =
-    'https://cdn.hguofichp.cn/dgq63136.user.js';
+const currentPluginVersion = 'V0.2.1';
+const currentPluginUpdatedAt = '2026-08-13 09:46';
+const userscriptInstallUrl = '/dgq63136.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
 const greasyForkUrl =
     'https://greasyfork.org/zh-CN/scripts/511991-dgq63136-cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86';
@@ -72,7 +106,7 @@ const installSteps = [
     {
         index: '1',
         title: '先安装油猴管理器',
-        desc: '如果浏览器已经装过 Tampermonkey，可以直接跳到下一步。',
+        desc: '如果浏览器已经装过 Tampermonkey，可以直接跳到下一步；记得先按上方教程把两个权限开关打开。',
     },
     {
         index: '2',
@@ -86,7 +120,125 @@ const installSteps = [
     },
 ];
 
+const requiredSwitches = [
+    {
+        name: '允许用户脚本 / Allow user scripts',
+        desc: '不开这个，Tampermonkey 可能无法运行自己安装的脚本。',
+    },
+    {
+        name: '在 InPrivate 中允许',
+        desc: '不开这个，部分浏览器或隐私窗口里插件不会生效。',
+    },
+];
+
+const permissionSteps = [
+    {
+        index: '1',
+        title: '进入扩展管理页',
+        desc: 'Edge 在地址栏输入 edge://extensions；Chrome 在地址栏输入 chrome://extensions，然后按回车。',
+    },
+    {
+        index: '2',
+        title: '找到油猴扩展',
+        desc: '在扩展列表里找到 Tampermonkey，先确认右侧总开关是开启状态。',
+    },
+    {
+        index: '3',
+        title: '进入详细信息',
+        desc: '点击 Tampermonkey 卡片上的“详细信息”或“详情”，进入扩展详情页面。',
+    },
+    {
+        index: '4',
+        title: '两个开关都打开',
+        desc: '在详情页往下找，把“允许用户脚本 / Allow user scripts”和“在 InPrivate 中允许”都打开。',
+    },
+    {
+        index: '5',
+        title: '回到本页安装插件',
+        desc: '开关打开后，再点击“一键安装插件”，油猴安装页出现后点安装或更新。',
+    },
+];
+
+const permissionChecks = [
+    '打开斗鱼直播间，聊天输入框旁能看到“厕纸”按钮。',
+    '点开“厕纸”能看到搜索、分类、热榜、最近、收藏、设置。',
+    '如果仍然没有显示，刷新斗鱼直播间，或回到扩展管理页确认 Tampermonkey、“允许用户脚本 / Allow user scripts”和“在 InPrivate 中允许”都已开启。',
+];
+
 const updateHistory = [
+    {
+        version: 'V0.2.1',
+        updatedAt: '2026-08-13 09:46',
+        changes: [
+            '修复更新检测弹窗把油猴技术版本显示成 V2026 日期版本的问题。',
+            '切换cdn源',
+            '@瓜瓜的御用攻城狮',
+        ],
+    },
+    {
+        version: 'V0.2.0',
+        updatedAt: '2026-08-13 00:33',
+        changes: [
+            '修复更新检测弹窗把油猴技术版本显示成 V2026 日期版本的问题。',
+            '更新检测继续使用油猴 @version 判断是否需要升级，弹窗和顶部提示优先显示用户可见版本号。',
+            'Greasy Fork 技术 @version 更新为 2026.08.13.01。',
+            '@呆物麋羊',
+        ],
+    },
+    {
+        version: 'V0.1.9',
+        updatedAt: '2026-08-12 23:35',
+        changes: [
+            '修复打开插件更新提示后，斗鱼播放器底部控制栏按钮可能点击无反应的问题。',
+            '更新提示改为非阻塞小窗口，不再用全屏遮罩拦住播放器弹幕开关、清晰度和全屏按钮。',
+            'Greasy Fork 技术 @version 更新为 2026.08.12.13。',
+            '@呆物麋羊',
+        ],
+    },
+    {
+        version: 'V0.1.8',
+        updatedAt: '2026-08-12 22:55',
+        changes: [
+            '旧版用户打开插件浮窗时，会自动检测 CDN 上的最新 .user.js 版本。',
+            '检测到新版本会直接弹出更新提示窗口，点击更新即可安装 CDN 最新文件。',
+            '自动检测结果本地缓存 1 小时，反复打开和关闭浮窗不会重复消耗 CDN 流量。',
+            'Greasy Fork 技术 @version 更新为 2026.08.12.12。',
+            '@呆物麋羊',
+        ],
+    },
+    {
+        version: 'V0.1.7',
+        updatedAt: '2026-08-12 18:45',
+        changes: [
+            '优化进入斗鱼直播间时的启动性能，打开直播间先只挂厕纸入口。',
+            '完整浮窗、分类接口、更新检测和在线统计延后到用户第一次打开面板后再加载。',
+            '减少工具栏查找时的深度 DOM 扫描，避免和斗鱼播放器首屏加载抢资源。',
+            'Greasy Fork 技术 @version 更新为 2026.08.12.11。',
+            '@呆物麋羊',
+        ],
+    },
+    {
+        version: 'V0.1.6',
+        updatedAt: '2026-08-12 18:10',
+        changes: [
+            '撤回弹幕列表按批次处理的方案，改为鼠标悬停到哪条弹幕才处理哪条。',
+            '详情浮层继续按 DouyuEx 的方式定点监听斗鱼弹幕详情容器，浮层出现后再补投 / +1。',
+            '减少插件平时对浏览器性能的占用，避免影响斗鱼页面和其他插件。',
+            'Greasy Fork 技术 @version 更新为 2026.08.12.10。',
+            '@呆物麋羊',
+        ],
+    },
+    {
+        version: 'V0.1.5',
+        updatedAt: '2026-08-12 17:30',
+        changes: [
+            '学习 DouyuEx 的弹幕详情浮层处理方式，详情区域单独监听，让投 / +1 更快出现。',
+            '弹幕列表改为优先处理新增节点，不再在每次页面变化时反复扫描整段列表。',
+            '限制弹幕监听范围，降低浏览器性能占用。',
+            'Greasy Fork 技术 @version 更新为 2026.08.12.09。',
+            '@呆物麋羊',
+        ],
+    },
     {
         version: 'V0.1.4',
         updatedAt: '2026-08-12 04:45',
@@ -239,6 +391,118 @@ const updateHistory = [
     align-items: center;
 }
 
+.permission-tip {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 14px;
+    align-items: start;
+    border-left: 4px solid #1976d2;
+}
+
+.permission-guide {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.switch-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.switch-item {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+    min-height: 74px;
+    border: 1px solid #d7eadc;
+    border-radius: 6px;
+    padding: 10px 12px;
+    background: #f7fff9;
+}
+
+.switch-item span {
+    position: relative;
+    width: 34px;
+    height: 20px;
+    border-radius: 999px;
+    background: #36b36b;
+}
+
+.switch-item span::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+}
+
+.switch-item strong {
+    display: block;
+    color: #1f7a42;
+    font-size: 14px;
+}
+
+.permission-step {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 9px;
+    min-height: 112px;
+    border: 1px solid #dcecff;
+    border-radius: 6px;
+    padding: 10px;
+    background: #f7fbff;
+}
+
+.permission-step span {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #e8f2ff;
+    color: #125ea8;
+    font-weight: 800;
+}
+
+.permission-checks {
+    margin-top: 12px;
+    border-radius: 6px;
+    padding: 10px 12px;
+    background: #fffaf0;
+    color: #4b3a12;
+}
+
+.permission-checks strong {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.permission-checks ul {
+    margin: 0;
+    padding-left: 18px;
+    line-height: 1.6;
+}
+
+.tip-badge {
+    width: fit-content;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(25, 118, 210, 0.1);
+    color: #1976d2;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
 .eyebrow {
     color: #1976d2;
     font-size: 13px;
@@ -369,6 +633,8 @@ h3 {
 }
 
 .step-item p,
+.switch-item p,
+.permission-step p,
 .section-heading p {
     margin-top: 6px;
     color: #555;
@@ -415,6 +681,9 @@ h3 {
 
 @media (max-width: 600px) {
     .install-hero,
+    .permission-tip,
+    .permission-guide,
+    .switch-list,
     .steps,
     .history-item {
         grid-template-columns: 1fr;
