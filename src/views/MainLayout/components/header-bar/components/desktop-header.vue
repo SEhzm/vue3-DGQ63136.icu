@@ -1,8 +1,8 @@
 <template>
     <header class="header">
-        <a class="logo-link" href="https://www.douyu.com/6657" target="_blank">
+        <a class="logo-link" href="https://www.douyu.com/63136" target="_blank">
             <img src="/favicon.ico" alt="大🐖头" class="logo-img" />
-            <p class="header-title">斗鱼玩机器烂梗库</p>
+            <p class="header-title">斗鱼冬瓜强弹幕库</p>
         </a>
 
         <div class="header-actions">
