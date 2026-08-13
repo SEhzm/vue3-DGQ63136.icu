@@ -28,5 +28,5 @@ coverage
 
 *.tsbuildinfo
 
-# Plugin delivery uses .user.js only. Do not commit website/plugin zip packages.
-*.zip
+# Release packages belong under releases/Vx.y.z/
+/*.zip

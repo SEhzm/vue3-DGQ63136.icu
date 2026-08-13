@@ -1,34 +1,40 @@
 {
-  "name": "vue",
-  "version": "0.0.1",
-  "private": true,
-  "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
-    "verify": "node tools/verify-install-page.mjs && vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@element-plus/icons-vue": "^2.3.1",
-    "aplayer": "^1.10.1",
-    "axios": "^1.7.7",
-    "cors": "^2.8.5",
-    "element-plus": "^2.9.3",
-    "mouse-firework": "^0.1.1",
-    "pinia": "^2.2.4",
-    "sass": "^1.79.5",
-    "vue": "^3.5.12",
-    "vue-router": "^4.4.5"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-vue": "^5.1.4",
-    "@vue/tsconfig": "^0.5.1",
-    "typescript": "^5.6.3",
-    "unplugin-auto-import": "^0.16.7",
-    "unplugin-element-plus": "^0.8.0",
-    "unplugin-icons": "^0.19.3",
-    "unplugin-vue-components": "^0.25.2",
-    "vite": "^5.4.9",
-    "vite-plugin-compression": "^0.5.1"
-  }
+    "name": "dgq63136.cn",
+    "version": "0.1.4+20260812",
+    "private": true,
+    "scripts": {
+        "dev": "vite --host 0.0.0.0",
+        "build": "vite build",
+        "verify": "node tools/verify-install-page.mjs && vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "@element-plus/icons-vue": "^2.3.1",
+        "aplayer": "^1.10.1",
+        "axios": "^1.7.7",
+        "cors": "^2.8.5",
+        "dompurify": "^3.2.6",
+        "echarts": "^5.6.0",
+        "echarts-wordcloud": "^2.1.0",
+        "element-plus": "^2.9.3",
+        "js-cookie": "^3.0.5",
+        "marked": "^15.0.12",
+        "matter-js": "^0.20.0",
+        "mouse-firework": "^0.1.1",
+        "pinia": "^2.2.4",
+        "sass": "^1.79.5",
+        "vue": "^3.5.12",
+        "vue-router": "^4.4.5"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^5.1.4",
+        "@vue/tsconfig": "^0.5.1",
+        "typescript": "^5.6.3",
+        "unplugin-auto-import": "^0.16.7",
+        "unplugin-element-plus": "^0.8.0",
+        "unplugin-icons": "^0.19.3",
+        "unplugin-vue-components": "^0.25.2",
+        "vite": "^5.4.9",
+        "vite-plugin-compression": "^0.5.1"
+    }
 }
