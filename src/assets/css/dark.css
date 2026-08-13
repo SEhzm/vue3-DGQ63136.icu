@@ -120,3 +120,251 @@ html.dark :deep(.el-dropdown-item.is-active) {
   background: var(--el-color-primary-light-9, rgba(56, 189, 248, 0.15)) !important;
   color: var(--primary-color) !important;
 }
+
+/* ================== 烂度热榜 (stale.vue) ================== */
+/* 标题/副标题：副标题里的浅灰 #666 在深色下看不见 */
+html.dark .stale .page-sub,
+html.dark .stale .loading,
+html.dark .stale .empty,
+html.dark .stale .submit-time,
+html.dark .stale .list-end {
+  color: var(--body-color) !important;
+  opacity: 0.75;
+}
+
+/* meme-item 列表：把硬编码 #f0f0f0 边框换成深色变量，确保不透明底 */
+html.dark .stale .meme-item {
+  border-bottom-color: var(--el-border-color-lighter, #2a3441) !important;
+}
+html.dark .stale .meme-item:hover {
+  background: var(--el-fill-color-light, rgba(255, 255, 255, 0.06)) !important;
+}
+html.dark .stale .meme-item.just-voted {
+  background: rgba(255, 215, 0, 0.08) !important;
+}
+
+/* rank-badge / thermo-track：保证圆形和进度条底色不透明 */
+html.dark .stale .rank-badge {
+  background: var(--card-bg) !important;
+  color: var(--body-color) !important;
+}
+html.dark .stale .thermo-track {
+  background: var(--el-fill-color-light, rgba(255, 255, 255, 0.08)) !important;
+}
+
+/* ================== 实时热度墙 (hotwall.vue) ================== */
+html.dark .hotwall .page-sub,
+html.dark .hotwall .online-count,
+html.dark .hotwall .stream-empty,
+html.dark .hotwall .empty,
+html.dark .hotwall .submit-time,
+html.dark .hotwall .rank-count {
+  color: var(--body-color) !important;
+}
+html.dark .hotwall .online-count { opacity: 0.7; }
+html.dark .hotwall .stream-empty { opacity: 0.6; }
+
+/* rank-item 边框 / rank-no 圆形 / rank-bar-wrap 进度条底：不透明 */
+html.dark .hotwall .rank-item {
+  border-bottom-color: var(--el-border-color-lighter, #2a3441) !important;
+}
+html.dark .hotwall .rank-no {
+  background: var(--card-bg) !important;
+  color: var(--body-color) !important;
+}
+html.dark .hotwall .rank-bar-wrap {
+  background: var(--el-fill-color-light, rgba(255, 255, 255, 0.08)) !important;
+}
+
+/* live-bar 状态条：保证不透明 */
+html.dark .hotwall .live-bar {
+  background: var(--card-bg) !important;
+}
+
+/* ================== 梗生命周期 (lifecycle.vue) ================== */
+/* 阶段时间线 panel 内部 list 行 */
+html.dark .lifecycle .meme-item {
+  border-bottom-color: var(--el-border-color-lighter, #2a3441) !important;
+}
+html.dark .lifecycle .meme-item:hover {
+  background: var(--el-fill-color-light, rgba(255, 255, 255, 0.06)) !important;
+}
+
+/* node-count 圆形徽章 */
+html.dark .lifecycle .node-count {
+  background: var(--card-bg) !important;
+}
+
+/* stage-panel 卡片底色 */
+html.dark .lifecycle .stage-panel {
+  background: var(--card-bg) !important;
+  border-color: var(--el-border-color-lighter, #2a3441) !important;
+}
+
+/* panel-birth / panel-boom 的彩色边框在深色下保留原色但提高亮度 */
+html.dark .lifecycle .panel-birth { border-color: rgba(54, 207, 201, 0.5) !important; }
+html.dark .lifecycle .panel-boom { border-color: rgba(255, 107, 53, 0.5) !important; }
+
+/* dna-hero 提示框：保证不透明 */
+html.dark .lifecycle .dna-hero-bg {
+  background: linear-gradient(135deg, #0f1c2e, #1a2a3a, #1e1a2e, #2a1a2e) !important;
+  background-size: 300% 300% !important;
+  opacity: 1 !important;
+}
+html.dark .lifecycle .dna-hero-text strong,
+html.dark .lifecycle .dna-hero-text span {
+  color: var(--body-color) !important;
+}
+
+/* stage-timeline 节点区背景：保证不透明 */
+html.dark .lifecycle .stage-timeline {
+  background: linear-gradient(90deg, #0f1c2e, #1a2a3a, #1e1a2e, #2a1a2e) !important;
+}
+html.dark .lifecycle .node-label {
+  color: var(--body-color) !important;
+}
+
+/* evolution-block 演变流程块：卡片底色 */
+html.dark .lifecycle .evolution-block {
+  background: var(--card-bg) !important;
+  border-color: var(--el-border-color-lighter, #2a3441) !important;
+}
+html.dark .lifecycle .flow-node {
+  background: var(--content-bg) !important;
+  border-color: var(--el-border-color-lighter, #2a3441) !important;
+}
+html.dark .lifecycle .flow-node-center {
+  background: linear-gradient(135deg, rgba(250, 140, 22, 0.18), rgba(250, 140, 22, 0.08)) !important;
+}
+html.dark .lifecycle .flow-node-tag {
+  background: var(--el-fill-color-light, rgba(255, 255, 255, 0.1)) !important;
+  color: var(--body-color) !important;
+}
+
+/* evolution-echarts 流程图区域背景：保证不透明 */
+html.dark .lifecycle .evolution-echarts {
+  background: linear-gradient(180deg, #0b1016 0%, #151b23 100%) !important;
+  border-color: var(--el-border-color-lighter, #2a3441) !important;
+}
+
+/* dna-info-card 信息卡片底色 */
+html.dark .lifecycle .dna-info-card {
+  background: var(--card-bg) !important;
+  border-color: var(--el-border-color-lighter, #2a3441) !important;
+}
+
+/* dna-echarts-container 容器：保证不透明 */
+html.dark .lifecycle .dna-echarts-container {
+  background: var(--content-bg) !important;
+}
+
+/* dna-legend 图例区 */
+html.dark .lifecycle .dna-legend {
+  background: var(--card-bg) !important;
+  border-color: var(--el-border-color-lighter, #2a3441) !important;
+}
+
+/* hdr-count 头部徽章：深色下用不透明底 */
+html.dark .lifecycle .hdr-count {
+  background: var(--el-fill-color-light, rgba(255, 255, 255, 0.1)) !important;
+  color: var(--body-color) !important;
+}
+
+/* dna-card 关联卡片：确保不透明 */
+html.dark .lifecycle .dna-card {
+  background: var(--card-bg) !important;
+}
+html.dark .lifecycle .dna-card .card-rel {
+  background: var(--el-fill-color-light, rgba(255, 255, 255, 0.1)) !important;
+  color: var(--body-color) !important;
+}
+
+/* ================== 烂梗擂台 (arena.vue) ================== */
+html.dark .arena .page-desc,
+html.dark .arena .empty,
+html.dark .arena .vote-hint,
+html.dark .arena .done-mark,
+html.dark .arena .week-range,
+html.dark .arena .pk-votes {
+  color: var(--body-color) !important;
+}
+html.dark .arena .page-desc { opacity: 0.75; }
+html.dark .arena .empty { opacity: 0.6; }
+
+/* pk-card 卡片底色：保证不透明 */
+html.dark .arena .pk-card {
+  background: var(--card-bg) !important;
+  border-color: var(--el-border-color-lighter, #2a3441) !important;
+}
+html.dark .arena .pk-card.done { opacity: 0.85; }
+html.dark .arena .pk-card.voted {
+  border-color: var(--el-color-primary-light-5, rgba(56, 189, 248, 0.6)) !important;
+}
+
+/* pk-vs-badge 中央徽章 */
+html.dark .arena .pk-vs-badge {
+  background: var(--content-bg) !important;
+  color: var(--body-color) !important;
+}
+
+/* pk-group-no / today-badge：保证不透明 */
+html.dark .arena .pk-group-no {
+  background: var(--el-fill-color-light, rgba(255, 255, 255, 0.1)) !important;
+  color: var(--body-color) !important;
+}
+
+/* pk-fighter 选项卡：边框和 picked 状态在深色下要可见 */
+html.dark .arena .pk-fighter {
+  border-color: var(--el-border-color-lighter, #2a3441) !important;
+  background: var(--content-bg) !important;
+}
+html.dark .arena .pk-fighter:hover {
+  border-color: #ff6b35 !important;
+}
+html.dark .arena .pk-fighter.picked {
+  border-color: #ff6b35 !important;
+  background: rgba(255, 107, 53, 0.15) !important;
+}
+
+/* 排行榜表格：表头/分隔线 */
+html.dark .arena .rank-table th {
+  background: var(--el-fill-color-light, rgba(255, 255, 255, 0.06)) !important;
+  border-bottom-color: var(--el-border-color-lighter, #2a3441) !important;
+}
+html.dark .arena .rank-table td {
+  border-bottom-color: var(--el-border-color-lighter, #2a3441) !important;
+}
+
+/* day-chip 每日徽章 */
+html.dark .arena .day-chip {
+  background: var(--el-fill-color-light, rgba(255, 255, 255, 0.1)) !important;
+  color: var(--body-color) !important;
+}
+html.dark .arena .day-chip.win {
+  background: rgba(82, 196, 26, 0.2) !important;
+  color: #73d13d !important;
+}
+
+/* 历史周列表 */
+html.dark .arena .history-week {
+  background: var(--card-bg) !important;
+}
+html.dark .arena .hw-detail {
+  border-top-color: var(--el-border-color-lighter, #2a3441) !important;
+}
+html.dark .arena .hw-arrow {
+  color: var(--body-color) !important;
+  opacity: 0.7;
+}
+html.dark .arena .hw-votes {
+  color: var(--body-color) !important;
+  opacity: 0.7;
+}
+
+/* dna-search-item 列表行 */
+html.dark .lifecycle .dna-search-item {
+  border-bottom-color: var(--el-border-color-lighter, #2a3441) !important;
+}
+html.dark .lifecycle .dna-search-item:hover {
+  background: var(--el-fill-color-light, rgba(255, 255, 255, 0.06)) !important;
+}

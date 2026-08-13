@@ -1,36 +1,66 @@
 import { defineStore } from 'pinia';
+import { computed, ref, watch } from 'vue';
 
-export type ThemeMode = 'light' | 'dark' | 'auto';
+export type ThemeMode = 'system' | 'light' | 'dark';
 
-export const useThemeStore = defineStore('theme', {
-    state: () => ({
-        mode: ((typeof localStorage !== 'undefined' && (localStorage.getItem('theme-mode') as ThemeMode)) || 'light') as ThemeMode,
-    }),
-    actions: {
-        setMode(mode: ThemeMode) {
-            this.mode = mode;
-            try {
-                localStorage.setItem('theme-mode', mode);
-            } catch (e) {
-                /* localStorage 不可用时静默 */
+const STORAGE_KEY = 'theme-mode';
+
+function getSystemDark(): boolean {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+export const useThemeStore = defineStore('theme', () => {
+    const mode = ref<ThemeMode>(
+        (localStorage.getItem(STORAGE_KEY) as ThemeMode) || 'system'
+    );
+
+    const isDark = computed(() => {
+        if (mode.value === 'system') return getSystemDark();
+        return mode.value === 'dark';
+    });
+
+    let mediaQuery: MediaQueryList | null = null;
+    let mediaListener: (() => void) | null = null;
+
+    function apply() {
+        document.documentElement.classList.toggle('dark', isDark.value);
+
+        // 仅在 system 模式时监听 OS 主题变化
+        if (mode.value === 'system') {
+            if (!mediaQuery) {
+                mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                mediaListener = () => {
+                    document.documentElement.classList.toggle('dark', mediaQuery!.matches);
+                };
+                mediaQuery.addEventListener('change', mediaListener);
             }
-            this.applyToDom();
-        },
-        applyToDom() {
-            const html = document.documentElement;
-            html.classList.remove('dark', 'theme-light', 'theme-auto');
-            if (this.mode === 'dark') {
-                html.classList.add('dark');
-            } else if (this.mode === 'auto') {
-                const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                if (isDark) html.classList.add('dark');
-                html.classList.add('theme-auto');
-            } else {
-                html.classList.add('theme-light');
+        } else {
+            if (mediaQuery && mediaListener) {
+                mediaQuery.removeEventListener('change', mediaListener);
+                mediaQuery = null;
+                mediaListener = null;
             }
-        },
-        init() {
-            this.applyToDom();
-        },
-    },
+        }
+    }
+
+    function setMode(m: ThemeMode) {
+        mode.value = m;
+        localStorage.setItem(STORAGE_KEY, m);
+        apply();
+    }
+
+    // 初始化时立即 apply
+    apply();
+
+    // 监听 mode 变更以重新 apply（处理 listener 注册/注销）
+    watch(mode, () => {
+        apply();
+    });
+
+    return {
+        mode,
+        isDark,
+        setMode,
+        apply,
+    };
 });

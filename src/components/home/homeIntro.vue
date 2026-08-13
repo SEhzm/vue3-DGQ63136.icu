@@ -11,12 +11,12 @@
             <b>
                 <RouterLink to="/Tampermonkey">油猴插件</RouterLink>
                 (已支持斗鱼新UI)
-                <a href="https://cdn.hguofichp.cn/dgq63136.user.js" target="_blank">点击下载</a>
+                <a href="https://dgq63136.cn/dgq63136.user.js" target="_blank">点击下载</a>
                 可在斗鱼直播间一键发送烂梗
             </b>
         </p>
         <p class="sub-info">开放注册功能，可能会出现收不到邮件的情况。</p>
-        <p class="sub-info">目前已支持 63136 冬瓜强直播间开播提醒。加入右侧 qq 交流群可获取开播 q 群@提示</p>
+        <!-- <p class="sub-info">目前已支持 63136 冬瓜强直播间开播提醒。加入右侧 qq 交流群可获取开播 q 群@提示</p> -->
         <p class="sub-info">右上角头像内新增签到、梗币、勋章、经验体系
             <RouterLink to="/checkin">每日签到</RouterLink>
         </p>
@@ -55,7 +55,7 @@ import { RouterLink } from 'vue-router';
 }
 .sub-info {
     font-size: 14px;
-    color: #555;
+    background-color: var(--card-bg);
     margin: 4px 0;
     a {
         color: #409eff;

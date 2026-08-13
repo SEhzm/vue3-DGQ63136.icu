@@ -17,7 +17,7 @@
                     <nav class="link-list" aria-label="友情链接">
                         <a href="https://www.douyu.com/63136" target="_blank" rel="noopener noreferrer">冬瓜强直播间</a>
                         <a href="https://sb6657.cn" target="_blank" rel="noopener noreferrer">sb6657.cn 玩机器站</a>
-                        <a href="https://cdn.hguofichp.cn/dgq63136.user.js" target="_blank" rel="noopener noreferrer">油猴插件</a>
+                        <a href="https://dgq63136.cn/dgq63136.user.js" target="_blank" rel="noopener noreferrer">油猴插件</a>
                     </nav>
                 </section>
             </div>
