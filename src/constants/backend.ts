@@ -94,8 +94,8 @@ export const API = {
     AI_CHAT_COMPLETION: '/dgq/douyuEx/completion',       // AI 流式对话
 
     // ===== 合成猪 (MergePig) =====
-    MERGE_PIG_LEADERBOARD: '/dgq/merge-pig/leaderboard', // 合成猪排行榜
-    MERGE_PIG_MY_RANK: '/dgq/merge-pig/rank/',           // 我的合成猪排名 (后接 siteToken)
+    MERGE_PIG_LEADERBOARD: '/machine/merge-pig/leaderboard', // 合成猪排行榜
+    MERGE_PIG_MY_RANK: '/machine/merge-pig/rank/',           // 我的合成猪排名 (后接 siteToken)
 
     // ===== 时光相册 =====
     SHOW_IMAGE: '/dgq/showImage',                        // 相册列表

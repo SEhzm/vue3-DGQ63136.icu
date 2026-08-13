@@ -1,0 +1,14 @@
+将 10 张正式 PNG 图片放在本目录，文件名必须为：
+level-1.png
+level-2.png
+level-3.png
+level-4.png
+level-5.png
+level-6.png
+level-7.png
+level-8.png
+level-9.png
+level-10.png
+
+建议使用正方形图片，主体居中。游戏会自动将图片居中裁剪为圆形。
+没有对应图片时，游戏会自动显示数字 1～10，不影响运行。

@@ -19,12 +19,12 @@ export interface MergePigRankInfo {
  * 后端返回统一包装 { code, data, msg }，data 是数组
  */
 export async function fetchMergePigLeaderboard(top = 100): Promise<MergePigLeaderboardItem[]> {
-    const res = await get<MergePigLeaderboardItem[]>(`/dgq/merge-pig/leaderboard?top=${top}`);
+    const res = await get<MergePigLeaderboardItem[]>(`/machine/merge-pig/leaderboard?top=${top}`);
     return res.flatData ?? [];
 }
 
 /** 拉取个人排名与最高分 */
 export async function fetchMergePigRank(siteToken: string): Promise<MergePigRankInfo> {
-    const res = await get<MergePigRankInfo>(`/dgq/merge-pig/rank/${encodeURIComponent(siteToken)}`);
+    const res = await get<MergePigRankInfo>(`/machine/merge-pig/rank/${encodeURIComponent(siteToken)}`);
     return res.flatData ?? { bestScore: 0, rank: -1 };
 }

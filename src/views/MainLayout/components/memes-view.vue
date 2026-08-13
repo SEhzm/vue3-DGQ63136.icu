@@ -393,7 +393,7 @@ const handleTouchEnd = (row: any) => {
             padding-top: 10px;
             padding-left: 10px;
             gap: 6px;
-            background-color: #fff;
+            background-color: var(--card-bg);
 
             .submit-tips {
                 font-size: small;

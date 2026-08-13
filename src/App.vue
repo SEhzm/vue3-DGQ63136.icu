@@ -16,12 +16,8 @@ import AnnouncementDialog from '@/components/AnnouncementDialog.vue';
 import MergePigLauncher from '@/components/MergePig/MergePigLauncher.vue';
 import MergePigDialog from '@/components/MergePig/MergePigDialog.vue';
 import { useThemeStore } from '@/stores/themeStore';
-import { onMounted } from 'vue';
 
 const theme = useThemeStore();
-onMounted(() => {
-    theme.init();
-});
 </script>
 
 <style scoped lang="scss">

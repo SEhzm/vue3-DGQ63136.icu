@@ -69,10 +69,8 @@ export default defineConfig({
     css: {
         preprocessorOptions: {
             scss: {
-                // 自动导入定制化样式文件进行样式覆盖
-                additionalData: `
-          @use "@/assets/css/index.scss" as *;
-        `,
+                // 避免 module loop: index.scss 内已通过 @forward/@use 加载 element-plus 主题变量，
+                // 不要在此处再 prepend @use "@/assets/css/index.scss"
             }
         }
     },

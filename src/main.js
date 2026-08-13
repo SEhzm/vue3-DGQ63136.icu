@@ -6,6 +6,7 @@ import ElementPlus from 'element-plus';
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs';
 import * as ElementPlusIconsVue from '@element-plus/icons-vue';
 
+import '@/assets/css/index.scss';
 import '@/assets/css/global.css';
 import '@/assets/css/dark.css';
 

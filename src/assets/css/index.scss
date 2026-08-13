@@ -5,3 +5,10 @@
     "danger": ("base": #F64848),
     "info": ("base": #6E77F2),
 ));
+
+// If you just import on demand, you can ignore the following content.
+// 如果你想导入所有样式:
+@use "element-plus/theme-chalk/src/index.scss" as *;
+
+// 暗黑模式 CSS 变量（通过 html.dark 选择器生效）
+@use "element-plus/theme-chalk/src/dark/css-vars.scss" as *;

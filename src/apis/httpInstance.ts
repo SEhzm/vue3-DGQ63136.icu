@@ -6,11 +6,11 @@ import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
 import { ref } from 'vue';
 
 const httpInstance = axios.create({
-    // baseURL: SERVER_ADDRESS,
-    baseURL: 'http://127.0.0.1:9999',
+    baseURL: SERVER_ADDRESS,
+    // baseURL: 'http://127.0.0.1:9999',
     timeout: 60000, // 默认超时时间
 });
-export const sbVersion = 'V0.1.4.20260812';
+export const sbVersion = 'V1.1.4.20260813';
 
 interface req<T> {
     url: string;
