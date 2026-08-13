@@ -6,7 +6,7 @@
 
 - 网站入口：https://dgq63136.cn/
 - 一键安装插件页：https://dgq63136.cn/#/Tampermonkey
-- 插件主下载地址：https://cdn.hguofichp.cn/dgq63136.user.js
+- 插件安装源（脚本头部 `@downloadURL` / `@updateURL` 指向）：https://dgq63136.cn/dgq63136.user.js
 - 安装提醒：有些浏览器即使装好 Tampermonkey，也要手动打开“允许用户脚本”，否则插件不会运行。
 
 ## 目录说明
@@ -15,7 +15,7 @@
 .
 ├── .github/workflows/        # GitHub Pages 自动部署
 ├── docs/                     # 项目说明、更新日志、油猴脚本文档
-├── public/                   # 静态资源
+├── public/                   # 静态资源（含油猴脚本 dgq63136.user.js 的单一真实源，构建后随 dist 一起部署）
 ├── src/                      # Vue3 前端源码
 ├── tools/                    # 安装页静态验证脚本
 ├── index.html
@@ -24,7 +24,7 @@
 └── vite.config.js
 ```
 
-插件交付物只使用 `.user.js` 文件，下载地址固定指向 `https://cdn.hguofichp.cn/dgq63136.user.js`；网站仓库不再保存插件源码 zip 或页面源码 zip。本地编辑器目录 `.idea/`、`node_modules/`、`dist/` 和临时 zip 不提交到仓库。
+插件交付物的单一真实源是 `public/dgq63136.user.js`，Vite 构建时会复制到 `dist/` 根目录，部署到 GitHub Pages 后即可通过 `https://dgq63136.cn/dgq63136.user.js` 直接下载。脚本头部 `@downloadURL` / `@updateURL` 与运行时更新检查的 `UPDATE_SOURCE_URL` / `UPDATE_SCRIPT_URL` 都已统一指向站内同源地址，油猴管理器会按 `@updateURL` 间隔去拉取最新脚本，运行时也会从同一个 URL 主动检查新版本。网站仓库不再保存插件源码 zip 或页面源码 zip。本地编辑器目录 `.idea/`、`node_modules/`、`dist/` 和临时 zip 不提交到仓库。
 
 ## 本地开发
 
@@ -44,7 +44,7 @@ npm run verify
 ## 当前插件页版本
 
 - 当前展示版本：`V0.2.0`
-- 更新时间：`2026-08-13 00:33`
+- 更新时间：`2026-08-13 09:46`
 - 更新历史署名规则：用户本人更新只写单独一行 `@呆物麋羊`，不要写成 `@呆物麋羊 更新`。
 - 安装教程：一键安装页已包含从浏览器扩展管理页进入 Tampermonkey 详细信息、开启“允许用户脚本 / Allow user scripts”和“在 InPrivate 中允许”两个开关、回到本页安装插件、安装后确认“厕纸”按钮的完整流程。
 
