@@ -1,10 +1,10 @@
 <template>
     <div>
-        <el-dialog draggable v-model="showDialog" class="dialog-main">
+        <el-dialog v-model="showDialog" draggable append-to-body width="min(96%, 1200px)">
             <template #header>
                 <slot></slot>
             </template>
-            <el-table :data="memeArr" stripe v-loading="loading" :empty-text="emptyText" cell-class-name="hover-pointer" @row-click="copyMeme_countPlus1">
+            <el-table v-loading="loading" :data="memeArr" stripe :empty-text="emptyText" cell-class-name="hover-pointer" @row-click="copyMeme_countPlus1">
                 <el-table-column align="center" width="60">
                     <template #default="scope">
                         <el-tag round effect="plain">{{ scope.$index + 1 }}</el-tag>
@@ -12,25 +12,35 @@
                 </el-table-column>
                 <el-table-column prop="content">
                     <template #default="scope">
-                            <el-popover placement="top" :width="'auto'" trigger="hover" :visible="scope.row.popoverVisible">
-                                <template #reference>
-                                    <div style="cursor: pointer;" @touchstart="handleTouchStart(scope.row)" @touchend="handleTouchEnd(scope.row)">
-                                        <span class="barrage-text">{{ scope.row.content }}</span>
-                                    </div>
-                                </template>
-                                <template #default>
-                                    <div style="display: flex; align-items: center; flex-wrap: wrap;">
-                                        <div v-for="(item, index) in getDictLabel(scope.row.tags)" :key="index" style="margin-right: 8px;">
-                                            <el-tag round effect="dark"
-                                                :style="{ fontSize: '16px', cursor: 'pointer' }">
-                                                <img v-if="item.iconUrl" :src="item.iconUrl" style=" width: 16px; height: 16px; object-fit: cover;vertical-align: middle;" />
-                                                <span style="vertical-align: middle;"> {{ item.label }}</span>
+                        <el-popover placement="top" :width="'auto'" trigger="hover" :visible="scope.row.popoverVisible">
+                            <template #reference>
+                                <div style="cursor: pointer" @touchstart="handleTouchStart(scope.row)" @touchend="handleTouchEnd(scope.row)">
+                                    <el-icon v-if="hasShieldWordInContent(scope.row.content)" style="color: #e6a23c; flex-shrink: 0;" size="large">
+                                        <WarningFilled />&nbsp;
+                                    </el-icon>
+                                    <span class="barrage-text">{{ scope.row.content }}</span>
+                                </div>
+                            </template>
+                            <template #default>
+                                <div class="meme-popover">
+                                    <div class="tags-container">
+                                        <div v-for="(item, index) in getDisplayTags(scope.row.tags, dictData)" :key="index" class="popover-tag">
+                                            <el-tag round effect="dark" class="tag-item">
+                                                <div class="tag-icon-wrapper">
+                                                    <img v-if="item.iconUrl" :src="item.iconUrl" class="tag-icon" />
+                                                    <span class="tag-label">{{ item.label }}</span>
+                                                </div>
                                             </el-tag>
                                         </div>
                                     </div>
-                                </template>
-                            </el-popover>
-                        </template>
+                                    <div class="meme-meta">
+                                        <span class="meta-id">#{{ scope.row.id }}</span>
+                                        <span v-if="scope.row.hotDateTime" class="meta-time">🔥{{ easyFormatTime(scope.row.hotDateTime) }}</span>
+                                    </div>
+                                </div>
+                            </template>
+                        </el-popover>
+                    </template>
                 </el-table-column>
                 <!-- <el-table-column align="center" width="40">
                     <template #default="scope">
@@ -39,7 +49,11 @@
                 </el-table-column> -->
                 <el-table-column align="center" width="100">
                     <template #default="scope">
-                        <el-button type="primary" class="copy-btn" @click.stop="copyMeme_countPlus1(scope.row)">复制 (<flip-num :num="scope.row.copyCount" />)</el-button>
+                        <el-button type="primary" class="copy-btn" @click.stop="copyMeme_countPlus1(scope.row)">
+                            复制 (
+                            <flip-num :num="scope.row.copyCount" />
+                            )
+                        </el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -48,12 +62,17 @@
 </template>
 
 <script setup lang="ts">
-import { throttle } from '@/utils/throttle';
-import { copyToClipboard, copySuccess, limitedCopy ,likeSuccess} from '@/utils/clipboard';
 import { copyCountPlus1, plus1Error } from '@/apis/setMeme';
 import flipNum from '@/components/flip-num.vue';
-import httpInstance from '@/apis/httpInstance';
-import { ref } from 'vue';
+import { useMemeTagsStore } from '@/stores/memeTags';
+import { copySuccess, copyToClipboard, limitedCopy } from '@/utils/clipboard';
+import { getDisplayTags } from '@/utils/tags';
+import { throttle } from '@/utils/throttle';
+import { easyFormatTime } from '@/utils/time';
+import { onMounted, ref } from 'vue';
+
+const memeTagsStore = useMemeTagsStore();
+
 
 /**
  * 组件输入:
@@ -61,11 +80,11 @@ import { ref } from 'vue';
  * 2.v-model，控制提示框的展示与否。注意这是个v-model，父组件要用v-model绑定。vue3.4新增的语法
  * 3.memeArr，烂梗数组
  * 4.loading，是否加载中
- * 5.emptyText，加载中或者搜索为空时候的提示词
+ * 5.emptyText，加载中或者为空时候的提示词
  * 6.refresh，刷新函数，其实就是获取此烂梗的函数，这里复制完调用一次，刷新+1结果
  */
-const showDialog = defineModel();
-const props = defineProps<{
+const showDialog = defineModel({ type: Boolean, default: false });
+defineProps<{
     memeArr: Meme[];
     loading: boolean;
     emptyText: string;
@@ -76,8 +95,6 @@ const emit = defineEmits<{
 
 // 2s节流。节流期间触发了就调第二个回调。表示2s内多次点击复制只取其中一次发请求给后台
 const copyMeme = throttle(copyToClipboard, limitedCopy, 2000);
-//like复用copy
-const likeMeme = throttle(copyToClipboard, limitedCopy, 2000);
 
 async function copyMeme_countPlus1(meme: Meme) {
     const memeText = meme.content;
@@ -99,36 +116,11 @@ async function copyMeme_countPlus1(meme: Meme) {
     plus1Error();
 }
 
-const dictData = ref([]);
+const dictData = ref<any>([]);
+memeTagsStore.tagsLoaded.then(() => {
+    dictData.value = memeTagsStore.tags;
+});
 
-const getDict = () => {
-    httpInstance.get('/dgq/dictList').then(res => {
-        if (res.code === 200) {
-            dictData.value = res.data;
-        }
-    }).catch(err => {
-        console.error('获取字典数据失败', err);
-    });
-};
-const getDictLabel = (tags: string | null | undefined): { label: string; iconUrl: string }[] => {
-    if (!tags || tags.trim() === '') {
-        return [];
-    }
-    const tagList = Array.from(new Set(tags.split(',').map(tag => tag.trim())));
-    if (!dictData.value) {
-        return tagList.map(() => ({ label: '', iconUrl: '' }));
-    }
-    const dictMap = new Map(
-        dictData.value.map(item => [String(item.dictValue).trim(), item])
-    );
-    const labels = tagList.map(tag => {
-        const dictItem = dictMap.get(tag);
-        return dictItem ? { label: dictItem.dictLabel, iconUrl: dictItem.iconUrl } : { label: '', iconUrl: '' };
-    });
-
-    return labels;
-};
-getDict()
 //移动端的触摸展示
 const handleTouchStart = (row: any) => {
     row.touchStartTime = Date.now();
@@ -136,21 +128,19 @@ const handleTouchStart = (row: any) => {
 
 const handleTouchEnd = (row: any) => {
     const touchEndTime = Date.now();
-    if (touchEndTime - row.touchStartTime > 100) { //100ms 长按时长
+    if (touchEndTime - row.touchStartTime > 100) {
+        //100ms 长按时长
         row.popoverVisible = true;
-        setTimeout(()=>{
-            row.popoverVisible=false
-        },1500)
+        setTimeout(() => {
+            row.popoverVisible = false;
+        }, 1500);
     }
 };
+
+// 屏蔽词相关 UI 已移除
 </script>
 
 <style scoped lang="scss">
-// 坑：element-plus表格类样式，在开启scoped的style里，要用deep才能生效
-:deep(.dialog-main) {
-    width: 95%;
-}
-
 :deep(.hover-pointer) {
     cursor: pointer;
 }
@@ -161,5 +151,77 @@ const handleTouchEnd = (row: any) => {
 
 .copy-btn {
     width: 90px;
+}
+
+.meme-popover {
+    min-width: 220px;
+    max-width: min(420px, 80vw);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    .tags-container {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+
+        .popover-tag {
+            display: flex;
+
+            .tag-item {
+                font-size: 16px;
+                cursor: pointer;
+
+                .tag-icon-wrapper {
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                }
+
+                .tag-icon {
+                    width: 16px;
+                    height: 16px;
+                    object-fit: cover;
+                    vertical-align: middle;
+                }
+
+                .tag-label {
+                    vertical-align: middle;
+                }
+            }
+        }
+    }
+
+    .meme-meta {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 4px 10px;
+        color: #909399;
+        font-size: 12px;
+        line-height: 1.5;
+
+        .meta-id {
+            color: #606266;
+            font-weight: 600;
+        }
+
+        .meta-time {
+            white-space: nowrap;
+        }
+    }
+
+    .shield-word-text {
+        display: inline-flex;
+        align-items: center;
+        color: #e6a23c;
+        font-size: 14px;
+
+        .shield-word-icon {
+            margin-right: 2px;
+            vertical-align: middle;
+        }
+    }
 }
 </style>

@@ -153,3 +153,23 @@ export async function getMemeList(category: string, pageIndex: number, pageSize:
         return false;
     }
 }
+
+export async function getRandomMeme() {
+    try {
+        const res: any = await httpInstance.get(API.GET_RAND_ONE_MEME);
+        if (res?.code === 200 && res.data) {
+            return {
+                id: res.data.barrageId ?? res.data.id ?? '',
+                barrage: res.data.barrage ?? '',
+                tags: res.data.tags ?? '',
+                likes: Number(res.data.likes) || 0,
+                cnt: Number(res.data.cnt) || 0,
+                submitTime: res.data.submitTime ?? '',
+            };
+        }
+        return false;
+    } catch (err: any) {
+        console.error('随机一条烂梗失败', err);
+        return false;
+    }
+}

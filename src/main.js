@@ -1,4 +1,5 @@
 import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 import App from './App.vue';
 import router from './router';
 import ElementPlus from 'element-plus';
@@ -6,12 +7,13 @@ import zhCn from 'element-plus/dist/locale/zh-cn.mjs';
 import * as ElementPlusIconsVue from '@element-plus/icons-vue';
 
 import '@/assets/css/global.css';
+import '@/assets/css/dark.css';
 
 const app = createApp(App);
-import audioPlay from './components/audioPlayer.vue';
-
+const pinia = createPinia();
 
 app.use(router);
+app.use(pinia);
 app.use(ElementPlus, {
     locale: zhCn,
 });
@@ -21,14 +23,13 @@ setInterval(() => {
     location.reload();
 }, 86400000);
 
-
 //生产环境去除console
 const VITE_NODE_ENV = import.meta.env.VITE_NODE_ENV;
 if (VITE_NODE_ENV !== 'development') {
-    console.log = function () {}
-    console.error = function(){}
-    console.dir = function(){}
-    console.warn = function(){}
+    console.log = function () {};
+    console.error = function () {};
+    console.dir = function () {};
+    console.warn = function () {};
 }
 app.mount('#app');
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
