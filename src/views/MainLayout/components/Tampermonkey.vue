@@ -95,8 +95,8 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.2.6';
-const currentPluginUpdatedAt = '2026-08-13 20:20';
+const currentPluginVersion = 'V0.2.7';
+const currentPluginUpdatedAt = '2026-08-13 20:55';
 const userscriptInstallUrl = '/dgq63136.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
 const greasyForkUrl =
@@ -166,6 +166,15 @@ const permissionChecks = [
 ];
 
 const updateHistory = [
+    {
+        version: 'V0.2.7',
+        updatedAt: '2026-08-13 20:55',
+        changes: [
+            '设置页只保留审核码输入，审核员备注改由房管弹幕管理器生成审核码时配置。',
+            'Greasy Fork 技术 @version 更新为 2026.08.13.08。',
+            '@呆物麋羊',
+        ],
+    },
     {
         version: 'V0.2.6',
         updatedAt: '2026-08-13 20:20',

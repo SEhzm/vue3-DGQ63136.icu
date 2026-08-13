@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.13.07
+// @version      2026.08.13.08
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -29,7 +29,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.6";
+    const DISPLAY_VERSION = "V0.2.7";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -84,10 +84,13 @@
         confirmBeforeSend: false,
         layoutMode: "standard",
         shortcutsEnabled: true,
-        reviewerToken: "",
-        reviewerName: ""
+        reviewerToken: ""
     };
     const CHANGELOG = {
+        "V0.2.7": [
+            "设置页只保留审核码输入，审核员备注改由房管弹幕管理器生成审核码时配置。",
+            "@呆物麋羊"
+        ],
         "V0.2.6": [
             "优化房管审核功能接入，提升审核上报稳定性。",
             "设置页保留审核码绑定入口，用户填写后即可使用“审”按钮。",
@@ -190,6 +193,7 @@
         "V0.0.1": ["新增一键投稿、本地收藏、更新提示和详情浮层投/复读按钮。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.13.08": "0.2.7",
         "2026.08.13.07": "0.2.6",
         "2026.08.13.06": "0.2.5",
         "2026.08.13.05": "0.2.4",
@@ -1497,18 +1501,19 @@
         settings.shortcutsEnabled = settings.shortcutsEnabled !== false;
         delete settings.reviewEndpoint;
         delete settings.reviewToken;
+        delete settings.reviewerName;
         settings.reviewerToken = String(settings.reviewerToken || "").trim();
-        settings.reviewerName = String(settings.reviewerName || "").trim();
         return settings;
     }
 
     function purgeLegacyReviewSecrets() {
         const stored = storageGet(SETTINGS_KEY, {});
         if (!stored || typeof stored !== "object") return;
-        if (!("reviewEndpoint" in stored) && !("reviewToken" in stored)) return;
+        if (!("reviewEndpoint" in stored) && !("reviewToken" in stored) && !("reviewerName" in stored)) return;
         const cleaned = { ...stored };
         delete cleaned.reviewEndpoint;
         delete cleaned.reviewToken;
+        delete cleaned.reviewerName;
         storageSet(SETTINGS_KEY, cleaned);
     }
 
@@ -1516,6 +1521,7 @@
         const nextSettings = { ...getSettings(), ...patch };
         delete nextSettings.reviewEndpoint;
         delete nextSettings.reviewToken;
+        delete nextSettings.reviewerName;
         nextSettings.reviewerToken = String(nextSettings.reviewerToken || "").trim();
         state.settings = nextSettings;
         storageSet(SETTINGS_KEY, state.settings);
@@ -1926,8 +1932,7 @@
         return {
             reviewEndpoint: REVIEW_REPORT_URL,
             reviewRouteCode: REVIEW_ROUTE_CODE,
-            reviewerToken: settings.reviewerToken,
-            reviewerName: settings.reviewerName
+            reviewerToken: settings.reviewerToken
         };
     }
 
@@ -2007,15 +2012,14 @@
             messageFingerprint: createMessageFingerprint(roomId, senderUid, messageText),
             messageTime: meta.messageTime || new Date().toISOString(),
             pageUrl: location.href,
-            reporterClientId: getOrCreateReviewClickerId(),
-            reporterName: normalizeBarrageText(meta.reviewerName || getSettings().reviewerName || "")
+            reporterClientId: getOrCreateReviewClickerId()
         };
     }
 
     async function reportBarrageReview(text, meta = {}) {
         const settings = getReviewSettingsOrWarn();
         if (!settings) return false;
-        const payload = buildReviewPayload(text, { ...meta, reviewerName: settings.reviewerName });
+        const payload = buildReviewPayload(text, meta);
         if (!payload.messageText) {
             showMsg("没有可审的弹幕", "warn");
             return false;
@@ -3110,8 +3114,7 @@
         reviewBox.className = "dgq-review-setting";
         reviewBox.innerHTML = `
             <label>审核码<input class="dgq-reviewer-token" type="password" autocomplete="new-password" inputmode="text" placeholder="填写房管管理器生成的审核员 token"></label>
-            <label>审核者备注<input class="dgq-review-name" type="text" autocomplete="off" inputmode="text" placeholder="可选，例如：小羊1号"></label>
-            <div class="dgq-review-setting-hint">房管审接口地址已内置隐藏，不需要填写。审核码由房管管理器生成，保存后不会在这里回显明文。</div>
+            <div class="dgq-review-setting-hint">审核码由房管管理器生成，备注姓名也在房管管理器里配置；这里不需要填写备注。</div>
             <div class="dgq-review-setting-hint dgq-review-token-status"></div>
             <div class="dgq-review-setting-actions">
                 <button class="dgq-save-reviewer-token" type="button">保存审核码</button>
@@ -3119,22 +3122,19 @@
             </div>
         `;
         const tokenInput = reviewBox.querySelector(".dgq-reviewer-token");
-        const nameInput = reviewBox.querySelector(".dgq-review-name");
         const tokenStatus = reviewBox.querySelector(".dgq-review-token-status");
         tokenStatus.textContent = settings.reviewerToken ? `已保存审核码：${maskSecret(settings.reviewerToken)}` : "未绑定审核码，点击“审”前需要先绑定。";
-        nameInput.value = settings.reviewerName;
         reviewBox.querySelector(".dgq-save-reviewer-token").addEventListener("click", () => {
             const reviewerToken = String(tokenInput.value || "").trim() || settings.reviewerToken;
-            const reviewerName = normalizeBarrageText(nameInput.value);
             if (!reviewerToken) {
                 showMsg("请填写审核码", "warn");
                 return;
             }
-            saveSettings({ reviewerToken, reviewerName });
+            saveSettings({ reviewerToken });
             showMsg("审核码已保存");
         });
         reviewBox.querySelector(".dgq-clear-reviewer-token").addEventListener("click", () => {
-            saveSettings({ reviewerToken: "", reviewerName: normalizeBarrageText(nameInput.value) });
+            saveSettings({ reviewerToken: "" });
             showMsg("审核码已清除");
         });
         panel.appendChild(reviewBox);
