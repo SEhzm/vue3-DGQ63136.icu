@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      0.2.1
-// @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏和版本更新提示
+// @version      2026.08.13.07
+// @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
 // @match        https://www.douyu.com
@@ -18,6 +18,7 @@
 // @grant        unsafeWindow
 // @connect      hguofichp.cn
 // @connect      update.greasyfork.org
+// @connect      ycfg.mygamemod.com
 // @icon         https://apic.douyucdn.cn/upload/avatar_v3/201808/e2b4d01edd7dd82f44efeb434a0d3a86_big.jpg
 // @license      MIT
 // @downloadURL https://dgq63136.cn/dgq63136.user.js
@@ -28,7 +29,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.1";
+    const DISPLAY_VERSION = "V0.2.6";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -44,10 +45,13 @@
     const UPDATE_SOURCE_URL = "https://dgq63136.cn/dgq63136.user.js";
     const UPDATE_SCRIPT_URL = "https://dgq63136.cn/dgq63136.user.js";
     const UPDATE_PAGE_URL = "https://dgq63136.cn/#/Tampermonkey";
+    const REVIEW_REPORT_URL = "https://ycfg.mygamemod.com/api/dgq63136/review/rvw_2c6a205ebff67878f318c01092f020fca98d2e1b5b337ee0";
+    const REVIEW_ROUTE_CODE = "rvw_2c6a205ebff67878f318c01092f020fca98d2e1b5b337ee0";
     const SITE_TOKEN_KEY = "DGQ63136_SITE_TOKEN_V1";
     const FAVORITES_KEY = "DGQ63136_FAVORITES_V1";
     const RECENTS_KEY = "DGQ63136_RECENTS_V1";
     const SETTINGS_KEY = "DGQ63136_SETTINGS_V1";
+    const REVIEW_CLICKER_ID_KEY = "DGQ63136_REVIEW_CLICKER_ID_V1";
     const UPDATE_CACHE_KEY = "DGQ63136_UPDATE_CACHE_V1";
     const DEFAULT_TAGS_KEY = "DGQ63136_DEFAULT_TAGS";
     const DEFAULT_TAGS_MIGRATION_KEY = "DGQ63136_DEFAULT_TAGS_MIGRATED_TO_01";
@@ -79,9 +83,31 @@
     const SETTINGS_DEFAULTS = {
         confirmBeforeSend: false,
         layoutMode: "standard",
-        shortcutsEnabled: true
+        shortcutsEnabled: true,
+        reviewerToken: "",
+        reviewerName: ""
     };
     const CHANGELOG = {
+        "V0.2.6": [
+            "优化房管审核功能接入，提升审核上报稳定性。",
+            "设置页保留审核码绑定入口，用户填写后即可使用“审”按钮。",
+            "@呆物麋羊"
+        ],
+        "V0.2.5": [
+            "设置页新增审核码绑定入口。",
+            "优化审核来源识别，方便房管管理器区分不同审核员。",
+            "@呆物麋羊"
+        ],
+        "V0.2.4": [
+            "新增房管弹幕管理器审核功能接入准备。",
+            "优化审核上报流程，等待房管管理器接入后即可使用。",
+            "@呆物麋羊"
+        ],
+        "V0.2.3": [
+            "优化审核功能设置项，减少用户填写步骤。",
+            "清理旧版审核设置兼容逻辑。",
+            "@呆物麋羊"
+        ],
         "V0.2.1": [
             "修复更新检测弹窗把油猴技术版本显示成 V2026 日期版本的问题。",
             "切换cdn源"
@@ -164,6 +190,11 @@
         "V0.0.1": ["新增一键投稿、本地收藏、更新提示和详情浮层投/复读按钮。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.13.07": "0.2.6",
+        "2026.08.13.06": "0.2.5",
+        "2026.08.13.05": "0.2.4",
+        "2026.08.13.04": "0.2.3",
+        "2026.08.13.03": "0.2.2",
         "2026.08.13.02": "0.2.1",
         "2026.08.13.01": "0.2.0",
         "2026.08.12.13": "0.1.9",
@@ -883,6 +914,9 @@
         .dgq-favorite {
             background: #8e44ad;
         }
+        .dgq-review {
+            background: #0f766e;
+        }
         .dgq-remove {
             background: #d9534f;
         }
@@ -1045,8 +1079,62 @@
         .dgq-barrage-action-plus {
             background: #ff5722;
         }
+        .dgq-barrage-action-review {
+            background: #0f766e;
+        }
         .dgq-barrage-action-favorite {
             background: #8e44ad;
+        }
+        .dgq-panel-tip-review {
+            cursor: pointer !important;
+            font-weight: 700 !important;
+            min-width: 18px !important;
+            padding-left: 3px !important;
+            padding-right: 3px !important;
+        }
+        .dgq-panel-tip-review:hover {
+            color: #ffdd57 !important;
+        }
+        .dgq-review-setting {
+            display: grid;
+            gap: 7px;
+            padding: 8px;
+            border: 1px solid #d8eee9;
+            border-radius: 6px;
+            background: #f7fffd;
+        }
+        .dgq-review-setting label {
+            display: grid;
+            gap: 4px;
+            color: #24445c;
+            font-size: 12px;
+        }
+        .dgq-review-setting input {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #c8d8d4;
+            border-radius: 4px;
+            padding: 5px 6px;
+            color: #111;
+            background: #fff;
+        }
+        .dgq-review-setting-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+        }
+        .dgq-review-setting-actions button {
+            border: 0;
+            border-radius: 4px;
+            padding: 5px 9px;
+            color: #fff;
+            background: #0f766e;
+            cursor: pointer;
+        }
+        .dgq-review-setting-hint {
+            color: #607d8b;
+            font-size: 12px;
+            line-height: 1.45;
         }
         .dgq-submit-dialog-mask {
             position: fixed;
@@ -1237,6 +1325,15 @@
         return token;
     }
 
+    function getOrCreateReviewClickerId() {
+        let id = storageGet(REVIEW_CLICKER_ID_KEY, "");
+        if (typeof id !== "string" || id.length < 12) {
+            id = `dgq-${Date.now().toString(36)}-${randomString(12)}`;
+            storageSet(REVIEW_CLICKER_ID_KEY, id);
+        }
+        return id;
+    }
+
     function parseJsonSafe(text, fallback = null) {
         if (typeof text !== "string") return fallback;
         try {
@@ -1276,6 +1373,36 @@
                         return;
                     }
                     reject(new Error(`HTTP ${response.status}: ${payload?.msg || response.responseText || "请求失败"}`));
+                },
+                onerror(error) {
+                    reject(error);
+                },
+                ontimeout() {
+                    reject(new Error("请求超时"));
+                }
+            });
+        });
+    }
+
+    function externalJsonRequest(method, url, body, headers = {}) {
+        return new Promise((resolve, reject) => {
+            GM_xmlhttpRequest({
+                method,
+                url,
+                headers: {
+                    "Content-Type": "application/json",
+                    ...headers
+                },
+                data: body === undefined ? undefined : JSON.stringify(body),
+                responseType: "json",
+                timeout: 12000,
+                onload(response) {
+                    const payload = response.response || parseJsonSafe(response.responseText, {});
+                    if (response.status >= 200 && response.status < 300) {
+                        resolve(payload);
+                        return;
+                    }
+                    reject(new Error(`HTTP ${response.status}: ${payload?.message || payload?.msg || response.responseText || "请求失败"}`));
                 },
                 onerror(error) {
                     reject(error);
@@ -1368,11 +1495,29 @@
         if (!["standard", "compact"].includes(settings.layoutMode)) settings.layoutMode = SETTINGS_DEFAULTS.layoutMode;
         settings.confirmBeforeSend = Boolean(settings.confirmBeforeSend);
         settings.shortcutsEnabled = settings.shortcutsEnabled !== false;
+        delete settings.reviewEndpoint;
+        delete settings.reviewToken;
+        settings.reviewerToken = String(settings.reviewerToken || "").trim();
+        settings.reviewerName = String(settings.reviewerName || "").trim();
         return settings;
     }
 
+    function purgeLegacyReviewSecrets() {
+        const stored = storageGet(SETTINGS_KEY, {});
+        if (!stored || typeof stored !== "object") return;
+        if (!("reviewEndpoint" in stored) && !("reviewToken" in stored)) return;
+        const cleaned = { ...stored };
+        delete cleaned.reviewEndpoint;
+        delete cleaned.reviewToken;
+        storageSet(SETTINGS_KEY, cleaned);
+    }
+
     function saveSettings(patch = {}) {
-        state.settings = { ...getSettings(), ...patch };
+        const nextSettings = { ...getSettings(), ...patch };
+        delete nextSettings.reviewEndpoint;
+        delete nextSettings.reviewToken;
+        nextSettings.reviewerToken = String(nextSettings.reviewerToken || "").trim();
+        state.settings = nextSettings;
         storageSet(SETTINGS_KEY, state.settings);
         applyLayoutMode();
         renderModeTabs();
@@ -1753,6 +1898,147 @@
             return true;
         } catch (error) {
             console.warn("[dgq63136] 使用次数上报失败", error);
+            return false;
+        }
+    }
+
+    function isReviewEnabled() {
+        return Boolean(REVIEW_REPORT_URL && REVIEW_ROUTE_CODE);
+    }
+
+    function maskSecret(value) {
+        const text = String(value || "").trim();
+        if (!text) return "";
+        if (text.length <= 8) return `${text.slice(0, 2)}****${text.slice(-2)}`;
+        return `${text.slice(0, 4)}****${text.slice(-4)}`;
+    }
+
+    function getReviewSettingsOrWarn() {
+        const settings = getSettings();
+        if (!REVIEW_REPORT_URL || !REVIEW_ROUTE_CODE) {
+            showMsg("审功能正在等待房管弹幕管理器接入", "warn");
+            return null;
+        }
+        if (!settings.reviewerToken) {
+            showMsg("请先在插件设置里绑定审核码", "warn");
+            return null;
+        }
+        return {
+            reviewEndpoint: REVIEW_REPORT_URL,
+            reviewRouteCode: REVIEW_ROUTE_CODE,
+            reviewerToken: settings.reviewerToken,
+            reviewerName: settings.reviewerName
+        };
+    }
+
+    function getAttributeByPatterns(element, patterns) {
+        if (!element) return "";
+        const queue = [element, ...Array.from(element.querySelectorAll("[data-uid], [data-user-id], [data-userid], [data-userid64], [data-rid], [uid], [userid]"))];
+        for (const node of queue) {
+            for (const attr of Array.from(node.attributes || [])) {
+                const name = attr.name.toLowerCase();
+                const value = String(attr.value || "").trim();
+                if (!value) continue;
+                if (patterns.some(pattern => pattern.test(name))) return value;
+            }
+        }
+        return "";
+    }
+
+    function extractUidFromText(text) {
+        const clean = String(text || "");
+        const match = clean.match(/\b(?:uid|userId|user_id)[:=：]\s*(\d{3,})\b/i);
+        return match ? match[1] : "";
+    }
+
+    function getBarrageSenderUid(root) {
+        const attrValue = getAttributeByPatterns(root, [/^data-.*uid$/, /^data-.*user.*id$/, /^uid$/, /^userid$/]);
+        const attrMatch = String(attrValue || "").match(/\d{3,}/);
+        if (attrMatch) return attrMatch[0];
+        const link = root?.querySelector?.("a[href*='uid='], a[href*='/user/'], a[href*='/u/'], a[href*='user_id=']");
+        const linkMatch = String(link?.href || link?.getAttribute?.("href") || "").match(/(?:uid|user_id)=?(\d{3,})|\/(?:user|u)\/(\d{3,})/i);
+        if (linkMatch) return linkMatch[1] || linkMatch[2] || "";
+        const textUid = extractUidFromText(root?.textContent || "");
+        return textUid || "";
+    }
+
+    function getBarrageSenderName(root) {
+        if (!root) return "";
+        const selectors = [
+            "[class*='nick']",
+            "[class*='Nick']",
+            "[class*='name']",
+            "[class*='Name']",
+            "[class*='author']",
+            "[class*='Author']",
+            ".danmuAuthor-3d7b4a",
+            "[class*='danmuAuthor']"
+        ];
+        for (const selector of selectors) {
+            const name = normalizeBarrageText(root.querySelector(selector)?.textContent || "");
+            if (name && !isNonChatBarrageText(name)) return name.replace(/[：:]\s*$/, "");
+        }
+        const fullText = getTextWithoutBarrageActions(root);
+        const match = fullText.match(/^([^：:]{1,30})[：:]\s*.+$/);
+        return match ? normalizeBarrageText(match[1]) : "";
+    }
+
+    function createMessageFingerprint(roomId, uid, text) {
+        const input = `${roomId}|${uid}|${normalizeBarrageText(text)}`;
+        let hash = 0;
+        for (let index = 0; index < input.length; index += 1) {
+            hash = ((hash << 5) - hash + input.charCodeAt(index)) | 0;
+        }
+        return Math.abs(hash).toString(36);
+    }
+
+    function buildReviewPayload(text, meta = {}) {
+        const roomId = String(meta.roomId || getRoomId() || "").trim();
+        const senderUid = String(meta.senderUid || "").trim();
+        const messageText = normalizeBarrageText(text);
+        return {
+            source: "dgq63136-userscript",
+            version: DISPLAY_VERSION,
+            technicalVersion: CURRENT_VERSION,
+            roomId,
+            senderUid,
+            senderName: normalizeBarrageText(meta.senderName || ""),
+            messageText,
+            messageFingerprint: createMessageFingerprint(roomId, senderUid, messageText),
+            messageTime: meta.messageTime || new Date().toISOString(),
+            pageUrl: location.href,
+            reporterClientId: getOrCreateReviewClickerId(),
+            reporterName: normalizeBarrageText(meta.reviewerName || getSettings().reviewerName || "")
+        };
+    }
+
+    async function reportBarrageReview(text, meta = {}) {
+        const settings = getReviewSettingsOrWarn();
+        if (!settings) return false;
+        const payload = buildReviewPayload(text, { ...meta, reviewerName: settings.reviewerName });
+        if (!payload.messageText) {
+            showMsg("没有可审的弹幕", "warn");
+            return false;
+        }
+        if (!payload.senderUid) {
+            showMsg("没有识别到这条弹幕的 UID，不能提交审", "warn");
+            return false;
+        }
+        if (!payload.roomId) {
+            showMsg("没有识别到当前直播间号，不能提交审", "warn");
+            return false;
+        }
+        try {
+            const response = await externalJsonRequest("POST", settings.reviewEndpoint, payload, {
+                "X-DGQ-Review-Code": settings.reviewRouteCode,
+                "X-DGQ-Reviewer-Token": settings.reviewerToken
+            });
+            const message = response?.message || response?.msg || "已提交到房管待审";
+            showMsg(message);
+            return true;
+        } catch (error) {
+            console.warn("[dgq63136] 审上报失败", error);
+            showMsg("审提交失败，请稍后再试", "error");
             return false;
         }
     }
@@ -2820,6 +3106,39 @@
         }
         panel.appendChild(layoutRow);
 
+        const reviewBox = document.createElement("div");
+        reviewBox.className = "dgq-review-setting";
+        reviewBox.innerHTML = `
+            <label>审核码<input class="dgq-reviewer-token" type="password" autocomplete="new-password" inputmode="text" placeholder="填写房管管理器生成的审核员 token"></label>
+            <label>审核者备注<input class="dgq-review-name" type="text" autocomplete="off" inputmode="text" placeholder="可选，例如：小羊1号"></label>
+            <div class="dgq-review-setting-hint">房管审接口地址已内置隐藏，不需要填写。审核码由房管管理器生成，保存后不会在这里回显明文。</div>
+            <div class="dgq-review-setting-hint dgq-review-token-status"></div>
+            <div class="dgq-review-setting-actions">
+                <button class="dgq-save-reviewer-token" type="button">保存审核码</button>
+                <button class="dgq-clear-reviewer-token" type="button">清除审核码</button>
+            </div>
+        `;
+        const tokenInput = reviewBox.querySelector(".dgq-reviewer-token");
+        const nameInput = reviewBox.querySelector(".dgq-review-name");
+        const tokenStatus = reviewBox.querySelector(".dgq-review-token-status");
+        tokenStatus.textContent = settings.reviewerToken ? `已保存审核码：${maskSecret(settings.reviewerToken)}` : "未绑定审核码，点击“审”前需要先绑定。";
+        nameInput.value = settings.reviewerName;
+        reviewBox.querySelector(".dgq-save-reviewer-token").addEventListener("click", () => {
+            const reviewerToken = String(tokenInput.value || "").trim() || settings.reviewerToken;
+            const reviewerName = normalizeBarrageText(nameInput.value);
+            if (!reviewerToken) {
+                showMsg("请填写审核码", "warn");
+                return;
+            }
+            saveSettings({ reviewerToken, reviewerName });
+            showMsg("审核码已保存");
+        });
+        reviewBox.querySelector(".dgq-clear-reviewer-token").addEventListener("click", () => {
+            saveSettings({ reviewerToken: "", reviewerName: normalizeBarrageText(nameInput.value) });
+            showMsg("审核码已清除");
+        });
+        panel.appendChild(reviewBox);
+
         const help = document.createElement("div");
         help.className = "dgq-shortcut-help";
         help.textContent = "快捷键：Alt+C 打开/关闭，Alt+S 聚焦搜索，Alt+Enter 发送第一条，Alt+←/→ 翻页，Alt+R 随机，Esc 关闭弹窗。";
@@ -3395,6 +3714,29 @@
         });
         actions.appendChild(plusButton);
 
+        if (isReviewEnabled()) {
+            const reviewButton = document.createElement("button");
+            reviewButton.className = "dgq-barrage-action-btn dgq-barrage-action-review";
+            reviewButton.type = "button";
+            reviewButton.textContent = "审";
+            reviewButton.title = "提交到房管弹幕管理器待审";
+            reviewButton.addEventListener("click", async event => {
+                event.preventDefault();
+                event.stopPropagation();
+                reviewButton.disabled = true;
+                reviewButton.textContent = "审...";
+                const ok = await reportBarrageReview(getBarrageTextFromItem(item) || text, {
+                    source: "barrage-list-review",
+                    roomId: getRoomId(),
+                    senderUid: getBarrageSenderUid(item),
+                    senderName: getBarrageSenderName(item)
+                });
+                reviewButton.textContent = ok ? "已审" : "审";
+                if (!ok) reviewButton.disabled = false;
+            });
+            actions.appendChild(reviewButton);
+        }
+
         appendBarrageActions(item, actions);
     }
 
@@ -3511,6 +3853,38 @@
         const { parent, douyuExPlusButton } = getBarrageTipButtonParent();
         if (!parent) return;
         const plusButton = ensurePanelPlusOneButton(parent, douyuExPlusButton, text);
+
+        if (isReviewEnabled()) {
+            let reviewButton = parent.querySelector("#dgq-panel-review");
+            if (!reviewButton) {
+                reviewButton = document.createElement("div");
+                reviewButton.id = "dgq-panel-review";
+                parent.insertBefore(reviewButton, plusButton || null);
+            } else if (plusButton && reviewButton.nextSibling !== plusButton) {
+                parent.insertBefore(reviewButton, plusButton);
+            }
+            const reviewBaseClass = (plusButton?.className || "labelfisrt-407af4 thirdBtn-06cde5 fourBtn-0845d4")
+                .replace(/\bdgq-panel-plus-one\b/g, "")
+                .trim();
+            setClassNameIfChanged(reviewButton, `${reviewBaseClass} dgq-panel-tip-review`);
+            setTextIfChanged(reviewButton, "审");
+            setAttributeIfChanged(reviewButton, "title", "提交到房管弹幕管理器待审");
+            reviewButton.onclick = async event => {
+                event.preventDefault();
+                event.stopPropagation();
+                setTextIfChanged(reviewButton, "审...");
+                const panel = parent.closest(".danmudiv-32f498, [class*='danmudiv'], #comment-higher-container, .danmuTips-1ee820") || parent;
+                const ok = await reportBarrageReview(getBarrageTipText() || text, {
+                    source: "panel-tip-review",
+                    roomId: getRoomId(),
+                    senderUid: getBarrageSenderUid(panel),
+                    senderName: getBarrageSenderName(panel)
+                });
+                setTextIfChanged(reviewButton, ok ? "已审" : "审");
+            };
+        } else {
+            parent.querySelector("#dgq-panel-review")?.remove();
+        }
 
         let button = parent.querySelector("#dgq-panel-submit");
         if (!button) {
@@ -3754,6 +4128,7 @@
         });
     }
 
+    purgeLegacyReviewSecrets();
     initMenuCommands();
     initKeyboardShortcuts();
     runWhenIdle(initBarrageActions, 5000);

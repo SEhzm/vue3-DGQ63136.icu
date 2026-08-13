@@ -6,6 +6,7 @@ const root = resolve(import.meta.dirname, "..");
 const constants = readFileSync(resolve(root, "src/constants/backend.ts"), "utf8");
 const page = readFileSync(resolve(root, "src/views/MainLayout/components/Tampermonkey.vue"), "utf8");
 const home = readFileSync(resolve(root, "src/views/MainLayout/components/Home.vue"), "utf8");
+const publicUserscript = readFileSync(resolve(root, "public/dgq63136.user.js"), "utf8");
 
 const installLink = "/dgq63136.user.js";
 const greasyForkUrl =
@@ -22,8 +23,8 @@ const displayedVersions = [
 ].map((match) => match[1]);
 assert.deepEqual(
   displayedVersions,
-  ["V0.2.0", "V0.2.0", "V0.1.9", "V0.1.8", "V0.1.7", "V0.1.6", "V0.1.5", "V0.1.4", "V0.1.3", "V0.1.2", "V0.1.1", "V0.1.0", "V0.0.9", "V0.0.8", "V0.0.7", "V0.0.6", "V0.0.5", "V0.0.4", "V0.0.3", "V0.0.2", "V0.0.1"],
-  "plugin versions should advance from V0.0.9 to V0.1.0 and continue to V0.2.0",
+  ["V0.2.6", "V0.2.6", "V0.2.5", "V0.2.4", "V0.2.3", "V0.2.1", "V0.2.0", "V0.1.9", "V0.1.8", "V0.1.7", "V0.1.6", "V0.1.5", "V0.1.4", "V0.1.3", "V0.1.2", "V0.1.1", "V0.1.0", "V0.0.9", "V0.0.8", "V0.0.7", "V0.0.6", "V0.0.5", "V0.0.4", "V0.0.3", "V0.0.2", "V0.0.1"],
+  "plugin versions should advance from V0.0.9 to V0.1.0 and continue to V0.2.6",
 );
 assert.ok(!displayedVersions.includes("V0.0.10"), "V0.0.9 should advance to V0.1.0, not V0.0.10");
 for (const version of displayedVersions) {
@@ -54,7 +55,7 @@ assert.ok(page.includes("updateHistory"), "page should render plugin update hist
 assert.ok(page.includes("更新历史"), "page should title the update history section");
 assert.ok(page.includes("版本号：") && page.includes("更新时间："), "history should label version and update time");
 assert.ok(page.includes("version") && page.includes("updatedAt") && page.includes("changes"), "history items should include update time, version and changes fields");
-assert.match(page, /2026-08-13 00:33/, "latest update time should show year-month-day hour:minute");
+assert.match(page, /2026-08-13 20:20/, "latest update time should show year-month-day hour:minute");
 assert.match(page, /updatedAt: '\d{4}-\d{2}-\d{2} \d{2}:\d{2}'/, "history update time should use YYYY-MM-DD HH:mm");
 assert.ok(page.includes("弹幕一键投稿") && page.includes("本地收藏"), "history should include latest feature changes");
 assert.ok(page.includes("右侧元素被裁切"), "latest history should mention the floating panel clipping fix");
@@ -71,6 +72,12 @@ assert.ok(page.includes("播放器底部控制栏按钮可能点击无反应"), 
 assert.ok(page.includes("非阻塞小窗口"), "latest history should mention non-blocking update dialog");
 assert.ok(page.includes("油猴技术版本显示成 V2026 日期版本"), "latest history should mention visible update version fix");
 assert.ok(page.includes("Greasy Fork 技术 @version 更新为 2026.08.13.01。"), "latest history should mention technical version");
+assert.ok(page.includes("优化房管审核功能接入"), "latest history should mention the review feature without exposing internal endpoint details");
+assert.ok(!page.includes("ycfg.mygamemod.com"), "install page history should not expose the internal review report domain");
+assert.ok(publicUserscript.includes("// @version      2026.08.13.07"), "public userscript should use current technical version");
+assert.ok(publicUserscript.includes('DISPLAY_VERSION = "V0.2.6"'), "public userscript should use current display version");
+assert.ok(publicUserscript.includes("ycfg.mygamemod.com"), "public userscript should point review reports to the current remote admin domain");
+assert.ok(publicUserscript.includes("rvw_2c6a205ebff67878f318c01092f020fca98d2e1b5b337ee0"), "public userscript should include the current fixed route code");
 assert.ok(!page.includes("每帧最多处理 80 条弹幕"), "install page should not mention a fixed 80-item frame limit");
 assert.ok(page.includes("@呆物麋羊"), "user-authored update history should include @呆物麋羊 signature");
 assert.ok(!page.includes("@呆物麋羊 更新"), "signature should not include update wording");

@@ -95,8 +95,8 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.2.1';
-const currentPluginUpdatedAt = '2026-08-13 09:46';
+const currentPluginVersion = 'V0.2.6';
+const currentPluginUpdatedAt = '2026-08-13 20:20';
 const userscriptInstallUrl = '/dgq63136.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
 const greasyForkUrl =
@@ -166,6 +166,43 @@ const permissionChecks = [
 ];
 
 const updateHistory = [
+    {
+        version: 'V0.2.6',
+        updatedAt: '2026-08-13 20:20',
+        changes: [
+            '优化房管审核功能接入，提升审核上报稳定性。',
+            '设置页保留审核码绑定入口，用户填写后即可使用“审”按钮。',
+            '优化审核来源识别，方便房管管理器区分不同审核员。',
+            'Greasy Fork 技术 @version 更新为 2026.08.13.07。',
+            '@呆物麋羊',
+        ],
+    },
+    {
+        version: 'V0.2.5',
+        updatedAt: '2026-08-13 19:05',
+        changes: [
+            '设置页新增审核码绑定入口。',
+            '审核码保存后支持清除，使用流程更清晰。',
+            '@呆物麋羊',
+        ],
+    },
+    {
+        version: 'V0.2.4',
+        updatedAt: '2026-08-13 18:50',
+        changes: [
+            '新增房管弹幕管理器审核功能接入准备。',
+            '@呆物麋羊',
+        ],
+    },
+    {
+        version: 'V0.2.3',
+        updatedAt: '2026-08-13 18:30',
+        changes: [
+            '优化审核功能设置项，减少用户填写步骤。',
+            '清理旧版审核设置兼容逻辑。',
+            '@呆物麋羊',
+        ],
+    },
     {
         version: 'V0.2.1',
         updatedAt: '2026-08-13 09:46',
