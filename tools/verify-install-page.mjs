@@ -7,8 +7,7 @@ const constants = readFileSync(resolve(root, "src/constants/backend.ts"), "utf8"
 const page = readFileSync(resolve(root, "src/views/MainLayout/components/Tampermonkey.vue"), "utf8");
 const home = readFileSync(resolve(root, "src/views/MainLayout/components/Home.vue"), "utf8");
 
-const scriptUrl =
-  "https://cdn.hguofichp.cn/dgq63136.user.js";
+const installLink = "/dgq63136.user.js";
 const greasyForkUrl =
   "https://greasyfork.org/zh-CN/scripts/511991-dgq63136-cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86";
 const staleInstallHosts = ["web-static-res-edge-speedtest-b1-hk.dahi.edu.eu.org"];
@@ -35,7 +34,7 @@ assert.doesNotMatch(
   /\b(?:currentPluginVersion\s*=\s*|version:\s*)'v(?:\d{2,4}\.)/i,
   "displayed plugin versions should not use date-style version strings",
 );
-assert.ok(page.includes(scriptUrl), "page should link to current userscript install URL");
+assert.ok(page.includes(installLink), "page should link to packaged userscript install path");
 assert.ok(page.includes(greasyForkUrl), "page should keep Greasy Fork as backup install page");
 assert.ok(page.includes("一键安装插件"), "page should have a primary install button");
 assert.ok(page.includes("安装油猴管理器"), "page should have Tampermonkey install entry");
@@ -75,7 +74,7 @@ assert.ok(page.includes("Greasy Fork 技术 @version 更新为 2026.08.13.01。"
 assert.ok(!page.includes("每帧最多处理 80 条弹幕"), "install page should not mention a fixed 80-item frame limit");
 assert.ok(page.includes("@呆物麋羊"), "user-authored update history should include @呆物麋羊 signature");
 assert.ok(!page.includes("@呆物麋羊 更新"), "signature should not include update wording");
-assert.ok(home.includes(scriptUrl), "home install links should use current userscript install URL");
+assert.ok(home.includes(installLink), "home install links should use packaged userscript install path");
 for (const staleHost of staleInstallHosts) {
   assert.ok(!page.includes(staleHost), `page should not include stale install host: ${staleHost}`);
   assert.ok(!home.includes(staleHost), `home should not include stale install host: ${staleHost}`);
