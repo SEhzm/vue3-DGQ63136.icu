@@ -378,17 +378,13 @@ const updateHistory = [
     gap: 14px;
 }
 
-:global(.chat-room-draggable),
-:global(.aplayer),
-:global(.version) {
-    display: none !important;
-}
+
 
 .install-hero {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 18px;
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
+    gap: 18px;
 }
 
 .permission-tip {
