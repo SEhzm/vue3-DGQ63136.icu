@@ -95,8 +95,8 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.2.7';
-const currentPluginUpdatedAt = '2026-08-13 20:55';
+const currentPluginVersion = 'V0.2.8';
+const currentPluginUpdatedAt = '2026-08-14 15:57';
 const userscriptInstallUrl = '/dgq63136.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
 const greasyForkUrl =
@@ -166,6 +166,15 @@ const permissionChecks = [
 ];
 
 const updateHistory = [
+    {
+        version: 'V0.2.8',
+        updatedAt: '2026-08-14 15:57',
+        changes: [
+            '审上报失败时显示房管管理器返回的具体拒收原因，方便定位审核码不存在、房间不在白名单或 UID 缺失。',
+            'Greasy Fork 技术 @version 更新为 2026.08.14.01。',
+            '@呆物麋羊',
+        ],
+    },
     {
         version: 'V0.2.7',
         updatedAt: '2026-08-13 20:55',

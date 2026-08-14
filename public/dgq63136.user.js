@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.13.08
+// @version      2026.08.14.01
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -29,7 +29,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.7";
+    const DISPLAY_VERSION = "V0.2.8";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -87,6 +87,10 @@
         reviewerToken: ""
     };
     const CHANGELOG = {
+        "V0.2.8": [
+            "审上报失败时显示房管管理器返回的具体原因，方便定位审核码不存在、房间不在白名单或 UID 缺失。",
+            "@呆物麋羊"
+        ],
         "V0.2.7": [
             "设置页只保留审核码输入，审核员备注改由房管弹幕管理器生成审核码时配置。",
             "@呆物麋羊"
@@ -193,6 +197,7 @@
         "V0.0.1": ["新增一键投稿、本地收藏、更新提示和详情浮层投/复读按钮。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.14.01": "0.2.8",
         "2026.08.13.08": "0.2.7",
         "2026.08.13.07": "0.2.6",
         "2026.08.13.06": "0.2.5",
@@ -1406,7 +1411,11 @@
                         resolve(payload);
                         return;
                     }
-                    reject(new Error(`HTTP ${response.status}: ${payload?.message || payload?.msg || response.responseText || "请求失败"}`));
+                    const message = payload?.reason || payload?.message || payload?.msg || response.responseText || "请求失败";
+                    const error = new Error(`HTTP ${response.status}: ${message}`);
+                    error.status = response.status;
+                    error.payload = payload;
+                    reject(error);
                 },
                 onerror(error) {
                     reject(error);
@@ -2042,7 +2051,8 @@
             return true;
         } catch (error) {
             console.warn("[dgq63136] 审上报失败", error);
-            showMsg("审提交失败，请稍后再试", "error");
+            const reason = error?.payload?.reason || error?.payload?.message || error?.payload?.msg || error?.message || "请稍后再试";
+            showMsg(`审提交失败：${String(reason).replace(/^HTTP\\s+\\d+\\s*:\\s*/i, "").slice(0, 80)}`, "error");
             return false;
         }
     }
