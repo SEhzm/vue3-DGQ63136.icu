@@ -95,9 +95,9 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.2.15';
-const currentPluginUpdatedAt = '2026-08-15 17:28';
-const userscriptInstallUrl = '/dgq63136.user.js?v=202608150728';
+const currentPluginVersion = 'V0.2.16';
+const currentPluginUpdatedAt = '2026-08-15 21:29';
+const userscriptInstallUrl = '/dgq63136.user.js?v=202608152129';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
 const greasyForkUrl =
     'https://greasyfork.org/zh-CN/scripts/511991-dgq63136-cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86';
@@ -166,6 +166,14 @@ const permissionChecks = [
 ];
 
 const updateHistory = [
+    {
+        version: 'V0.2.16',
+        updatedAt: '2026-08-15 21:29',
+        changes: [
+            '优化弹幕操作入口的稳定性。',
+            '@呆物麋羊',
+        ],
+    },
     {
         version: 'V0.2.15',
         updatedAt: '2026-08-15 17:28',

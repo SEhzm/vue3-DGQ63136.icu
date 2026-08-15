@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.15.07
+// @version      2026.08.15.08
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -29,7 +29,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.15";
+    const DISPLAY_VERSION = "V0.2.16";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -64,7 +64,7 @@
     const BARRAGE_ITEM_SELECTOR = ".Barrage-listItem, [class*='Barrage-listItem']";
     const BARRAGE_LIST_ROOT_SELECTOR = "#js-barrage-list, .Barrage-list, [class*='Barrage-list']";
     const BARRAGE_PANEL_ROOT_SELECTOR = "#comment-dzjy-container, #comment-higher-container, .danmuTips-1ee820";
-    const PANEL_ACTION_SELECTOR = "#dgq-panel-submit, #dgq-panel-review, #dgq-panel-plus-one";
+    const PANEL_ACTION_SELECTOR = "#dgq-panel-submit, #dgq-panel-plus-one";
     const EXTERNAL_PLUGIN_ROOT_SELECTOR = "#xy-gift-recorder, [id^='xy-'], [class^='xy-'], [class*=' xy-']";
     const CATEGORY_SORT_OPTIONS = [
         { label: "最新", value: "latest" },
@@ -88,6 +88,10 @@
         reviewerToken: ""
     };
     const CHANGELOG = {
+        "V0.2.16": [
+            "优化弹幕操作入口的稳定性。",
+            "@呆物麋羊"
+        ],
         "V0.2.15": [
             "优化弹幕操作体验。",
             "@呆物麋羊"
@@ -222,6 +226,7 @@
         "V0.0.1": ["新增一键投稿、本地收藏和更新提示。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.15.08": "0.2.16",
         "2026.08.15.07": "0.2.15",
         "2026.08.15.06": "0.2.14",
         "2026.08.15.05": "0.2.13",
@@ -2097,7 +2102,7 @@
             return false;
         }
         if (!payload.senderName) {
-            showMsg("没有识别到这条弹幕的发送昵称，不能提交审", "warn");
+            showMsg("没有识别到发送昵称，请在右侧聊天列表点击“审”", "warn");
             return false;
         }
         if (!payload.roomId) {
@@ -3993,41 +3998,7 @@
         if (!parent) return;
         const plusButton = ensurePanelPlusOneButton(parent, douyuExPlusButton, text);
 
-        if (isReviewEnabled()) {
-            let reviewButton = parent.querySelector("#dgq-panel-review");
-            if (!reviewButton) {
-                reviewButton = document.createElement("div");
-                reviewButton.id = "dgq-panel-review";
-                parent.insertBefore(reviewButton, plusButton || null);
-            } else if (plusButton && reviewButton.nextSibling !== plusButton) {
-                parent.insertBefore(reviewButton, plusButton);
-            }
-            const reviewBaseClass = (plusButton?.className || "labelfisrt-407af4 thirdBtn-06cde5 fourBtn-0845d4")
-                .replace(/\bdgq-panel-plus-one\b/g, "")
-                .trim();
-            setClassNameIfChanged(reviewButton, `${reviewBaseClass} dgq-panel-tip-review`);
-            setTextIfChanged(reviewButton, "审");
-            setAttributeIfChanged(reviewButton, "title", "提交到房管弹幕管理器待审");
-            setAttributeIfChanged(reviewButton, "role", "button");
-            setAttributeIfChanged(reviewButton, "tabindex", "0");
-            reviewButton.onclick = null;
-            bindPanelButtonAction(reviewButton, async () => {
-                if (reviewButton.__dgqReviewBusy) return;
-                reviewButton.__dgqReviewBusy = true;
-                setTextIfChanged(reviewButton, "审...");
-                const panel = parent.closest(".danmudiv-32f498, [class*='danmudiv'], #comment-higher-container, .danmuTips-1ee820") || parent;
-                const ok = await reportBarrageReview(getBarrageTipText() || text, {
-                    source: "panel-tip-review",
-                    roomId: getRoomId(),
-                    senderUid: getBarrageSenderUid(panel),
-                    senderName: getBarrageSenderName(panel)
-                });
-                setTextIfChanged(reviewButton, ok ? "已审" : "审");
-                reviewButton.__dgqReviewBusy = false;
-            });
-        } else {
-            parent.querySelector("#dgq-panel-review")?.remove();
-        }
+        parent.querySelector("#dgq-panel-review")?.remove();
 
         let button = parent.querySelector("#dgq-panel-submit");
         if (!button) {
