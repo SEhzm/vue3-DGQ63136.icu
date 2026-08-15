@@ -174,6 +174,7 @@ const updateHistory = [
             '@呆物麋羊',
         ],
     },
+    {
         version: 'V0.2.15',
         updatedAt: '2026-08-15 17:28',
         changes: [
