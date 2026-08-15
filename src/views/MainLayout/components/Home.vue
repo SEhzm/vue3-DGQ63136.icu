@@ -117,7 +117,7 @@
         <div class="card sixth-card">
             友情链接 <a href="https://sb6657.cn" target="_blank">sb6657.cn</a>&nbsp;&nbsp;&nbsp;
             <a href="https://dgq63136.cn/#/Starrysky" target="_blank">星空背景</a>&nbsp;&nbsp;&nbsp;
-            <a href="https://cdn.hguofichp.cn/dgq63136.user.js" target="_blank">油猴插件</a>
+            <a href="https://dgq63136.cn/dgq63136.user.js?v=202608150728" target="_blank">油猴插件</a>
         </div>
     </div>
 </template>

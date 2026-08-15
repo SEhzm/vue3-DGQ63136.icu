@@ -8,7 +8,7 @@ const page = readFileSync(resolve(root, "src/views/MainLayout/components/Tamperm
 const home = readFileSync(resolve(root, "src/views/MainLayout/components/Home.vue"), "utf8");
 const publicUserscript = readFileSync(resolve(root, "public/dgq63136.user.js"), "utf8");
 
-const installLink = "/dgq63136.user.js";
+const installLink = "/dgq63136.user.js?v=202608150728";
 const greasyForkUrl =
   "https://greasyfork.org/zh-CN/scripts/511991-dgq63136-cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86";
 const staleInstallHosts = ["web-static-res-edge-speedtest-b1-hk.dahi.edu.eu.org"];
