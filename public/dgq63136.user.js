@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.15.06
+// @version      2026.08.15.07
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -29,7 +29,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.14";
+    const DISPLAY_VERSION = "V0.2.15";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -64,6 +64,7 @@
     const BARRAGE_ITEM_SELECTOR = ".Barrage-listItem, [class*='Barrage-listItem']";
     const BARRAGE_LIST_ROOT_SELECTOR = "#js-barrage-list, .Barrage-list, [class*='Barrage-list']";
     const BARRAGE_PANEL_ROOT_SELECTOR = "#comment-dzjy-container, #comment-higher-container, .danmuTips-1ee820";
+    const PANEL_ACTION_SELECTOR = "#dgq-panel-submit, #dgq-panel-review, #dgq-panel-plus-one";
     const EXTERNAL_PLUGIN_ROOT_SELECTOR = "#xy-gift-recorder, [id^='xy-'], [class^='xy-'], [class*=' xy-']";
     const CATEGORY_SORT_OPTIONS = [
         { label: "最新", value: "latest" },
@@ -87,6 +88,10 @@
         reviewerToken: ""
     };
     const CHANGELOG = {
+        "V0.2.15": [
+            "优化弹幕操作体验。",
+            "@呆物麋羊"
+        ],
         "V0.2.14": [
             "优化弹幕操作体验。",
             "@呆物麋羊"
@@ -217,6 +222,7 @@
         "V0.0.1": ["新增一键投稿、本地收藏和更新提示。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.15.07": "0.2.15",
         "2026.08.15.06": "0.2.14",
         "2026.08.15.05": "0.2.13",
         "2026.08.15.04": "0.2.12",
@@ -313,6 +319,7 @@
         autoUpdateDialogShown: false,
         gfWebSocketStarted: false,
         barrageActionsStarted: false,
+        panelActionCaptureStarted: false,
         lastDeepToolbarSearchAt: 0
     };
 
@@ -3904,12 +3911,43 @@
         if (typeof button.__dgqPanelAction === "function") button.__dgqPanelAction(event);
     }
 
+    function getPanelActionButtonFromEvent(event) {
+        const path = typeof event.composedPath === "function" ? event.composedPath() : [event.target];
+        for (const node of path) {
+            if (!node || node.nodeType !== 1) continue;
+            if (node.matches?.(PANEL_ACTION_SELECTOR)) return node;
+            const button = node.closest?.(PANEL_ACTION_SELECTOR);
+            if (button) return button;
+        }
+        return null;
+    }
+
+    function initPanelButtonActionCapture() {
+        if (state.panelActionCaptureStarted) return;
+        state.panelActionCaptureStarted = true;
+
+        const handlePanelActionPointer = event => {
+            const button = getPanelActionButtonFromEvent(event);
+            if (!button?.__dgqPanelActionBound) return;
+            activatePanelButtonAction(button, event);
+        };
+
+        // Register in the page realm first so the Douyu detail popup cannot consume the action at a parent node.
+        const captureWindows = [window];
+        if (typeof unsafeWindow !== "undefined" && unsafeWindow && unsafeWindow !== window) {
+            captureWindows.unshift(unsafeWindow);
+        }
+        captureWindows.forEach(targetWindow => {
+            targetWindow.addEventListener("pointerdown", handlePanelActionPointer, true);
+            targetWindow.addEventListener("mousedown", handlePanelActionPointer, true);
+            targetWindow.addEventListener("touchstart", handlePanelActionPointer, true);
+        });
+    }
+
     function bindPanelButtonAction(button, action) {
         button.__dgqPanelAction = action;
         if (button.__dgqPanelActionBound) return;
         button.__dgqPanelActionBound = true;
-        button.addEventListener("pointerdown", event => activatePanelButtonAction(button, event), true);
-        button.addEventListener("touchstart", event => activatePanelButtonAction(button, event), true);
         button.addEventListener("click", event => {
             activatePanelButtonAction(button, event);
         }, true);
@@ -4283,6 +4321,7 @@
     purgeLegacyReviewSecrets();
     initMenuCommands();
     initKeyboardShortcuts();
+    initPanelButtonActionCapture();
     initBarrageActions();
     insertToolbarToggleButton();
     setInterval(insertToolbarToggleButton, 2000);
