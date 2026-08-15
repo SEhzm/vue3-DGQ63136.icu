@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.14.01
+// @version      2026.08.15.07
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -29,7 +29,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.8";
+    const DISPLAY_VERSION = "V0.2.15";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -64,6 +64,7 @@
     const BARRAGE_ITEM_SELECTOR = ".Barrage-listItem, [class*='Barrage-listItem']";
     const BARRAGE_LIST_ROOT_SELECTOR = "#js-barrage-list, .Barrage-list, [class*='Barrage-list']";
     const BARRAGE_PANEL_ROOT_SELECTOR = "#comment-dzjy-container, #comment-higher-container, .danmuTips-1ee820";
+    const PANEL_ACTION_SELECTOR = "#dgq-panel-submit, #dgq-panel-review, #dgq-panel-plus-one";
     const EXTERNAL_PLUGIN_ROOT_SELECTOR = "#xy-gift-recorder, [id^='xy-'], [class^='xy-'], [class*=' xy-']";
     const CATEGORY_SORT_OPTIONS = [
         { label: "最新", value: "latest" },
@@ -87,116 +88,148 @@
         reviewerToken: ""
     };
     const CHANGELOG = {
+        "V0.2.15": [
+            "优化弹幕操作体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.14": [
+            "优化弹幕操作体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.13": [
+            "优化公开更新说明，改为更简洁的功能概述。",
+            "@呆物麋羊"
+        ],
+        "V0.2.12": [
+            "优化弹幕互动操作的响应体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.11": [
+            "完善特殊情况下的弹幕处理流程。",
+            "提升相关功能的稳定性和安全性。",
+            "@呆物麋羊"
+        ],
+        "V0.2.10": [
+            "优化弹幕识别与交互体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.9": [
+            "优化弹幕操作入口的加载和响应速度。",
+            "@呆物麋羊"
+        ],
         "V0.2.8": [
-            "审上报失败时显示房管管理器返回的具体原因，方便定位审核码不存在、房间不在白名单或 UID 缺失。",
+            "优化异常提示，提升问题定位体验。",
             "@呆物麋羊"
         ],
         "V0.2.7": [
-            "设置页只保留审核码输入，审核员备注改由房管弹幕管理器生成审核码时配置。",
+            "优化插件设置项，减少使用步骤。",
             "@呆物麋羊"
         ],
         "V0.2.6": [
-            "优化房管审核功能接入，提升审核上报稳定性。",
-            "设置页保留审核码绑定入口，用户填写后即可使用“审”按钮。",
+            "完善弹幕管理相关功能，提升整体稳定性。",
             "@呆物麋羊"
         ],
         "V0.2.5": [
-            "设置页新增审核码绑定入口。",
-            "优化审核来源识别，方便房管管理器区分不同审核员。",
+            "优化插件设置与使用流程。",
             "@呆物麋羊"
         ],
         "V0.2.4": [
-            "新增房管弹幕管理器审核功能接入准备。",
-            "优化审核上报流程，等待房管管理器接入后即可使用。",
+            "完善相关功能接入准备。",
             "@呆物麋羊"
         ],
         "V0.2.3": [
-            "优化审核功能设置项，减少用户填写步骤。",
-            "清理旧版审核设置兼容逻辑。",
+            "优化功能设置，减少使用步骤。",
             "@呆物麋羊"
         ],
         "V0.2.1": [
-            "修复更新检测弹窗把油猴技术版本显示成 V2026 日期版本的问题。",
-            "切换cdn源"
+            "优化版本提示和更新体验。",
+            "@呆物麋羊"
         ],
         "V0.2.0": [
-            "修复更新检测弹窗把油猴技术版本显示成 V2026 日期版本的问题。",
-            "更新检测继续使用油猴 @version 判断是否需要升级，弹窗和更新提示优先显示用户可见版本号。"
+            "优化版本显示和更新提示。",
+            "@呆物麋羊"
         ],
         "V0.1.9": [
-            "修复打开插件更新提示后，斗鱼播放器底部控制栏按钮可能点击无反应的问题。",
-            "更新提示改为非阻塞小窗口，不再用全屏遮罩拦住播放器弹幕开关、清晰度和全屏按钮。"
+            "优化更新提示窗口，减少对页面操作的影响。",
+            "@呆物麋羊"
         ],
         "V0.1.8": [
-            "旧版用户打开斗鱼直播间里的插件浮窗时，会自动检测 CDN 上的新版本。",
-            "检测到新版本后直接弹出更新提示窗口，用户可点击“更新”安装 CDN 最新 .user.js。",
-            "自动检测结果本地缓存 1 小时，反复打开和关闭浮窗不会重复消耗 CDN 流量。"
+            "新增版本检测和更新提醒。",
+            "优化重复打开面板时的检测体验。",
+            "@呆物麋羊"
         ],
         "V0.1.7": [
-            "优化进入斗鱼直播间时的启动性能，打开直播间先只挂“厕纸”入口。",
-            "完整浮窗、分类接口、更新检测和在线统计延后到用户第一次打开面板后再加载。",
-            "减少工具栏查找时的深度 DOM 扫描，避免和斗鱼播放器首屏加载抢资源。"
+            "优化直播间启动速度和使用体验。",
+            "减少插件平时的资源占用。",
+            "@呆物麋羊"
         ],
         "V0.1.6": [
-            "撤回弹幕列表按批次处理的方案，改为鼠标悬停到哪条弹幕才处理哪条，减少平时浏览器性能占用。",
-            "详情浮层继续按 DouyuEx 的方式盯住斗鱼弹幕详情容器，浮层出现后再补“投 / +1”。",
-            "更新页面文案同步改为按需处理方案，不再宣传固定批量处理。"
+            "优化弹幕互动功能的处理方式。",
+            "进一步降低插件运行时的资源占用。",
+            "@呆物麋羊"
         ],
         "V0.1.5": [
-            "学习 DouyuEx 的弹幕详情浮层处理方式，单独监听详情容器，鼠标悬停后“投 / +1”出现更快。",
-            "弹幕列表快捷按钮改为优先处理新增弹幕，不再每次 DOM 变化都全量扫描列表。",
-            "进一步缩小弹幕监听范围，降低浏览器性能占用。"
+            "优化弹幕操作入口的加载速度。",
+            "降低页面变化较多时的额外开销。",
+            "@呆物麋羊"
         ],
         "V0.1.4": [
-            "缩小弹幕增强监听范围，只监听弹幕列表和弹幕详情区域，避免影响 DouyuEx 修改播放器。",
-            "列表快捷按钮样式改为插件自有选择器，减少和斗鱼/DouyuEx 页面样式冲突。"
+            "优化弹幕区域的兼容性和显示效果。",
+            "减少与页面其他功能的样式影响。",
+            "@呆物麋羊"
         ],
         "V0.1.3": [
-            "修复点击斗鱼弹幕列表“+1”时，把插件按钮文字“投/+1”一起发出去的问题。"
+            "优化弹幕发送内容的识别，避免出现多余文字。",
+            "@呆物麋羊"
         ],
         "V0.1.2": [
-            "修复弹幕列表快捷按钮注入位置，只给普通聊天弹幕显示“投 / +1”。",
-            "公告、欢迎提示、直播间规则、看点卡片等非普通弹幕不再显示“投 / +1”。"
+            "优化弹幕操作入口的显示范围。",
+            "减少不相关内容上的干扰。",
+            "@呆物麋羊"
         ],
         "V0.1.1": [
-            "顶部“更新”按钮改为先检测版本，再弹出更新提示小窗口。",
-            "检测到新版本时才允许点击“更新”，没有新版本时更新按钮保持不可点击。",
-            "更新提示小窗口增加“访问”按钮，可直接打开插件网站。"
+            "优化更新按钮和提示窗口体验。",
+            "@呆物麋羊"
         ],
         "V0.1.0": [
-            "热榜里的弹幕已经来自弹幕库，移除投稿按钮，只保留发送和收藏。",
-            "点击复制或发送成功后，上报一次使用次数到网站现有 /dgq/addCnt/{id} 计数接口，让插件使用行为参与后端热门统计。",
-            "设置里的布局模式改成标准 / 紧凑按钮，避免原生下拉在斗鱼页面里显示不完整。",
-            "恢复弹幕列表每条弹幕后面的 投 / +1 快捷按钮。",
-            "放宽斗鱼弹幕行选择器，兼容带 hash 的 Barrage-listItem 类名。",
-            "+1 会把当前弹幕填入斗鱼输入框并点击发送，投稿仍打开标签选择弹窗。",
-            "浮窗快捷标签和标题筛选按钮允许换行，窄屏下不再裁掉右侧元素。"
+            "优化热榜、使用统计、布局模式和窄屏显示体验。",
+            "完善弹幕互动入口。",
+            "@呆物麋羊"
         ],
         "V0.0.9": [
             "浮窗首屏重排：顶部直接显示版本号，搜索 / 分类 / 热榜 / 最近 / 收藏 / 设置入口前置到第一屏。",
             "快捷标签、随机按钮、查看及投稿分类入口更明显，避免看起来仍是旧浮窗。"
         ],
         "V0.0.8": [
-            "Greasy Fork 内部 @version 改为 2026.08.12.01，确保高于旧线上版本 2026.08.11.02。",
-            "插件面板和更新提示继续显示用户版本 V0.0.8。"
+            "优化版本兼容和更新提示。",
+            "@呆物麋羊"
         ],
         "V0.0.7": [
-            "递增 Greasy Fork 脚本 @version 到 0.0.7，确保已安装用户能收到自动更新。",
-            "同步插件面板显示版本为 V0.0.7。"
+            "优化版本更新识别。",
+            "@呆物麋羊"
         ],
         "V0.0.6": [
             "新增最近使用入口，复制、发送、投稿、收藏都会记录到本地最近。",
-            "分类浏览新增 最新 / 最热 / 点赞 / 复制 排序，并把 sort 参数传给后端。",
+            "分类浏览新增最新、最热、点赞、复制排序。",
             "新增随机来一条、快捷标签、收藏分类筛选、发送前确认、快捷键和紧凑模式。",
-            "更新提示改为当前版本、最新版本和更新内容卡片。"
+            "更新提示改为当前版本、最新版本和更新内容卡片。",
+            "@呆物麋羊"
         ],
         "V0.0.5": ["分类浏览和热梗列表显示网站返回时间，并统一展示到分钟。"],
         "V0.0.4": ["选择分类后每页 5 条查看该分类弹幕，分类下拉贴屏展开。"],
         "V0.0.3": ["新增 24 小时热门和 7 天热门折叠入口。"],
-        "V0.0.2": ["优化投稿分类菜单、默认分类迁移和弹幕增强监听。"],
-        "V0.0.1": ["新增一键投稿、本地收藏、更新提示和详情浮层投/复读按钮。"]
+        "V0.0.2": ["优化分类菜单和弹幕增强体验。"],
+        "V0.0.1": ["新增一键投稿、本地收藏和更新提示。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.15.07": "0.2.15",
+        "2026.08.15.06": "0.2.14",
+        "2026.08.15.05": "0.2.13",
+        "2026.08.15.04": "0.2.12",
+        "2026.08.15.03": "0.2.11",
+        "2026.08.14.04": "0.2.11",
+        "2026.08.14.03": "0.2.10",
+        "2026.08.14.02": "0.2.9",
         "2026.08.14.01": "0.2.8",
         "2026.08.13.08": "0.2.7",
         "2026.08.13.07": "0.2.6",
@@ -286,6 +319,7 @@
         autoUpdateDialogShown: false,
         gfWebSocketStarted: false,
         barrageActionsStarted: false,
+        panelActionCaptureStarted: false,
         lastDeepToolbarSearchAt: 0
     };
 
@@ -1100,6 +1134,9 @@
             min-width: 18px !important;
             padding-left: 3px !important;
             padding-right: 3px !important;
+            pointer-events: auto !important;
+            position: relative !important;
+            z-index: 2147483647 !important;
         }
         .dgq-panel-tip-review:hover {
             color: #ffdd57 !important;
@@ -1228,6 +1265,9 @@
             min-width: 18px !important;
             padding-left: 3px !important;
             padding-right: 3px !important;
+            pointer-events: auto !important;
+            position: relative !important;
+            z-index: 2147483647 !important;
         }
         .dgq-panel-tip-submit:hover {
             color: #ffdd57 !important;
@@ -1235,6 +1275,9 @@
         .dgq-panel-plus-one {
             cursor: pointer !important;
             font-weight: 700 !important;
+            pointer-events: auto !important;
+            position: relative !important;
+            z-index: 2147483647 !important;
         }
         .dgq-panel-plus-one:hover {
             color: #ffdd57 !important;
@@ -1947,13 +1990,35 @@
 
     function getAttributeByPatterns(element, patterns) {
         if (!element) return "";
-        const queue = [element, ...Array.from(element.querySelectorAll("[data-uid], [data-user-id], [data-userid], [data-userid64], [data-rid], [uid], [userid]"))];
+        const queue = [];
+        const seen = new Set();
+        const pushNode = node => {
+            if (!node || seen.has(node)) return;
+            seen.add(node);
+            queue.push(node);
+        };
+        let current = element;
+        let depth = 0;
+        while (current && depth < 6) {
+            pushNode(current);
+            current = current.parentElement;
+            depth += 1;
+        }
+        element.querySelectorAll("[data-uid], [data-user-id], [data-userid], [data-userid64], [data-rid], [uid], [userid], a[href*='uid='], a[href*='user_id='], a[href*='/user/'], a[href*='/u/']").forEach(pushNode);
         for (const node of queue) {
             for (const attr of Array.from(node.attributes || [])) {
                 const name = attr.name.toLowerCase();
                 const value = String(attr.value || "").trim();
                 if (!value) continue;
                 if (patterns.some(pattern => pattern.test(name))) return value;
+                if (/uid|user.?id|user/i.test(name)) {
+                    const match = value.match(/\b(\d{3,})\b/);
+                    if (match) return match[1];
+                }
+                if (name === "href") {
+                    const hrefMatch = value.match(/(?:uid|user_id)=?(\d{3,})|\/(?:user|u)\/(\d{3,})/i);
+                    if (hrefMatch) return hrefMatch[1] || hrefMatch[2] || "";
+                }
             }
         }
         return "";
@@ -1961,17 +2026,14 @@
 
     function extractUidFromText(text) {
         const clean = String(text || "");
-        const match = clean.match(/\b(?:uid|userId|user_id)[:=：]\s*(\d{3,})\b/i);
+        const match = clean.match(/\b(?:uid|userId|user_id)[:=：\s]*([0-9]{3,})\b/i);
         return match ? match[1] : "";
     }
 
     function getBarrageSenderUid(root) {
-        const attrValue = getAttributeByPatterns(root, [/^data-.*uid$/, /^data-.*user.*id$/, /^uid$/, /^userid$/]);
+        const attrValue = getAttributeByPatterns(root, [/^data-.*uid$/, /^data-.*user.*id$/, /^uid$/, /^userid$/, /^href$/]);
         const attrMatch = String(attrValue || "").match(/\d{3,}/);
         if (attrMatch) return attrMatch[0];
-        const link = root?.querySelector?.("a[href*='uid='], a[href*='/user/'], a[href*='/u/'], a[href*='user_id=']");
-        const linkMatch = String(link?.href || link?.getAttribute?.("href") || "").match(/(?:uid|user_id)=?(\d{3,})|\/(?:user|u)\/(\d{3,})/i);
-        if (linkMatch) return linkMatch[1] || linkMatch[2] || "";
         const textUid = extractUidFromText(root?.textContent || "");
         return textUid || "";
     }
@@ -1997,8 +2059,8 @@
         return match ? normalizeBarrageText(match[1]) : "";
     }
 
-    function createMessageFingerprint(roomId, uid, text) {
-        const input = `${roomId}|${uid}|${normalizeBarrageText(text)}`;
+    function createMessageFingerprint(roomId, senderIdentity, text) {
+        const input = `${roomId}|${normalizeBarrageText(senderIdentity)}|${normalizeBarrageText(text)}`;
         let hash = 0;
         for (let index = 0; index < input.length; index += 1) {
             hash = ((hash << 5) - hash + input.charCodeAt(index)) | 0;
@@ -2009,6 +2071,7 @@
     function buildReviewPayload(text, meta = {}) {
         const roomId = String(meta.roomId || getRoomId() || "").trim();
         const senderUid = String(meta.senderUid || "").trim();
+        const senderName = normalizeBarrageText(meta.senderName || "");
         const messageText = normalizeBarrageText(text);
         return {
             source: "dgq63136-userscript",
@@ -2016,9 +2079,9 @@
             technicalVersion: CURRENT_VERSION,
             roomId,
             senderUid,
-            senderName: normalizeBarrageText(meta.senderName || ""),
+            senderName,
             messageText,
-            messageFingerprint: createMessageFingerprint(roomId, senderUid, messageText),
+            messageFingerprint: createMessageFingerprint(roomId, senderUid || senderName, messageText),
             messageTime: meta.messageTime || new Date().toISOString(),
             pageUrl: location.href,
             reporterClientId: getOrCreateReviewClickerId()
@@ -2033,8 +2096,8 @@
             showMsg("没有可审的弹幕", "warn");
             return false;
         }
-        if (!payload.senderUid) {
-            showMsg("没有识别到这条弹幕的 UID，不能提交审", "warn");
+        if (!payload.senderName) {
+            showMsg("没有识别到这条弹幕的发送昵称，不能提交审", "warn");
             return false;
         }
         if (!payload.roomId) {
@@ -3690,6 +3753,12 @@
         item.appendChild(actions);
     }
 
+    function collectBarrageItemsFromNode(node, bucket) {
+        if (!node || node.nodeType !== Node.ELEMENT_NODE || !bucket) return;
+        if (node.matches?.(BARRAGE_ITEM_SELECTOR)) bucket.add(node);
+        node.querySelectorAll?.(BARRAGE_ITEM_SELECTOR).forEach(item => bucket.add(item));
+    }
+
     function enhanceBarrageItem(item) {
         if (!item || item.querySelector(".dgq-barrage-actions")) return;
         if (!isOrdinaryBarrageItem(item)) return;
@@ -3828,6 +3897,65 @@
         if (element.getAttribute(name) !== value) element.setAttribute(name, value);
     }
 
+    function stopPanelButtonEvent(event, preventDefault = false) {
+        if (preventDefault) event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation?.();
+    }
+
+    function activatePanelButtonAction(button, event) {
+        stopPanelButtonEvent(event, true);
+        const now = Date.now();
+        if (now - Number(button.__dgqPanelActionAt || 0) < 450) return;
+        button.__dgqPanelActionAt = now;
+        if (typeof button.__dgqPanelAction === "function") button.__dgqPanelAction(event);
+    }
+
+    function getPanelActionButtonFromEvent(event) {
+        const path = typeof event.composedPath === "function" ? event.composedPath() : [event.target];
+        for (const node of path) {
+            if (!node || node.nodeType !== 1) continue;
+            if (node.matches?.(PANEL_ACTION_SELECTOR)) return node;
+            const button = node.closest?.(PANEL_ACTION_SELECTOR);
+            if (button) return button;
+        }
+        return null;
+    }
+
+    function initPanelButtonActionCapture() {
+        if (state.panelActionCaptureStarted) return;
+        state.panelActionCaptureStarted = true;
+
+        const handlePanelActionPointer = event => {
+            const button = getPanelActionButtonFromEvent(event);
+            if (!button?.__dgqPanelActionBound) return;
+            activatePanelButtonAction(button, event);
+        };
+
+        // Register in the page realm first so the Douyu detail popup cannot consume the action at a parent node.
+        const captureWindows = [window];
+        if (typeof unsafeWindow !== "undefined" && unsafeWindow && unsafeWindow !== window) {
+            captureWindows.unshift(unsafeWindow);
+        }
+        captureWindows.forEach(targetWindow => {
+            targetWindow.addEventListener("pointerdown", handlePanelActionPointer, true);
+            targetWindow.addEventListener("mousedown", handlePanelActionPointer, true);
+            targetWindow.addEventListener("touchstart", handlePanelActionPointer, true);
+        });
+    }
+
+    function bindPanelButtonAction(button, action) {
+        button.__dgqPanelAction = action;
+        if (button.__dgqPanelActionBound) return;
+        button.__dgqPanelActionBound = true;
+        button.addEventListener("click", event => {
+            activatePanelButtonAction(button, event);
+        }, true);
+        button.addEventListener("keydown", event => {
+            if (event.key === "Enter" || event.key === " ") activatePanelButtonAction(button, event);
+        }, true);
+    }
+
     function ensurePanelPlusOneButton(parent, douyuExPlusButton, text) {
         document.querySelectorAll("#dgq-panel-plus-one").forEach(button => {
             if (douyuExPlusButton || button.parentElement !== parent) {
@@ -3847,11 +3975,12 @@
         setClassNameIfChanged(button, "labelfisrt-407af4 thirdBtn-06cde5 fourBtn-0845d4 dgq-panel-plus-one");
         setTextIfChanged(button, "+1");
         setAttributeIfChanged(button, "title", "复读这条弹幕");
-        button.onclick = event => {
-            event.preventDefault();
-            event.stopPropagation();
+        setAttributeIfChanged(button, "role", "button");
+        setAttributeIfChanged(button, "tabindex", "0");
+        button.onclick = null;
+        bindPanelButtonAction(button, () => {
             sendBarrage(getBarrageTipText() || text, { source: "panel-tip" });
-        };
+        });
         return button;
     }
 
@@ -3879,9 +4008,12 @@
             setClassNameIfChanged(reviewButton, `${reviewBaseClass} dgq-panel-tip-review`);
             setTextIfChanged(reviewButton, "审");
             setAttributeIfChanged(reviewButton, "title", "提交到房管弹幕管理器待审");
-            reviewButton.onclick = async event => {
-                event.preventDefault();
-                event.stopPropagation();
+            setAttributeIfChanged(reviewButton, "role", "button");
+            setAttributeIfChanged(reviewButton, "tabindex", "0");
+            reviewButton.onclick = null;
+            bindPanelButtonAction(reviewButton, async () => {
+                if (reviewButton.__dgqReviewBusy) return;
+                reviewButton.__dgqReviewBusy = true;
                 setTextIfChanged(reviewButton, "审...");
                 const panel = parent.closest(".danmudiv-32f498, [class*='danmudiv'], #comment-higher-container, .danmuTips-1ee820") || parent;
                 const ok = await reportBarrageReview(getBarrageTipText() || text, {
@@ -3891,7 +4023,8 @@
                     senderName: getBarrageSenderName(panel)
                 });
                 setTextIfChanged(reviewButton, ok ? "已审" : "审");
-            };
+                reviewButton.__dgqReviewBusy = false;
+            });
         } else {
             parent.querySelector("#dgq-panel-review")?.remove();
         }
@@ -3911,11 +4044,12 @@
         setClassNameIfChanged(button, `${baseClass} dgq-panel-tip-submit`);
         setTextIfChanged(button, "投");
         setAttributeIfChanged(button, "title", "选择标签投稿到63136烂梗网站");
-        button.onclick = event => {
-            event.preventDefault();
-            event.stopPropagation();
+        setAttributeIfChanged(button, "role", "button");
+        setAttributeIfChanged(button, "tabindex", "0");
+        button.onclick = null;
+        bindPanelButtonAction(button, () => {
             openSubmitTagDialog(getBarrageTipText() || text, { source: "panel-tip" });
-        };
+        });
     }
 
     function enhanceBarragePanel() {
@@ -3936,26 +4070,69 @@
         if (state.barrageActionsStarted) return;
         state.barrageActionsStarted = true;
         let barragePanelScheduled = false;
+        let barrageListScheduled = false;
         const observedRoots = new Set();
         const observedPanelRoots = new Set();
+        const observedListObservers = new Map();
+        const pendingBarrageItems = new Set();
 
         function handleBarrageListPointer(event) {
             if (isExternalPluginNode(event.target)) return;
             const item = event.target?.closest?.(BARRAGE_ITEM_SELECTOR);
-            if (item && event.currentTarget.contains(item)) enhanceBarrageItem(item);
+            if (item && event.currentTarget.contains(item)) {
+                enhanceBarrageItem(item);
+                scheduleBarragePanelEnhancement();
+            }
         }
+
+        const scheduleBarrageListEnhancement = () => {
+            if (barrageListScheduled) return;
+            barrageListScheduled = true;
+            requestAnimationFrame(() => {
+                barrageListScheduled = false;
+                const items = Array.from(pendingBarrageItems);
+                pendingBarrageItems.clear();
+                items.forEach(item => enhanceBarrageItem(item));
+            });
+        };
 
         const syncBarrageListDelegates = () => {
             const roots = getBarrageObserverRoots();
             roots.forEach(root => {
-                if (observedRoots.has(root)) return;
-                root.addEventListener("mouseover", handleBarrageListPointer);
-                root.addEventListener("focusin", handleBarrageListPointer);
-                observedRoots.add(root);
+                let shouldScanExistingItems = false;
+                if (!observedRoots.has(root)) {
+                    root.addEventListener("mouseover", handleBarrageListPointer);
+                    root.addEventListener("focusin", handleBarrageListPointer);
+                    observedRoots.add(root);
+                    shouldScanExistingItems = true;
+                }
+                if (!observedListObservers.has(root)) {
+                    const listObserver = new MutationObserver(mutations => {
+                        let changed = false;
+                        for (const mutation of mutations) {
+                            mutation.addedNodes.forEach(node => {
+                                const before = pendingBarrageItems.size;
+                                collectBarrageItemsFromNode(node, pendingBarrageItems);
+                                if (pendingBarrageItems.size > before) changed = true;
+                            });
+                        }
+                        if (changed) scheduleBarrageListEnhancement();
+                    });
+                    listObserver.observe(root, { childList: true, subtree: true });
+                    observedListObservers.set(root, listObserver);
+                }
+                if (shouldScanExistingItems) collectBarrageItemsFromNode(root, pendingBarrageItems);
             });
             observedRoots.forEach(root => {
                 if (!root.isConnected) observedRoots.delete(root);
             });
+            observedListObservers.forEach((observer, root) => {
+                if (!root.isConnected) {
+                    observer.disconnect();
+                    observedListObservers.delete(root);
+                }
+            });
+            if (pendingBarrageItems.size) scheduleBarrageListEnhancement();
         };
 
         const cleanupBarrageListDelegates = () => {
@@ -3964,6 +4141,9 @@
                 root.removeEventListener("focusin", handleBarrageListPointer);
             });
             observedRoots.clear();
+            observedListObservers.forEach(observer => observer.disconnect());
+            observedListObservers.clear();
+            pendingBarrageItems.clear();
         };
 
         const syncPanelObservers = () => {
@@ -4141,7 +4321,8 @@
     purgeLegacyReviewSecrets();
     initMenuCommands();
     initKeyboardShortcuts();
-    runWhenIdle(initBarrageActions, 5000);
+    initPanelButtonActionCapture();
+    initBarrageActions();
     insertToolbarToggleButton();
     setInterval(insertToolbarToggleButton, 2000);
 })();
