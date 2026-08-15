@@ -95,8 +95,8 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.2.13';
-const currentPluginUpdatedAt = '2026-08-15 16:20';
+const currentPluginVersion = 'V0.2.14';
+const currentPluginUpdatedAt = '2026-08-15 17:00';
 const userscriptInstallUrl = '/dgq63136.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
 const greasyForkUrl =
@@ -166,6 +166,14 @@ const permissionChecks = [
 ];
 
 const updateHistory = [
+    {
+        version: 'V0.2.14',
+        updatedAt: '2026-08-15 17:00',
+        changes: [
+            '优化弹幕操作体验。',
+            '@呆物麋羊',
+        ],
+    },
     {
         version: 'V0.2.13',
         updatedAt: '2026-08-15 16:20',

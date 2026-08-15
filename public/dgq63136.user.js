@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.15.05
+// @version      2026.08.15.06
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -29,7 +29,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.13";
+    const DISPLAY_VERSION = "V0.2.14";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -87,6 +87,10 @@
         reviewerToken: ""
     };
     const CHANGELOG = {
+        "V0.2.14": [
+            "优化弹幕操作体验。",
+            "@呆物麋羊"
+        ],
         "V0.2.13": [
             "优化公开更新说明，改为更简洁的功能概述。",
             "@呆物麋羊"
@@ -213,6 +217,7 @@
         "V0.0.1": ["新增一键投稿、本地收藏和更新提示。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.15.06": "0.2.14",
         "2026.08.15.05": "0.2.13",
         "2026.08.15.04": "0.2.12",
         "2026.08.15.03": "0.2.11",
@@ -1122,6 +1127,9 @@
             min-width: 18px !important;
             padding-left: 3px !important;
             padding-right: 3px !important;
+            pointer-events: auto !important;
+            position: relative !important;
+            z-index: 2147483647 !important;
         }
         .dgq-panel-tip-review:hover {
             color: #ffdd57 !important;
@@ -3888,16 +3896,25 @@
         event.stopImmediatePropagation?.();
     }
 
+    function activatePanelButtonAction(button, event) {
+        stopPanelButtonEvent(event, true);
+        const now = Date.now();
+        if (now - Number(button.__dgqPanelActionAt || 0) < 450) return;
+        button.__dgqPanelActionAt = now;
+        if (typeof button.__dgqPanelAction === "function") button.__dgqPanelAction(event);
+    }
+
     function bindPanelButtonAction(button, action) {
         button.__dgqPanelAction = action;
         if (button.__dgqPanelActionBound) return;
         button.__dgqPanelActionBound = true;
-        ["pointerdown", "mousedown", "mouseup", "touchstart"].forEach(type => {
-            button.addEventListener(type, event => stopPanelButtonEvent(event), true);
-        });
+        button.addEventListener("pointerdown", event => activatePanelButtonAction(button, event), true);
+        button.addEventListener("touchstart", event => activatePanelButtonAction(button, event), true);
         button.addEventListener("click", event => {
-            stopPanelButtonEvent(event, true);
-            if (typeof button.__dgqPanelAction === "function") button.__dgqPanelAction(event);
+            activatePanelButtonAction(button, event);
+        }, true);
+        button.addEventListener("keydown", event => {
+            if (event.key === "Enter" || event.key === " ") activatePanelButtonAction(button, event);
         }, true);
     }
 
@@ -3920,6 +3937,8 @@
         setClassNameIfChanged(button, "labelfisrt-407af4 thirdBtn-06cde5 fourBtn-0845d4 dgq-panel-plus-one");
         setTextIfChanged(button, "+1");
         setAttributeIfChanged(button, "title", "复读这条弹幕");
+        setAttributeIfChanged(button, "role", "button");
+        setAttributeIfChanged(button, "tabindex", "0");
         button.onclick = null;
         bindPanelButtonAction(button, () => {
             sendBarrage(getBarrageTipText() || text, { source: "panel-tip" });
@@ -3951,8 +3970,12 @@
             setClassNameIfChanged(reviewButton, `${reviewBaseClass} dgq-panel-tip-review`);
             setTextIfChanged(reviewButton, "审");
             setAttributeIfChanged(reviewButton, "title", "提交到房管弹幕管理器待审");
+            setAttributeIfChanged(reviewButton, "role", "button");
+            setAttributeIfChanged(reviewButton, "tabindex", "0");
             reviewButton.onclick = null;
             bindPanelButtonAction(reviewButton, async () => {
+                if (reviewButton.__dgqReviewBusy) return;
+                reviewButton.__dgqReviewBusy = true;
                 setTextIfChanged(reviewButton, "审...");
                 const panel = parent.closest(".danmudiv-32f498, [class*='danmudiv'], #comment-higher-container, .danmuTips-1ee820") || parent;
                 const ok = await reportBarrageReview(getBarrageTipText() || text, {
@@ -3962,6 +3985,7 @@
                     senderName: getBarrageSenderName(panel)
                 });
                 setTextIfChanged(reviewButton, ok ? "已审" : "审");
+                reviewButton.__dgqReviewBusy = false;
             });
         } else {
             parent.querySelector("#dgq-panel-review")?.remove();
@@ -3982,6 +4006,8 @@
         setClassNameIfChanged(button, `${baseClass} dgq-panel-tip-submit`);
         setTextIfChanged(button, "投");
         setAttributeIfChanged(button, "title", "选择标签投稿到63136烂梗网站");
+        setAttributeIfChanged(button, "role", "button");
+        setAttributeIfChanged(button, "tabindex", "0");
         button.onclick = null;
         bindPanelButtonAction(button, () => {
             openSubmitTagDialog(getBarrageTipText() || text, { source: "panel-tip" });
