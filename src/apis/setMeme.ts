@@ -71,8 +71,8 @@ export async function submitMeme(category: string, meme: string, tags?: string) 
         const res: submitMemeRes = await httpInstance.post(API.SUBMIT_MEME, payload);
         if (res.code === 500) {
             ElNotification({
-                title: '烂梗已经有了',
-                message: '勿重复提交',
+                title: '投稿被后台判重',
+                message: '烂梗库里已存在相同或相似内容，搜索页可能还没显示出来',
                 type: 'error',
             });
             return false;
