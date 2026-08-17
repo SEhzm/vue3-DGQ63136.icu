@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.15.08
+// @version      2026.08.17.01
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -29,7 +29,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.16";
+    const DISPLAY_VERSION = "V0.2.17";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -66,6 +66,10 @@
     const BARRAGE_PANEL_ROOT_SELECTOR = "#comment-dzjy-container, #comment-higher-container, .danmuTips-1ee820";
     const PANEL_ACTION_SELECTOR = "#dgq-panel-submit, #dgq-panel-plus-one";
     const EXTERNAL_PLUGIN_ROOT_SELECTOR = "#xy-gift-recorder, [id^='xy-'], [class^='xy-'], [class*=' xy-']";
+    const VIDEO_SYNC_BUTTON_ID = "dgq-video-sync";
+    const DOUYUEX_VIDEO_SYNC_BUTTON_ID = "ex-videosync";
+    const VIDEO_SYNC_TOOLBAR_SELECTOR = ".left-d3671e, .left-bfab3b";
+    const LIVE_VIDEO_SELECTOR = ".layout-Player-videoEntity video, video";
     const CATEGORY_SORT_OPTIONS = [
         { label: "最新", value: "latest" },
         { label: "最热", value: "hot" },
@@ -88,6 +92,10 @@
         reviewerToken: ""
     };
     const CHANGELOG = {
+        "V0.2.17": [
+            "新增播放器同步时间入口。",
+            "@呆物麋羊"
+        ],
         "V0.2.16": [
             "优化弹幕操作入口的稳定性。",
             "@呆物麋羊"
@@ -226,6 +234,7 @@
         "V0.0.1": ["新增一键投稿、本地收藏和更新提示。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.17.01": "0.2.17",
         "2026.08.15.08": "0.2.16",
         "2026.08.15.07": "0.2.15",
         "2026.08.15.06": "0.2.14",
@@ -325,6 +334,7 @@
         gfWebSocketStarted: false,
         barrageActionsStarted: false,
         panelActionCaptureStarted: false,
+        videoSyncStarted: false,
         lastDeepToolbarSearchAt: 0
     };
 
@@ -1079,6 +1089,35 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+        }
+        #dgq-video-sync {
+            float: left;
+            width: 24px;
+            height: 24px;
+            margin-left: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            cursor: pointer;
+            color: #fff;
+            background: transparent;
+            border: 0;
+            padding: 0;
+            outline: 0;
+            line-height: 1;
+        }
+        #dgq-video-sync.dgq-video-sync-compact {
+            margin-left: 8px;
+        }
+        #dgq-video-sync svg {
+            width: 22px;
+            height: 22px;
+            display: block;
+            pointer-events: none;
+        }
+        #dgq-video-sync:hover {
+            opacity: 0.85;
         }
         .dgq-toast {
             font-size: 16px;
@@ -3640,6 +3679,77 @@
         toolbar.insertBefore(button, toolbar.firstChild);
     }
 
+    function getLiveVideoNode() {
+        const preferredVideo = document.querySelector(".layout-Player-videoEntity video");
+        if (preferredVideo) return preferredVideo;
+        return Array.from(document.querySelectorAll(LIVE_VIDEO_SELECTOR)).find(video => {
+            const rect = video.getBoundingClientRect();
+            return rect.width > 160 && rect.height > 90 && video.buffered !== undefined;
+        }) || null;
+    }
+
+    function syncLiveVideoTime() {
+        const video = getLiveVideoNode();
+        const buffered = video?.buffered;
+        if (!video || !buffered || buffered.length === 0) {
+            showMsg("暂无可同步的直播时间", "warn");
+            return;
+        }
+        const targetTime = buffered.end(buffered.length - 1);
+        try {
+            video.currentTime = targetTime;
+        } catch (error) {
+            video.currentTime = Math.max(0, targetTime - 0.05);
+        }
+        showMsg("已同步到最新直播时间");
+    }
+
+    function createVideoSyncButton() {
+        const button = document.createElement("div");
+        button.id = VIDEO_SYNC_BUTTON_ID;
+        button.title = "同步时间";
+        button.setAttribute("role", "button");
+        button.setAttribute("tabindex", "0");
+        button.innerHTML = `
+            <svg viewBox="0 0 1024 1024" aria-hidden="true">
+                <path d="M938.1888 534.016h-80.7936c0.4096-7.3728 0.6144-14.6432 0.6144-22.016 0-218.624-176.8448-400.7936-389.12-400.7936C257.024 111.2064 80.6912 293.1712 80.6912 512c0 218.7264 176.4352 400.7936 388.1984 400.7936 74.752 0 149.0944-22.016 208.1792-60.0064l42.7008 68.608c-75.0592 48.9472-161.9968 74.8544-250.7776 74.752C209.8176 996.1472 0 779.264 0 512S209.8176 27.8528 468.8896 27.8528C728.3712 27.8528 938.7008 244.736 938.7008 512c0 7.3728-0.2048 14.6432-0.512 22.016z m-261.12 318.7712z m-26.4192-158.1056L426.7008 556.032V291.9424h64v226.5088L689.5616 635.904l-38.912 58.7776z m245.3504-6.656L768 512h256L896 688.0256z" fill="currentColor"></path>
+            </svg>
+        `;
+        const handleActivate = event => {
+            event.preventDefault();
+            event.stopPropagation();
+            syncLiveVideoTime();
+        };
+        button.addEventListener("click", handleActivate);
+        button.addEventListener("keydown", event => {
+            if (event.key !== "Enter" && event.key !== " ") return;
+            handleActivate(event);
+        });
+        return button;
+    }
+
+    function ensureVideoSyncButton() {
+        const ownButton = document.getElementById(VIDEO_SYNC_BUTTON_ID);
+        if (document.getElementById(DOUYUEX_VIDEO_SYNC_BUTTON_ID)) {
+            ownButton?.remove();
+            return;
+        }
+        if (ownButton?.isConnected) return;
+        const toolbar = document.querySelector(VIDEO_SYNC_TOOLBAR_SELECTOR);
+        if (!toolbar || isExternalPluginNode(toolbar)) return;
+        const button = createVideoSyncButton();
+        const isCompactToolbar = toolbar.classList.contains("left-bfab3b");
+        if (isCompactToolbar) button.classList.add("dgq-video-sync-compact");
+        const targetIndex = isCompactToolbar ? 2 : 3;
+        toolbar.insertBefore(button, toolbar.childNodes[targetIndex] || null);
+    }
+
+    function initVideoSyncButton() {
+        if (state.videoSyncStarted) return;
+        state.videoSyncStarted = true;
+        ensureVideoSyncButton();
+    }
+
     function enableDrag(container, handle) {
         let dragging = false;
         let offsetX = 0;
@@ -4295,5 +4405,9 @@
     initPanelButtonActionCapture();
     initBarrageActions();
     insertToolbarToggleButton();
-    setInterval(insertToolbarToggleButton, 2000);
+    initVideoSyncButton();
+    setInterval(() => {
+        insertToolbarToggleButton();
+        ensureVideoSyncButton();
+    }, 2000);
 })();
