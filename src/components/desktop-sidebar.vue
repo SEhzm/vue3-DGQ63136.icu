@@ -1,7 +1,7 @@
 <template>
     <div class="sidebar">
-        <el-menu router class="sidebar-el-menu" :default-active="route.path">
-            <el-menu-item v-for="category in MemeCategory" :key="category.path" :index="category.path">
+        <el-menu class="sidebar-el-menu" :default-active="route.path">
+            <el-menu-item v-for="category in MemeCategory" :key="category.path" :index="category.path" @click="navigateTo(category.path)">
                 <div class="sidebar-icon">
                     <img :src="category.icon" alt="" />
                 </div>
@@ -13,9 +13,16 @@
 
 <script setup lang="ts">
 import { MemeCategory } from '@/constants/backend';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
+const router = useRouter();
+
+const navigateTo = (path: string) => {
+    if (route.path !== path) {
+        void router.push(path);
+    }
+};
 </script>
 
 <style lang="scss" scoped>
