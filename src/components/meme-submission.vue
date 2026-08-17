@@ -160,7 +160,7 @@ function saveBarrage() {
                 ElNotification.success('投稿成功，待审核(一天内)');
                 emit('submitted');
             } else if (res.code === 500) {
-                ElNotification.error('烂梗已经有了，勿重复提交');
+                ElNotification.error('烂梗库里已存在相同或相似内容，搜索页可能还没显示出来');
             } else {
                 ElNotification.error('请求失败');
             }
