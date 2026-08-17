@@ -56,6 +56,9 @@ const navigateTo = (path: string) => {
 
 .sidebar {
     width: auto;
+    position: relative;
+    z-index: 1100;
+    flex: 0 0 auto;
     border-right: 0px solid #ddd;
     min-height: calc(100vh - 60px);
 
