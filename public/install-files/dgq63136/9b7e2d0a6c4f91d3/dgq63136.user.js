@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.17.08
+// @version      2026.08.17.09
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -30,7 +30,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.24";
+    const DISPLAY_VERSION = "V0.2.25";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -98,6 +98,10 @@
         reviewerToken: ""
     };
     const CHANGELOG = {
+        "V0.2.25": [
+            "优化热榜排序体验。",
+            "@呆物麋羊"
+        ],
         "V0.2.24": [
             "优化热榜实时显示体验。",
             "@呆物麋羊"
@@ -248,6 +252,8 @@
         "V0.0.1": ["新增一键投稿、本地收藏和更新提示。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.17.09": "0.2.25",
+        "2026.08.17.08": "0.2.24",
         "2026.08.17.04": "0.2.20",
         "2026.08.17.03": "0.2.19",
         "2026.08.17.02": "0.2.18",
@@ -2806,7 +2812,10 @@
 
     function normalizeHotwallEventRows(items) {
         if (!Array.isArray(items)) return [];
-        return items.map(item => {
+        return items
+            .slice()
+            .sort((left, right) => Number(right?.time || 0) - Number(left?.time || 0))
+            .map(item => {
             const row = normalizeMemeRow({
                 barrage: item?.barrage || "",
                 time: item?.time || Date.now()
@@ -2829,7 +2838,12 @@
         const updateParsed = text => {
             const parsed = parseHotwallSseText(text);
             if (parsed.ranking.length) latestParsed.ranking = parsed.ranking.slice(0, HOTWALL_RANK_LIMIT);
-                if (parsed.events.length) latestParsed.events = parsed.events.slice(0, HOTWALL_STREAM_LIMIT);
+            if (parsed.events.length) {
+                latestParsed.events = parsed.events
+                    .slice()
+                    .sort((left, right) => Number(right?.time || 0) - Number(left?.time || 0))
+                    .slice(0, HOTWALL_STREAM_LIMIT);
+            }
         };
         const hasEnoughData = () => (
             tab === "five"
