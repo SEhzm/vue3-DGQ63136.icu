@@ -21,19 +21,19 @@ assert.ok(page.includes("冬瓜强意难平的数字"), "install page should sho
 assert.ok(page.includes("INSTALL_GATE_ANSWER = '70'"), "install page gate answer should be 70");
 assert.ok(!page.includes("sessionStorage"), "install page should ask for the answer every time it is opened");
 assert.ok(page.includes("v-if=\"!installUnlocked\"") && page.includes("v-else"), "install content should be hidden before unlock");
-assert.ok(page.includes("currentPluginVersion = 'V0.2.23'"), "install page should show current display version");
-assert.ok(page.includes("currentPluginUpdatedAt = '2026-08-17 22:40'"), "install page should show current update time");
+assert.ok(page.includes("currentPluginVersion = 'V0.2.24'"), "install page should show current display version");
+assert.ok(page.includes("currentPluginUpdatedAt = '2026-08-17 23:05'"), "install page should show current update time");
 assert.ok(page.includes("/dgq63136.user.js?v=202608171922"), "install button should use cache-busted packaged userscript path");
 assert.ok(page.includes("安装油猴管理器"), "page should have Tampermonkey install entry");
 assert.ok(page.includes("允许用户脚本") && page.includes("Allow user scripts"), "page should remind users to enable user scripts");
 assert.ok(page.includes("在 InPrivate 中允许"), "page should remind users to enable InPrivate access");
-assert.ok(page.includes("version: 'V0.2.23'") && page.includes("version: 'V0.2.17'"), "history should include recent plugin versions");
+assert.ok(page.includes("version: 'V0.2.24'") && page.includes("version: 'V0.2.17'"), "history should include recent plugin versions");
 assert.ok(page.includes("@呆物麋羊"), "user-authored update history should include @呆物麋羊 signature");
 assert.ok(!page.includes("@呆物麋羊 更新"), "signature should not include update wording");
 assert.ok(!page.includes("ycfg.mygamemod.com"), "install page history should not expose internal review report domain");
 
 assert.ok(publicUserscript.includes("// @version      2026.08.17.04"), "public userscript should use current technical version");
-assert.ok(publicUserscript.includes('DISPLAY_VERSION = "V0.2.23"'), "public userscript should use current display version");
+assert.ok(publicUserscript.includes('DISPLAY_VERSION = "V0.2.24"'), "public userscript should use current display version");
 assert.ok(!publicUserscript.includes("审核者备注"), "public userscript should not expose reviewer remark input");
 
 console.log("install page verification passed");
