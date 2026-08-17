@@ -1,5 +1,26 @@
 <template>
     <div class="install-page">
+        <section v-if="!installUnlocked" class="card install-gate">
+            <p class="eyebrow">63136 弹幕插件</p>
+            <h1>一键安装插件</h1>
+            <p class="gate-desc">输入正确答案后继续访问安装教程、安装按钮和更新历史。</p>
+            <form class="gate-form" @submit.prevent="unlockInstallPage">
+                <label for="install-gate-answer">冬瓜强意难平的数字</label>
+                <div class="gate-input-row">
+                    <input
+                        id="install-gate-answer"
+                        v-model.trim="installGateAnswer"
+                        inputmode="numeric"
+                        autocomplete="off"
+                        placeholder="请输入答案"
+                    />
+                    <button type="submit">进入</button>
+                </div>
+                <p v-if="installGateError" class="gate-error">{{ installGateError }}</p>
+            </form>
+        </section>
+
+        <template v-else>
         <section class="card install-hero">
             <div>
                 <p class="eyebrow">63136 弹幕插件</p>
@@ -91,13 +112,21 @@
                 </article>
             </div>
         </section>
+        </template>
     </div>
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.2.16';
-const currentPluginUpdatedAt = '2026-08-15 21:29';
-const userscriptInstallUrl = '/dgq63136.user.js?v=202608152129';
+import { ref } from 'vue';
+
+const INSTALL_GATE_STORAGE_KEY = 'DGQ63136_INSTALL_PAGE_UNLOCKED_V1';
+const INSTALL_GATE_ANSWER = '70';
+const installUnlocked = ref(sessionStorage.getItem(INSTALL_GATE_STORAGE_KEY) === '1');
+const installGateAnswer = ref('');
+const installGateError = ref('');
+const currentPluginVersion = 'V0.2.18';
+const currentPluginUpdatedAt = '2026-08-17 19:22';
+const userscriptInstallUrl = '/dgq63136.user.js?v=202608171922';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
 const greasyForkUrl =
     'https://greasyfork.org/zh-CN/scripts/511991-dgq63136-cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86';
@@ -166,6 +195,22 @@ const permissionChecks = [
 ];
 
 const updateHistory = [
+    {
+        version: 'V0.2.18',
+        updatedAt: '2026-08-17 19:22',
+        changes: [
+            '优化播放器区域提示显示体验。',
+            '@呆物麋羊',
+        ],
+    },
+    {
+        version: 'V0.2.17',
+        updatedAt: '2026-08-17 19:13',
+        changes: [
+            '新增播放器同步时间入口。',
+            '@呆物麋羊',
+        ],
+    },
     {
         version: 'V0.2.16',
         updatedAt: '2026-08-15 21:29',
