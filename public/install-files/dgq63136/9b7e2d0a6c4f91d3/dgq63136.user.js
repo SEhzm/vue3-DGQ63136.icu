@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.17.02
+// @version      2026.08.17.03
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -19,6 +19,7 @@
 // @connect      hguofichp.cn
 // @connect      update.greasyfork.org
 // @connect      ycfg.mygamemod.com
+// @connect      dgq63136.cn
 // @icon         https://apic.douyucdn.cn/upload/avatar_v3/201808/e2b4d01edd7dd82f44efeb434a0d3a86_big.jpg
 // @license      MIT
 // @downloadURL https://dgq63136.cn/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js
@@ -29,7 +30,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.18";
+    const DISPLAY_VERSION = "V0.2.19";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -240,6 +241,7 @@
         "V0.0.1": ["新增一键投稿、本地收藏和更新提示。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.17.03": "0.2.19",
         "2026.08.17.02": "0.2.18",
         "2026.08.17.01": "0.2.17",
         "2026.08.15.08": "0.2.16",
