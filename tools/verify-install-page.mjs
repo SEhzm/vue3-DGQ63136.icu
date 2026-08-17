@@ -34,3 +34,4 @@ assert.ok(publicUserscript.includes('DISPLAY_VERSION = "V0.2.18"'), "public user
 assert.ok(!publicUserscript.includes("审核者备注"), "public userscript should not expose reviewer remark input");
 
 console.log("install page verification passed");
+assert.ok(!home.includes("dgq63136.user.js"), "home should not expose old userscript direct links");
