@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.17.01
+// @version      2026.08.17.02
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -29,7 +29,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.17";
+    const DISPLAY_VERSION = "V0.2.18";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -70,6 +70,8 @@
     const DOUYUEX_VIDEO_SYNC_BUTTON_ID = "ex-videosync";
     const VIDEO_SYNC_TOOLBAR_SELECTOR = ".left-d3671e, .left-bfab3b";
     const LIVE_VIDEO_SELECTOR = ".layout-Player-videoEntity video, video";
+    const PLAYER_GIFT_POPUP_ROOT_SELECTOR = "#js-player-dialog, .layout-Player-main, .layout-Player-video, .layout-Player-videoEntity";
+    const PLAYER_GIFT_POPUP_HIDDEN_ATTRIBUTE = "data-dgq-hidden-player-gift-popup";
     const CATEGORY_SORT_OPTIONS = [
         { label: "最新", value: "latest" },
         { label: "最热", value: "hot" },
@@ -92,6 +94,10 @@
         reviewerToken: ""
     };
     const CHANGELOG = {
+        "V0.2.18": [
+            "优化播放器区域提示显示体验。",
+            "@呆物麋羊"
+        ],
         "V0.2.17": [
             "新增播放器同步时间入口。",
             "@呆物麋羊"
@@ -234,6 +240,7 @@
         "V0.0.1": ["新增一键投稿、本地收藏和更新提示。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.17.02": "0.2.18",
         "2026.08.17.01": "0.2.17",
         "2026.08.15.08": "0.2.16",
         "2026.08.15.07": "0.2.15",
@@ -335,6 +342,7 @@
         barrageActionsStarted: false,
         panelActionCaptureStarted: false,
         videoSyncStarted: false,
+        playerGiftPopupBlockerStarted: false,
         lastDeepToolbarSearchAt: 0
     };
 
@@ -1118,6 +1126,11 @@
         }
         #dgq-video-sync:hover {
             opacity: 0.85;
+        }
+        [data-dgq-hidden-player-gift-popup="1"] {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
         .dgq-toast {
             font-size: 16px;
@@ -3750,6 +3763,94 @@
         ensureVideoSyncButton();
     }
 
+    function isLikelyPlayerGiftPopup(element) {
+        if (!element || element.nodeType !== 1) return false;
+        if (element.closest("#dgq63136-panel, #dgq-submit-dialog-mask, #dgq-send-confirm-mask, #dgq-update-dialog-mask") || isExternalPluginNode(element)) return false;
+        if (element.closest("#js-player-toolbar, #js-player-controlbar, .ChatSend, .Barrage-list, [class*='Barrage-list']")) return false;
+        const text = normalizeBarrageText(element.textContent || "");
+        if (!text || !/灯塔/.test(text)) return false;
+        if (!/(点亮全站第\d+层灯塔|助力.*灯塔|赠送.*灯塔|去看看)/.test(text)) return false;
+        const rect = element.getBoundingClientRect();
+        if (rect.width < 120 || rect.width > 560 || rect.height < 24 || rect.height > 180) return false;
+        const playerRoot = element.closest(PLAYER_GIFT_POPUP_ROOT_SELECTOR);
+        if (!playerRoot) return false;
+        const rootRect = playerRoot.getBoundingClientRect();
+        if (rootRect.width > 0 && rect.width > rootRect.width * 0.75) return false;
+        if (rootRect.height > 0 && rect.height > rootRect.height * 0.35) return false;
+        return true;
+    }
+
+    function hidePlayerGiftPopup(element) {
+        if (!isLikelyPlayerGiftPopup(element)) return false;
+        element.setAttribute(PLAYER_GIFT_POPUP_HIDDEN_ATTRIBUTE, "1");
+        return true;
+    }
+
+    function scanPlayerGiftPopupNode(node) {
+        if (!node || node.nodeType !== 1) return;
+        if (hidePlayerGiftPopup(node)) return;
+        node.querySelectorAll("div, section, aside, a, button").forEach(element => {
+            hidePlayerGiftPopup(element);
+        });
+    }
+
+    function getPlayerGiftPopupRoots() {
+        return Array.from(document.querySelectorAll(PLAYER_GIFT_POPUP_ROOT_SELECTOR))
+            .filter(root => root?.isConnected && !isExternalPluginNode(root));
+    }
+
+    function initPlayerGiftPopupBlocker() {
+        if (state.playerGiftPopupBlockerStarted) return;
+        state.playerGiftPopupBlockerStarted = true;
+        const observedRoots = new Map();
+        let scheduledNodes = new Set();
+        let scheduled = false;
+
+        const flushNodes = () => {
+            scheduled = false;
+            const nodes = Array.from(scheduledNodes);
+            scheduledNodes = new Set();
+            nodes.forEach(scanPlayerGiftPopupNode);
+        };
+
+        const scheduleNode = node => {
+            if (!node || node.nodeType !== 1) return;
+            scheduledNodes.add(node);
+            if (scheduled) return;
+            scheduled = true;
+            requestAnimationFrame(flushNodes);
+        };
+
+        const syncRoots = () => {
+            getPlayerGiftPopupRoots().forEach(root => {
+                if (!observedRoots.has(root)) {
+                    const observer = new MutationObserver(mutations => {
+                        mutations.forEach(mutation => {
+                            mutation.addedNodes.forEach(scheduleNode);
+                        });
+                    });
+                    observer.observe(root, { childList: true, subtree: true });
+                    observedRoots.set(root, observer);
+                    scheduleNode(root);
+                }
+            });
+            observedRoots.forEach((observer, root) => {
+                if (root.isConnected) return;
+                observer.disconnect();
+                observedRoots.delete(root);
+            });
+        };
+
+        const discoverTimer = setInterval(syncRoots, 2000);
+        syncRoots();
+        window.addEventListener("beforeunload", () => {
+            clearInterval(discoverTimer);
+            observedRoots.forEach(observer => observer.disconnect());
+            observedRoots.clear();
+            scheduledNodes.clear();
+        });
+    }
+
     function enableDrag(container, handle) {
         let dragging = false;
         let offsetX = 0;
@@ -4406,6 +4507,7 @@
     initBarrageActions();
     insertToolbarToggleButton();
     initVideoSyncButton();
+    initPlayerGiftPopupBlocker();
     setInterval(() => {
         insertToolbarToggleButton();
         ensureVideoSyncButton();
