@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.17.09
+// @version      2026.08.17.10
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -30,7 +30,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.25";
+    const DISPLAY_VERSION = "V0.2.26";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -65,6 +65,7 @@
     const LIST_PAGE_SIZE = 5;
     const HOTWALL_STREAM_LIMIT = 40;
     const HOTWALL_RANK_LIMIT = 20;
+    const HOTWALL_SETTLE_MS = 1200;
     const BARRAGE_ITEM_SELECTOR = ".Barrage-listItem, [class*='Barrage-listItem']";
     const BARRAGE_LIST_ROOT_SELECTOR = "#js-barrage-list, .Barrage-list, [class*='Barrage-list']";
     const BARRAGE_PANEL_ROOT_SELECTOR = "#comment-dzjy-container, #comment-higher-container, .danmuTips-1ee820";
@@ -98,6 +99,10 @@
         reviewerToken: ""
     };
     const CHANGELOG = {
+        "V0.2.26": [
+            "优化热榜加载体验。",
+            "@呆物麋羊"
+        ],
         "V0.2.25": [
             "优化热榜排序体验。",
             "@呆物麋羊"
@@ -252,6 +257,8 @@
         "V0.0.1": ["新增一键投稿、本地收藏和更新提示。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.17.10": "0.2.26",
+        "2026.08.17.09": "0.2.25",
         "2026.08.17.09": "0.2.25",
         "2026.08.17.08": "0.2.24",
         "2026.08.17.04": "0.2.20",
@@ -2843,16 +2850,20 @@
                     .slice()
                     .sort((left, right) => Number(right?.time || 0) - Number(left?.time || 0))
                     .slice(0, HOTWALL_STREAM_LIMIT);
+                if (!settleTimer) {
+                    settleTimer = setTimeout(() => controller.abort(), HOTWALL_SETTLE_MS);
+                }
             }
         };
         const hasEnoughData = () => (
             tab === "five"
                 ? latestParsed.ranking.length > 0
                 : tab === "realtime"
-                    ? latestParsed.events.length >= HOTWALL_STREAM_LIMIT
+                    ? latestParsed.events.length >= 5
                     : latestParsed.ranking.length > 0 || latestParsed.events.length > 0
         );
-        const timer = setTimeout(() => controller.abort(), 12000);
+                let settleTimer = null;
+        const timer = setTimeout(() => controller.abort(), 6000);
         try {
             const response = await fetch(API_BASE_URL + API_PATHS.HOTWALL_STREAM, {
                 method: "GET",
@@ -2877,9 +2888,10 @@
                 }
             }
         } catch (error) {
-            if (!hasEnoughData()) throw error;
+            if (!latestParsed.ranking.length && !latestParsed.events.length) throw error;
         } finally {
             clearTimeout(timer);
+            clearTimeout(settleTimer);
             if (state.hotwallRequest === controller) state.hotwallRequest = null;
             try { controller.abort(); } catch (error) { /* ignore */ }
         }
@@ -2978,7 +2990,13 @@
             if (state.hotTab === tab) renderHotEmpty(response?.msg || "热门弹幕加载失败。");
         } catch (error) {
             console.warn("[dgq63136] 热门弹幕加载失败", error);
-            if (state.hotTab === tab) renderHotEmpty("热门弹幕加载失败，请稍后再试。");
+            if (state.hotTab === tab) {
+                if (isHotwallTab(tab)) {
+                    renderHotEmpty(tab === "realtime" ? "实时暂无新数据，稍后再试。" : "5分钟热榜暂无数据，稍后再试。");
+                } else {
+                    renderHotEmpty("热门弹幕加载失败，请稍后再试。");
+                }
+            }
         } finally {
             const activeTabNeedsLoad = state.hotExpanded && state.hotTab !== state.hotLoadingTab && !state.hotCache[state.hotTab]?.length;
             state.hotLoading = false;
