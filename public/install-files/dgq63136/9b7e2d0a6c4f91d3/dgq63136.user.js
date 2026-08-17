@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.17.04
+// @version      2026.08.17.05
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -30,7 +30,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.20";
+    const DISPLAY_VERSION = "V0.2.21";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -2725,6 +2725,10 @@
         }
     }
 
+    function isHotwallTab(tab) {
+        return tab === "realtime" || tab === "five";
+    }
+
     function getHotPath(tab) {
         return tab === "7d" ? API_PATHS.HOT_MEME_7D : API_PATHS.HOT_MEME_24H;
     }
@@ -2809,7 +2813,7 @@
         }).filter(item => item.content).slice(0, LIST_PAGE_SIZE);
     }
 
-    function requestHotwallSnapshot() {
+    function requestHotwallSnapshot(tab = state.hotTab) {
         if (state.hotwallRequest && typeof state.hotwallRequest.abort === "function") {
             try { state.hotwallRequest.abort(); } catch (error) { /* ignore */ }
         }
@@ -2835,9 +2839,15 @@
                 const parsed = parseHotwallSseText(latestText);
                 if (parsed.ranking.length) latestParsed.ranking = parsed.ranking;
                 if (parsed.events.length) latestParsed.events = parsed.events.concat(latestParsed.events).slice(0, 20);
-                if (latestParsed.ranking.length && latestParsed.events.length >= 3) finish();
+                const hasEnoughData =
+                    tab === "five"
+                        ? latestParsed.ranking.length > 0
+                        : tab === "realtime"
+                            ? latestParsed.events.length > 0
+                            : latestParsed.ranking.length > 0 || latestParsed.events.length > 0;
+                if (hasEnoughData) finish();
             };
-            const timer = setTimeout(finish, 4200);
+            const timer = setTimeout(finish, 3500);
             state.hotwallRequest = GM_xmlhttpRequest({
                 method: "GET",
                 url: API_BASE_URL + API_PATHS.HOTWALL_STREAM,
@@ -2872,14 +2882,21 @@
     }
 
     async function loadHotwallMemes(tab) {
-        const payload = await requestHotwallSnapshot();
+        const payload = await requestHotwallSnapshot(tab);
         const realtimeRows = normalizeHotwallEventRows(payload.events);
         const fiveRows = normalizeHotwallRankRows(payload.ranking);
         state.hotCache.realtime = realtimeRows;
         state.hotCache.five = fiveRows;
-        if (state.hotTab === tab) {
-            renderHotRows(tab === "five" ? fiveRows : realtimeRows);
+        if (state.hotTab !== tab) return;
+        if (tab === "five") {
+            renderHotRows(fiveRows);
+            return;
         }
+        if (realtimeRows.length) {
+            renderHotRows(realtimeRows);
+            return;
+        }
+        renderHotEmpty("实时暂无新弹幕，稍后点击刷新。");
     }
     function renderHotEmpty(message) {
         if (!state.hotList) return;
@@ -2914,7 +2931,7 @@
 
             const meta = document.createElement("div");
             meta.className = "dgq-hot-meta";
-            meta.textContent = buildMetaText(row, true);
+            meta.textContent = row.hotMeta ? `${row.hotMeta} · ${buildMetaText(row, true)}` : buildMetaText(row, true);
             main.appendChild(meta);
 
             item.appendChild(main);
@@ -2942,6 +2959,10 @@
         state.hotLoadingTab = tab;
         renderHotEmpty("热门弹幕加载中...");
         try {
+            if (isHotwallTab(tab)) {
+                await loadHotwallMemes(tab);
+                return;
+            }
             const response = await apiRequest("GET", getHotPath(tab));
             if (response?.code === 200 && Array.isArray(response.data)) {
                 const rows = normalizeHotRows(response.data, tab);
@@ -2962,7 +2983,8 @@
     }
 
     function setHotTab(tab) {
-        state.hotTab = tab === "7d" ? "7d" : "24h";
+        const nextTab = ["realtime", "five", "24h", "7d"].includes(tab) ? tab : "24h";
+        state.hotTab = nextTab;
         renderHotTabs();
         loadHotMemes(state.hotTab);
     }
