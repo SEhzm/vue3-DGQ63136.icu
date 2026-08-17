@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.17.05
+// @version      2026.08.17.06
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -30,7 +30,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.21";
+    const DISPLAY_VERSION = "V0.2.22";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -2763,12 +2763,12 @@
     function parseHotwallSseText(text) {
         const result = { ranking: [], events: [] };
         if (typeof text !== "string" || !text.trim()) return result;
-        const blocks = text.split(/\n\n+/);
+        const blocks = text.split(/\r?\n\r?\n+/);
         for (const block of blocks) {
             if (!block.trim()) continue;
             let eventName = "";
             let dataText = "";
-            for (const line of block.split(/\n/)) {
+            for (const line of block.split(/\r?\n/)) {
                 if (line.startsWith("event:")) eventName = line.replace(/^event:\s*/, "").trim();
                 if (line.startsWith("data:")) dataText += line.replace(/^data:\s?/, "");
             }
@@ -2813,74 +2813,59 @@
         }).filter(item => item.content).slice(0, LIST_PAGE_SIZE);
     }
 
-    function requestHotwallSnapshot(tab = state.hotTab) {
+    async function requestHotwallSnapshot(tab = state.hotTab) {
         if (state.hotwallRequest && typeof state.hotwallRequest.abort === "function") {
             try { state.hotwallRequest.abort(); } catch (error) { /* ignore */ }
         }
-        return new Promise((resolve, reject) => {
-            let settled = false;
-            let latestText = "";
-            let latestParsed = { ranking: [], events: [] };
-            const finish = () => {
-                if (settled) return;
-                settled = true;
-                if (state.hotwallRequest && typeof state.hotwallRequest.abort === "function") {
-                    try { state.hotwallRequest.abort(); } catch (error) { /* ignore */ }
-                }
-                state.hotwallRequest = null;
-                if (latestParsed.ranking.length || latestParsed.events.length) {
-                    resolve(latestParsed);
-                } else {
-                    reject(new Error("hotwall empty"));
-                }
-            };
-            const updateParsed = response => {
-                latestText = response?.responseText || response?.response || latestText || "";
-                const parsed = parseHotwallSseText(latestText);
-                if (parsed.ranking.length) latestParsed.ranking = parsed.ranking;
-                if (parsed.events.length) latestParsed.events = parsed.events.concat(latestParsed.events).slice(0, 20);
-                const hasEnoughData =
-                    tab === "five"
-                        ? latestParsed.ranking.length > 0
-                        : tab === "realtime"
-                            ? latestParsed.events.length > 0
-                            : latestParsed.ranking.length > 0 || latestParsed.events.length > 0;
-                if (hasEnoughData) finish();
-            };
-            const timer = setTimeout(finish, 3500);
-            state.hotwallRequest = GM_xmlhttpRequest({
+        const controller = new AbortController();
+        state.hotwallRequest = controller;
+        const latestParsed = { ranking: [], events: [] };
+        const updateParsed = text => {
+            const parsed = parseHotwallSseText(text);
+            if (parsed.ranking.length) latestParsed.ranking = parsed.ranking;
+            if (parsed.events.length) latestParsed.events = parsed.events.concat(latestParsed.events).slice(0, 20);
+        };
+        const hasEnoughData = () => (
+            tab === "five"
+                ? latestParsed.ranking.length > 0
+                : tab === "realtime"
+                    ? latestParsed.events.length > 0
+                    : latestParsed.ranking.length > 0 || latestParsed.events.length > 0
+        );
+        const timer = setTimeout(() => controller.abort(), 4500);
+        try {
+            const response = await fetch(API_BASE_URL + API_PATHS.HOTWALL_STREAM, {
                 method: "GET",
-                url: API_BASE_URL + API_PATHS.HOTWALL_STREAM,
                 headers: {
                     "dpahjdoiaw": API_AUTH_HEADER,
                     "siteToken": getOrCreateSiteToken()
                 },
-                responseType: "text",
-                timeout: 5000,
-                onprogress(response) {
-                    updateParsed(response);
-                },
-                onload(response) {
-                    clearTimeout(timer);
-                    if (response.status >= 200 && response.status < 300) {
-                        updateParsed(response);
-                        finish();
-                        return;
-                    }
-                    reject(new Error(`HTTP ${response.status}`));
-                },
-                onerror(error) {
-                    clearTimeout(timer);
-                    if (!settled) reject(error);
-                },
-                ontimeout() {
-                    clearTimeout(timer);
-                    finish();
-                }
+                signal: controller.signal
             });
-        });
+            if (!response.ok || !response.body) throw new Error(`HTTP ${response.status}`);
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = "";
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                buffer += decoder.decode(value, { stream: true });
+                updateParsed(buffer);
+                if (hasEnoughData()) {
+                    try { await reader.cancel(); } catch (error) { /* ignore */ }
+                    break;
+                }
+            }
+        } catch (error) {
+            if (!hasEnoughData()) throw error;
+        } finally {
+            clearTimeout(timer);
+            if (state.hotwallRequest === controller) state.hotwallRequest = null;
+            try { controller.abort(); } catch (error) { /* ignore */ }
+        }
+        if (latestParsed.ranking.length || latestParsed.events.length) return latestParsed;
+        throw new Error("hotwall empty");
     }
-
     async function loadHotwallMemes(tab) {
         const payload = await requestHotwallSnapshot(tab);
         const realtimeRows = normalizeHotwallEventRows(payload.events);
