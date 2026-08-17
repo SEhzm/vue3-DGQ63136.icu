@@ -6,7 +6,7 @@ const root = resolve(import.meta.dirname, "..");
 const constants = readFileSync(resolve(root, "src/constants/backend.ts"), "utf8");
 const page = readFileSync(resolve(root, "src/views/MainLayout/components/Tampermonkey.vue"), "utf8");
 const homeIntro = readFileSync(resolve(root, "src/components/home/homeIntro.vue"), "utf8");
-const publicUserscript = readFileSync(resolve(root, "public/dgq63136.user.js"), "utf8");
+const publicUserscript = readFileSync(resolve(root, "public/_install/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js"), "utf8");
 
 assert.ok(constants.includes("path: '/Tampermonkey'"), "left menu should include Tampermonkey route");
 assert.ok(constants.includes("text: '一键安装插件'"), "left menu label should be 一键安装插件");
@@ -16,7 +16,7 @@ assert.ok(!homeIntro.includes('href="https://dgq63136.cn/dgq63136.user.js"'), "h
 assert.ok(page.includes("installUnlocked"), "install page should hide content behind a simple question gate");
 assert.ok(page.includes("冬瓜强意难平的数字"), "install page should show the gate question");
 assert.ok(page.includes("INSTALL_GATE_ANSWER = '70'"), "install page gate answer should be 70");
-assert.ok(page.includes("sessionStorage"), "install page should remember unlock state for the browser session");
+assert.ok(!page.includes("sessionStorage"), "install page should ask for the answer every time it is opened");
 assert.ok(page.includes("v-if=\"!installUnlocked\"") && page.includes("v-else"), "install content should be hidden before unlock");
 assert.ok(page.includes("currentPluginVersion = 'V0.2.18'"), "install page should show current display version");
 assert.ok(page.includes("currentPluginUpdatedAt = '2026-08-17 19:22'"), "install page should show current update time");
