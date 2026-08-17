@@ -11,7 +11,7 @@
             <b>
                 <RouterLink to="/Tampermonkey">油猴插件</RouterLink>
                 (已支持斗鱼新UI)
-                <a href="https://dgq63136.cn/dgq63136.user.js" target="_blank">点击下载</a>
+                <RouterLink to="/Tampermonkey">点击下载</RouterLink>
                 可在斗鱼直播间一键发送烂梗
             </b>
         </p>
