@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.17.06
+// @version      2026.08.17.07
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -30,7 +30,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.22";
+    const DISPLAY_VERSION = "V0.2.23";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -3781,7 +3781,7 @@
                 const latestInfo = normalizeRemoteVersionInfo(remoteInfo);
                 if (!latestInfo) throw new Error("missing version");
                 const latestDisplay = latestInfo.displayVersion;
-                const hasUpdate = compareVersions(latestInfo.version, CURRENT_VERSION) > 0;
+                const hasUpdate = hasDisplayVersionUpdate(latestInfo) || compareVersions(latestInfo.version, CURRENT_VERSION) > 0;
                 state.updateLatestVersion = latestInfo.version;
                 state.updateLatestDisplayVersion = latestInfo.displayVersion;
                 if (versions) versions.innerHTML = `当前版本：${DISPLAY_VERSION}<br>最新版本：${latestDisplay}`;
@@ -4536,6 +4536,11 @@
         });
     }
 
+    function hasDisplayVersionUpdate(latestInfo) {
+        const latestDisplay = normalizeRemoteVersionInfo(latestInfo)?.displayVersion || "";
+        return compareVersions(latestDisplay, DISPLAY_VERSION) > 0;
+    }
+
     function compareVersions(left, right) {
         const a = normalizeVersionForCompare(left);
         const b = normalizeVersionForCompare(right);
@@ -4574,7 +4579,7 @@
             .then(latestVersionInfo => {
                 const latestInfo = normalizeRemoteVersionInfo(latestVersionInfo);
                 if (!latestInfo) throw new Error("missing version");
-                if (compareVersions(latestInfo.version, CURRENT_VERSION) > 0) {
+                if (hasDisplayVersionUpdate(latestInfo) || compareVersions(latestInfo.version, CURRENT_VERSION) > 0) {
                     setUpdateTip(latestInfo);
                     showMsg(`检测到新版本 ${latestInfo.displayVersion}，点击顶部提示更新`, "warn");
                 } else if (manual) {
