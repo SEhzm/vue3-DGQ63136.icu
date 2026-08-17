@@ -6,7 +6,7 @@ const root = resolve(import.meta.dirname, "..");
 const constants = readFileSync(resolve(root, "src/constants/backend.ts"), "utf8");
 const page = readFileSync(resolve(root, "src/views/MainLayout/components/Tampermonkey.vue"), "utf8");
 const homeIntro = readFileSync(resolve(root, "src/components/home/homeIntro.vue"), "utf8");
-const publicUserscript = readFileSync(resolve(root, "public/_install/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js"), "utf8");
+const publicUserscript = readFileSync(resolve(root, "public/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js"), "utf8");
 
 assert.ok(constants.includes("path: '/Tampermonkey'"), "left menu should include Tampermonkey route");
 assert.ok(constants.includes("text: '一键安装插件'"), "left menu label should be 一键安装插件");
