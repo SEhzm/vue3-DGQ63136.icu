@@ -6,7 +6,7 @@
 
 - 网站入口：https://dgq63136.cn/
 - 一键安装插件页：https://dgq63136.cn/#/Tampermonkey
-- 插件安装源（脚本头部 `@downloadURL` / `@updateURL` 指向）：https://dgq63136.cn/_install/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js
+- 插件安装源（脚本头部 `@downloadURL` / `@updateURL` 指向）：https://dgq63136.cn/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js
 - 安装提醒：有些浏览器即使装好 Tampermonkey，也要手动打开“允许用户脚本”，否则插件不会运行。
 
 ## 目录说明
@@ -24,7 +24,7 @@
 └── vite.config.js
 ```
 
-插件交付物的单一真实源是 `public/_install/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js`，Vite 构建时会复制到 `dist/` 根目录，部署到 GitHub Pages 后即可通过 `https://dgq63136.cn/_install/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js` 直接下载。脚本头部 `@downloadURL` / `@updateURL` 与运行时更新检查的 `UPDATE_SOURCE_URL` / `UPDATE_SCRIPT_URL` 都已统一指向站内同源地址，油猴管理器会按 `@updateURL` 间隔去拉取最新脚本，运行时也会从同一个 URL 主动检查新版本。网站仓库不再保存插件源码 zip 或页面源码 zip。本地编辑器目录 `.idea/`、`node_modules/`、`dist/` 和临时 zip 不提交到仓库。
+插件交付物的单一真实源是 `public/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js`，Vite 构建时会复制到 `dist/` 根目录，部署到 GitHub Pages 后即可通过 `https://dgq63136.cn/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js` 直接下载。脚本头部 `@downloadURL` / `@updateURL` 与运行时更新检查的 `UPDATE_SOURCE_URL` / `UPDATE_SCRIPT_URL` 都已统一指向站内同源地址，油猴管理器会按 `@updateURL` 间隔去拉取最新脚本，运行时也会从同一个 URL 主动检查新版本。网站仓库不再保存插件源码 zip 或页面源码 zip。本地编辑器目录 `.idea/`、`node_modules/`、`dist/` 和临时 zip 不提交到仓库。
 
 ## 本地开发
 
