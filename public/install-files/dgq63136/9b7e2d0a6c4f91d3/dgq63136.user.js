@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.17.07
+// @version      2026.08.17.08
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -30,7 +30,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.23";
+    const DISPLAY_VERSION = "V0.2.24";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -63,6 +63,8 @@
     const AUTO_UPDATE_CHECK_INTERVAL = 60 * 60 * 1000;
     const CATEGORY_PAGE_SIZE = 5;
     const LIST_PAGE_SIZE = 5;
+    const HOTWALL_STREAM_LIMIT = 40;
+    const HOTWALL_RANK_LIMIT = 20;
     const BARRAGE_ITEM_SELECTOR = ".Barrage-listItem, [class*='Barrage-listItem']";
     const BARRAGE_LIST_ROOT_SELECTOR = "#js-barrage-list, .Barrage-list, [class*='Barrage-list']";
     const BARRAGE_PANEL_ROOT_SELECTOR = "#comment-dzjy-container, #comment-higher-container, .danmuTips-1ee820";
@@ -96,6 +98,10 @@
         reviewerToken: ""
     };
     const CHANGELOG = {
+        "V0.2.24": [
+            "优化热榜实时显示体验。",
+            "@呆物麋羊"
+        ],
         "V0.2.18": [
             "优化播放器区域提示显示体验。",
             "@呆物麋羊"
@@ -2795,7 +2801,7 @@
             row.hotCount = Number(item?.count || 0) || 0;
             row.hotMeta = `5分钟热度：${row.hotCount}`;
             return row;
-        }).filter(item => item.content).slice(0, LIST_PAGE_SIZE);
+        }).filter(item => item.content).slice(0, HOTWALL_RANK_LIMIT);
     }
 
     function normalizeHotwallEventRows(items) {
@@ -2808,9 +2814,9 @@
                 source: "hotwall-realtime",
                 time: item?.time || Date.now()
             });
-            row.hotMeta = `实时：${hotwallTypeName(item?.type)} · ${formatHotwallTime(item?.time)}`;
+            row.hotMeta = `${hotwallTypeName(item?.type)} · ${formatHotwallTime(item?.time)}`;
             return row;
-        }).filter(item => item.content).slice(0, LIST_PAGE_SIZE);
+        }).filter(item => item.content).slice(0, HOTWALL_STREAM_LIMIT);
     }
 
     async function requestHotwallSnapshot(tab = state.hotTab) {
@@ -2822,17 +2828,17 @@
         const latestParsed = { ranking: [], events: [] };
         const updateParsed = text => {
             const parsed = parseHotwallSseText(text);
-            if (parsed.ranking.length) latestParsed.ranking = parsed.ranking;
-            if (parsed.events.length) latestParsed.events = parsed.events.concat(latestParsed.events).slice(0, 20);
+            if (parsed.ranking.length) latestParsed.ranking = parsed.ranking.slice(0, HOTWALL_RANK_LIMIT);
+                if (parsed.events.length) latestParsed.events = parsed.events.slice(0, HOTWALL_STREAM_LIMIT);
         };
         const hasEnoughData = () => (
             tab === "five"
                 ? latestParsed.ranking.length > 0
                 : tab === "realtime"
-                    ? latestParsed.events.length > 0
+                    ? latestParsed.events.length >= HOTWALL_STREAM_LIMIT
                     : latestParsed.ranking.length > 0 || latestParsed.events.length > 0
         );
-        const timer = setTimeout(() => controller.abort(), 4500);
+        const timer = setTimeout(() => controller.abort(), 12000);
         try {
             const response = await fetch(API_BASE_URL + API_PATHS.HOTWALL_STREAM, {
                 method: "GET",
@@ -2916,7 +2922,7 @@
 
             const meta = document.createElement("div");
             meta.className = "dgq-hot-meta";
-            meta.textContent = row.hotMeta ? `${row.hotMeta} · ${buildMetaText(row, true)}` : buildMetaText(row, true);
+            meta.textContent = row.hotMeta || buildMetaText(row, true);
             main.appendChild(meta);
 
             item.appendChild(main);
