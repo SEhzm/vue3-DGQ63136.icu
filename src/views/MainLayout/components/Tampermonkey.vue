@@ -131,6 +131,15 @@ const tampermonkeyUrl = 'https://www.tampermonkey.net/';
 const greasyForkUrl =
     'https://greasyfork.org/zh-CN/scripts/511991-dgq63136-cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86';
 
+const unlockInstallPage = () => {
+    if (installGateAnswer.value === INSTALL_GATE_ANSWER) {
+        sessionStorage.setItem(INSTALL_GATE_STORAGE_KEY, '1');
+        installUnlocked.value = true;
+        installGateError.value = '';
+        return;
+    }
+    installGateError.value = '答案不对，再想想。';
+};
 const installSteps = [
     {
         index: '1',
