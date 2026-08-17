@@ -123,8 +123,8 @@ const INSTALL_GATE_ANSWER = '70';
 const installUnlocked = ref(false);
 const installGateAnswer = ref('');
 const installGateError = ref('');
-const currentPluginVersion = 'V0.2.18';
-const currentPluginUpdatedAt = '2026-08-17 19:22';
+const currentPluginVersion = 'V0.2.19';
+const currentPluginUpdatedAt = '2026-08-17 20:25';
 const userscriptInstallUrl = '/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js?v=202608171922';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
 const greasyForkUrl =
@@ -202,6 +202,15 @@ const permissionChecks = [
 ];
 
 const updateHistory = [
+    {
+        date: '2026-08-17',
+        updatedAt: '2026-08-17 20:25',
+        version: 'V0.2.19',
+        changes: [
+            '修复更新检测失败的问题。',
+            '@呆物麋羊',
+        ],
+    },
     {
         version: 'V0.2.18',
         updatedAt: '2026-08-17 19:22',
