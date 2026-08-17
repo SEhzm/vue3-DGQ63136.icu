@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.17.03
+// @version      2026.08.17.04
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -30,7 +30,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.19";
+    const DISPLAY_VERSION = "V0.2.20";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -41,7 +41,8 @@
         RANDOM_MEME: "/dgq/random",
         INCREASE_COPY_COUNT: "/dgq/addCnt",
         HOT_MEME_24H: "/dgq/hotBarrageOf24H",
-        HOT_MEME_7D: "/dgq/hotBarrageOf7Day"
+        HOT_MEME_7D: "/dgq/hotBarrageOf7Day",
+        HOTWALL_STREAM: "/dgq/hotwall/stream"
     };
     const UPDATE_SOURCE_URL = "https://dgq63136.cn/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js";
     const UPDATE_SCRIPT_URL = "https://dgq63136.cn/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js";
@@ -241,6 +242,7 @@
         "V0.0.1": ["新增一键投稿、本地收藏和更新提示。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.17.04": "0.2.20",
         "2026.08.17.03": "0.2.19",
         "2026.08.17.02": "0.2.18",
         "2026.08.17.01": "0.2.17",
@@ -320,7 +322,8 @@
         hotTab: "24h",
         hotLoading: false,
         hotLoadingTab: "",
-        hotCache: { "24h": [], "7d": [] },
+        hotCache: { "realtime": [], "five": [], "24h": [], "7d": [] },
+        hotwallRequest: null,
         tagPickerButton: null,
         tagPickerMenu: null,
         tagPickerOpen: false,
@@ -2324,7 +2327,7 @@
             state.hotExpanded = true;
             if (state.hotSection) state.hotSection.hidden = false;
             updateHotToggle();
-            setTableTitle("热门弹幕：24 小时 / 7 天热门可直接发送、收藏。");
+            setTableTitle("热门弹幕：实时 / 5分钟 / 24小时 / 7天热门可直接发送、收藏。");
             state.currentRows = [];
             state.table.innerHTML = "";
             loadHotMemes(state.hotTab);
@@ -2562,6 +2565,24 @@
         hotTabs.className = "dgq-hot-tabs";
         hotSection.appendChild(hotTabs);
 
+        const hotRealtimeButton = document.createElement("button");
+        hotRealtimeButton.className = "dgq-hot-tab";
+        hotRealtimeButton.type = "button";
+        hotRealtimeButton.textContent = "实时";
+        hotRealtimeButton.setAttribute("data-hot-tab", "realtime");
+        hotRealtimeButton.addEventListener("click", () => setHotTab("realtime"));
+        hotTabs.appendChild(hotRealtimeButton);
+        state.hotTabs["realtime"] = hotRealtimeButton;
+
+        const hotFiveButton = document.createElement("button");
+        hotFiveButton.className = "dgq-hot-tab";
+        hotFiveButton.type = "button";
+        hotFiveButton.textContent = "5分钟";
+        hotFiveButton.setAttribute("data-hot-tab", "five");
+        hotFiveButton.addEventListener("click", () => setHotTab("five"));
+        hotTabs.appendChild(hotFiveButton);
+        state.hotTabs["five"] = hotFiveButton;
+
         const hot24Button = document.createElement("button");
         hot24Button.className = "dgq-hot-tab";
         hot24Button.type = "button";
@@ -2717,6 +2738,149 @@
             })).filter(item => item.content).slice(0, LIST_PAGE_SIZE);
     }
 
+
+    function hotwallTypeName(type) {
+        return {
+            submit: "投稿",
+            copy: "复制",
+            search: "搜索",
+            view: "浏览",
+            pick: "选梗",
+            burst: "爆发"
+        }[type] || type || "实时";
+    }
+
+    function formatHotwallTime(time) {
+        const date = new Date(Number(time) || time || Date.now());
+        const pad = value => String(value).padStart(2, "0");
+        return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+    }
+
+    function parseHotwallSseText(text) {
+        const result = { ranking: [], events: [] };
+        if (typeof text !== "string" || !text.trim()) return result;
+        const blocks = text.split(/\n\n+/);
+        for (const block of blocks) {
+            if (!block.trim()) continue;
+            let eventName = "";
+            let dataText = "";
+            for (const line of block.split(/\n/)) {
+                if (line.startsWith("event:")) eventName = line.replace(/^event:\s*/, "").trim();
+                if (line.startsWith("data:")) dataText += line.replace(/^data:\s?/, "");
+            }
+            if (!dataText) continue;
+            const data = parseJsonSafe(dataText, null);
+            if (!data) continue;
+            if (eventName === "snapshot" && Array.isArray(data.items)) {
+                result.ranking = data.items;
+            } else if (eventName === "event" && data.barrage) {
+                result.events.push(data);
+            }
+        }
+        return result;
+    }
+
+    function normalizeHotwallRankRows(items) {
+        if (!Array.isArray(items)) return [];
+        return items.map(item => {
+            const row = normalizeMemeRow(item, {
+                source: "hotwall-5m",
+                memeId: String(item?.barrageId || item?.id || ""),
+                time: item?.submitTime || ""
+            });
+            row.hotCount = Number(item?.count || 0) || 0;
+            row.hotMeta = `5分钟热度：${row.hotCount}`;
+            return row;
+        }).filter(item => item.content).slice(0, LIST_PAGE_SIZE);
+    }
+
+    function normalizeHotwallEventRows(items) {
+        if (!Array.isArray(items)) return [];
+        return items.map(item => {
+            const row = normalizeMemeRow({
+                barrage: item?.barrage || "",
+                time: item?.time || Date.now()
+            }, {
+                source: "hotwall-realtime",
+                time: item?.time || Date.now()
+            });
+            row.hotMeta = `实时：${hotwallTypeName(item?.type)} · ${formatHotwallTime(item?.time)}`;
+            return row;
+        }).filter(item => item.content).slice(0, LIST_PAGE_SIZE);
+    }
+
+    function requestHotwallSnapshot() {
+        if (state.hotwallRequest && typeof state.hotwallRequest.abort === "function") {
+            try { state.hotwallRequest.abort(); } catch (error) { /* ignore */ }
+        }
+        return new Promise((resolve, reject) => {
+            let settled = false;
+            let latestText = "";
+            let latestParsed = { ranking: [], events: [] };
+            const finish = () => {
+                if (settled) return;
+                settled = true;
+                if (state.hotwallRequest && typeof state.hotwallRequest.abort === "function") {
+                    try { state.hotwallRequest.abort(); } catch (error) { /* ignore */ }
+                }
+                state.hotwallRequest = null;
+                if (latestParsed.ranking.length || latestParsed.events.length) {
+                    resolve(latestParsed);
+                } else {
+                    reject(new Error("hotwall empty"));
+                }
+            };
+            const updateParsed = response => {
+                latestText = response?.responseText || response?.response || latestText || "";
+                const parsed = parseHotwallSseText(latestText);
+                if (parsed.ranking.length) latestParsed.ranking = parsed.ranking;
+                if (parsed.events.length) latestParsed.events = parsed.events.concat(latestParsed.events).slice(0, 20);
+                if (latestParsed.ranking.length && latestParsed.events.length >= 3) finish();
+            };
+            const timer = setTimeout(finish, 4200);
+            state.hotwallRequest = GM_xmlhttpRequest({
+                method: "GET",
+                url: API_BASE_URL + API_PATHS.HOTWALL_STREAM,
+                headers: {
+                    "dpahjdoiaw": API_AUTH_HEADER,
+                    "siteToken": getOrCreateSiteToken()
+                },
+                responseType: "text",
+                timeout: 5000,
+                onprogress(response) {
+                    updateParsed(response);
+                },
+                onload(response) {
+                    clearTimeout(timer);
+                    if (response.status >= 200 && response.status < 300) {
+                        updateParsed(response);
+                        finish();
+                        return;
+                    }
+                    reject(new Error(`HTTP ${response.status}`));
+                },
+                onerror(error) {
+                    clearTimeout(timer);
+                    if (!settled) reject(error);
+                },
+                ontimeout() {
+                    clearTimeout(timer);
+                    finish();
+                }
+            });
+        });
+    }
+
+    async function loadHotwallMemes(tab) {
+        const payload = await requestHotwallSnapshot();
+        const realtimeRows = normalizeHotwallEventRows(payload.events);
+        const fiveRows = normalizeHotwallRankRows(payload.ranking);
+        state.hotCache.realtime = realtimeRows;
+        state.hotCache.five = fiveRows;
+        if (state.hotTab === tab) {
+            renderHotRows(tab === "five" ? fiveRows : realtimeRows);
+        }
+    }
     function renderHotEmpty(message) {
         if (!state.hotList) return;
         state.hotList.innerHTML = "";
@@ -2808,7 +2972,7 @@
         if (state.hotExpanded) {
             state.mode = "hot";
             renderModeTabs();
-            setTableTitle("热门弹幕：24 小时 / 7 天热门可直接发送、收藏。");
+            setTableTitle("热门弹幕：实时 / 5分钟 / 24小时 / 7天热门可直接发送、收藏。");
             state.currentRows = [];
             state.table.innerHTML = "";
         }
