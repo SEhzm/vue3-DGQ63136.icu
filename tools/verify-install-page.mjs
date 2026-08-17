@@ -10,6 +10,9 @@ const publicUserscript = readFileSync(resolve(root, "public/install-files/dgq631
 
 assert.ok(constants.includes("path: '/Tampermonkey'"), "left menu should include Tampermonkey route");
 assert.ok(constants.includes("text: '一键安装插件'"), "left menu label should be 一键安装插件");
+assert.ok(desktopSidebar.includes("@click=\"navigateTo(category.path)\""), "desktop sidebar should use explicit router push for menu clicks");
+assert.ok(desktopSidebar.includes("useRouter"), "desktop sidebar should import useRouter");
+assert.ok(desktopSidebar.includes("z-index: 1100"), "desktop sidebar should stay above home content overlays");
 assert.ok(homeIntro.includes('<RouterLink to="/Tampermonkey">点击下载</RouterLink>'), "home download link should open install page");
 assert.ok(!homeIntro.includes('href="https://dgq63136.cn/dgq63136.user.js"'), "home intro should not directly link to userscript download");
 
