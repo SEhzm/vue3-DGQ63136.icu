@@ -119,21 +119,19 @@
 <script setup>
 import { ref } from 'vue';
 
-const INSTALL_GATE_STORAGE_KEY = 'DGQ63136_INSTALL_PAGE_UNLOCKED_V1';
 const INSTALL_GATE_ANSWER = '70';
-const installUnlocked = ref(sessionStorage.getItem(INSTALL_GATE_STORAGE_KEY) === '1');
+const installUnlocked = ref(false);
 const installGateAnswer = ref('');
 const installGateError = ref('');
 const currentPluginVersion = 'V0.2.18';
 const currentPluginUpdatedAt = '2026-08-17 19:22';
-const userscriptInstallUrl = '/dgq63136.user.js?v=202608171922';
+const userscriptInstallUrl = '/_install/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js?v=202608171922';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
 const greasyForkUrl =
     'https://greasyfork.org/zh-CN/scripts/511991-dgq63136-cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86';
 
 const unlockInstallPage = () => {
     if (installGateAnswer.value === INSTALL_GATE_ANSWER) {
-        sessionStorage.setItem(INSTALL_GATE_STORAGE_KEY, '1');
         installUnlocked.value = true;
         installGateError.value = '';
         return;
