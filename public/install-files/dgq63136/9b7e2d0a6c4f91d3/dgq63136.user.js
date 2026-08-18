@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.18.03
+// @version      2026.08.18.04
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -30,7 +30,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.29";
+    const DISPLAY_VERSION = "V0.2.30";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -56,10 +56,12 @@
     const REVIEW_CLICKER_ID_KEY = "DGQ63136_REVIEW_CLICKER_ID_V1";
     const UPDATE_CACHE_KEY = "DGQ63136_UPDATE_CACHE_V1";
     const DEFAULT_TAGS_KEY = "DGQ63136_DEFAULT_TAGS";
+    const TAG_OPTIONS_CACHE_KEY = "DGQ63136_TAG_OPTIONS_CACHE_V1";
     const DEFAULT_TAGS_MIGRATION_KEY = "DGQ63136_DEFAULT_TAGS_MIGRATED_TO_01";
     const DEFAULT_SUBMIT_TAG = "01";
     const FAVORITES_LIMIT = 500;
     const RECENTS_LIMIT = 100;
+    const TAG_OPTIONS_REFRESH_INTERVAL = 60 * 1000;
     const AUTO_UPDATE_CHECK_INTERVAL = 60 * 60 * 1000;
     const CATEGORY_PAGE_SIZE = 5;
     const LIST_PAGE_SIZE = 5;
@@ -99,6 +101,10 @@
         reviewerToken: ""
     };
     const CHANGELOG = {
+        "V0.2.30": [
+            "优化投稿标签刷新体验。",
+            "@呆物麋羊"
+        ],
         "V0.2.29": [
             "优化投稿异常处理体验。",
             "@呆物麋羊"
@@ -269,6 +275,7 @@
         "V0.0.1": ["新增一键投稿、本地收藏和更新提示。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.18.04": "0.2.30",
         "2026.08.18.03": "0.2.29",
         "2026.08.18.02": "0.2.28",
         "2026.08.18.01": "0.2.27",
@@ -384,7 +391,9 @@
         panelActionCaptureStarted: false,
         videoSyncStarted: false,
         playerGiftPopupBlockerStarted: false,
-        lastDeepToolbarSearchAt: 0
+        lastDeepToolbarSearchAt: 0,
+        tagOptionsLoadedAt: 0,
+        tagOptionsLoading: null
     };
 
     console.log("dgq63136.cn插件--当前版本:" + CURRENT_VERSION);
@@ -1630,21 +1639,55 @@
         return merged.length > 0 ? merged : FALLBACK_TAGS.slice();
     }
 
-    async function loadTagOptions() {
-        try {
-            const response = await apiRequest("GET", API_PATHS.DICT_LIST);
-            if (response?.code === 200 && Array.isArray(response.data)) {
-                const remoteOptions = response.data.map(item => ({
-                    label: item.dictLabel,
-                    value: item.dictValue
-                })).filter(item => item.label && item.value);
-                state.tagOptions = mergeTagOptions(remoteOptions);
-            }
-        } catch (error) {
-            console.warn("[dgq63136] 获取投稿标签失败，使用内置标签", error);
-        }
+    function normalizeRemoteTagOptions(data) {
+        return (Array.isArray(data) ? data : []).map(item => ({
+            label: String(item?.dictLabel || item?.label || "").trim(),
+            value: String(item?.dictValue || item?.value || "").trim()
+        })).filter(item => item.label && item.value);
+    }
+
+    function applyTagOptions(remoteOptions) {
+        state.tagOptions = mergeTagOptions(remoteOptions);
+        state.tagOptionsLoadedAt = Date.now();
+        storageSet(TAG_OPTIONS_CACHE_KEY, {
+            time: state.tagOptionsLoadedAt,
+            items: remoteOptions
+        });
         renderTagSelect();
         renderShortcutTags();
+    }
+
+    async function loadTagOptions(options = {}) {
+        const now = Date.now();
+        const force = Boolean(options.force);
+        const cached = storageGet(TAG_OPTIONS_CACHE_KEY, null);
+        if (cached?.items?.length && !force && state.tagOptionsLoadedAt === 0) {
+            state.tagOptions = mergeTagOptions(normalizeRemoteTagOptions(cached.items));
+            state.tagOptionsLoadedAt = Number(cached.time || 0);
+            renderTagSelect();
+            renderShortcutTags();
+        }
+        if (!force && state.tagOptionsLoadedAt && now - state.tagOptionsLoadedAt < TAG_OPTIONS_REFRESH_INTERVAL) {
+            return state.tagOptions;
+        }
+        if (state.tagOptionsLoading) return state.tagOptionsLoading;
+        state.tagOptionsLoading = apiRequest("GET", API_PATHS.DICT_LIST)
+            .then(response => {
+                if (response?.code === 200 && Array.isArray(response.data)) {
+                    applyTagOptions(normalizeRemoteTagOptions(response.data));
+                }
+                return state.tagOptions;
+            })
+            .catch(error => {
+                console.warn("[dgq63136] 获取投稿标签失败，使用内置标签", error);
+                renderTagSelect();
+                renderShortcutTags();
+                return state.tagOptions;
+            })
+            .finally(() => {
+                state.tagOptionsLoading = null;
+            });
+        return state.tagOptionsLoading;
     }
 
     function getSettings() {
@@ -1931,7 +1974,7 @@
         }
     }
 
-    function openSubmitTagDialog(text, meta = {}) {
+    async function openSubmitTagDialog(text, meta = {}) {
         text = normalizeBarrageText(text);
         if (!text) {
             showMsg("没有可投稿的弹幕", "warn");
@@ -1943,6 +1986,7 @@
         }
 
         document.getElementById("dgq-submit-dialog-mask")?.remove();
+        await loadTagOptions({ force: true });
 
         const tagOptions = state.tagOptions.length > 0 ? state.tagOptions : FALLBACK_TAGS;
         const defaultSelected = new Set(getDefaultTags());
@@ -3938,7 +3982,10 @@
         if (!panel) return;
         state.panelVisible = visible === undefined ? panel.style.display === "none" : visible;
         panel.style.display = state.panelVisible ? "flex" : "none";
-        if (state.panelVisible) ensurePanelBootstrapped();
+        if (state.panelVisible) {
+            ensurePanelBootstrapped();
+            loadTagOptions();
+        }
     }
 
     function insertToolbarToggleButton() {
