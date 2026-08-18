@@ -5,18 +5,25 @@
             <h1>一键安装插件</h1>
             <p class="gate-desc">输入正确答案后继续访问安装教程、安装按钮和更新历史。</p>
             <form class="gate-form" @submit.prevent="unlockInstallPage">
-                <label for="install-gate-answer">冬瓜强意难平的数字</label>
+                <label for="install-gate-answer" class="gate-label">冬瓜强意难平的数字</label>
                 <div class="gate-input-row">
+                    <span class="gate-input-icon" aria-hidden="true">#</span>
                     <input
                         id="install-gate-answer"
+                        class="gate-input"
                         v-model.trim="installGateAnswer"
-                        inputmode="numeric"
+                        inputmode="decimal"
                         autocomplete="off"
+                        spellcheck="false"
                         placeholder="请输入答案"
+                        :class="{ 'gate-input-invalid': installGateError }"
                     />
-                    <button type="submit">进入</button>
+                    <button class="gate-submit" type="submit">进入</button>
                 </div>
                 <p v-if="installGateError" class="gate-error">{{ installGateError }}</p>
+                <p v-if="installGateHint" class="gate-hint">
+                    <span class="gate-hint-badge">提示</span>{{ installGateHint }}
+                </p>
             </form>
         </section>
 
@@ -119,24 +126,46 @@
 <script setup>
 import { ref } from 'vue';
 
-const INSTALL_GATE_ANSWER = '70';
+/** 冬瓜强意难平的数字 —— 任一命中即放行 */
+const INSTALL_GATE_ANSWERS = [70, 17, 0.17, 15, 63136, 9418, 6657];
 const installUnlocked = ref(false);
 const installGateAnswer = ref('');
 const installGateError = ref('');
-const currentPluginVersion = 'V0.2.28';
-const currentPluginUpdatedAt = '2026-08-18 05:28';
-const userscriptInstallUrl = '/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js?v=202608180528';
+const installGateWrongCnt = ref(0);
+const installGateHint = ref('');
+/** 错误到一定次数给点题提示，分级展开 */
+const GATE_HINTS = [
+    '5EPL rating = ?',
+    '团播飞盘🙋‍♂️',
+];
+const currentPluginVersion = 'V0.2.29';
+const currentPluginUpdatedAt = '2026-08-18 06:00';
+const userscriptInstallUrl = '/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js?v=202608180600';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
 const greasyForkUrl =
     'https://greasyfork.org/zh-CN/scripts/511991-dgq63136-cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86';
 
 const unlockInstallPage = () => {
-    if (installGateAnswer.value === INSTALL_GATE_ANSWER) {
-        installUnlocked.value = true;
-        installGateError.value = '';
+    const raw = (installGateAnswer.value || '').trim();
+    if (raw === '') {
+        installGateError.value = '先输入一个数字试试。';
         return;
     }
+    const num = Number(raw);
+    if (!Number.isNaN(num) && INSTALL_GATE_ANSWERS.some(a => a === num)) {
+        installUnlocked.value = true;
+        installGateError.value = '';
+        installGateHint.value = '';
+        return;
+    }
+    installGateWrongCnt.value += 1;
     installGateError.value = '答案不对，再想想。';
+    const cnt = installGateWrongCnt.value;
+    if (cnt >= 8) {
+        installGateHint.value = GATE_HINTS[1];
+    } else if (cnt >= 5) {
+        installGateHint.value = GATE_HINTS[0];
+    }
 };
 const installSteps = [
     {
@@ -606,6 +635,163 @@ const updateHistory = [
     gap: 14px;
 }
 
+/* ===== 安装门禁：意难平数字闸口 ===== */
+.install-gate {
+    display: grid;
+    gap: 4px;
+    border-top: 3px solid #1976d2;
+    padding: 22px 22px 24px;
+}
+
+.gate-desc {
+    margin-top: 6px;
+    color: #5b6470;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.gate-form {
+    margin-top: 16px;
+    display: grid;
+    gap: 10px;
+}
+
+.gate-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #125ea8;
+    letter-spacing: 0.2px;
+}
+
+.gate-input-row {
+    display: grid;
+    grid-template-columns: 44px 1fr auto;
+    align-items: stretch;
+    border-radius: 10px;
+    background: #f3f7ff;
+    border: 1.5px solid #cfe0ff;
+    box-shadow: 0 2px 10px rgba(25, 118, 210, 0.06);
+    overflow: hidden;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.gate-input-row:focus-within {
+    border-color: #1976d2;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.12), 0 4px 14px rgba(25, 118, 210, 0.14);
+}
+
+.gate-input-row:has(.gate-input-invalid) {
+    border-color: #e54d3c;
+    background: #fff5f3;
+    box-shadow: 0 0 0 4px rgba(229, 77, 60, 0.10);
+    animation: gate-shake 0.4s ease;
+}
+
+@keyframes gate-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-3px); }
+}
+
+.gate-input-icon {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(180deg, #eaf2ff, #d8e8ff);
+    color: #1976d2;
+    font-weight: 800;
+    font-size: 18px;
+    border-right: 1.5px solid #cfe0ff;
+}
+
+.gate-input {
+    border: none;
+    background: transparent;
+    outline: none;
+    padding: 0 14px;
+    height: 50px;
+    font-size: 17px;
+    font-weight: 600;
+    color: #1a2230;
+    letter-spacing: 1px;
+    font-variant-numeric: tabular-nums;
+}
+
+.gate-input::placeholder {
+    color: #9aa6b6;
+    font-weight: 500;
+    letter-spacing: 0;
+}
+
+.gate-submit {
+    border: none;
+    cursor: pointer;
+    padding: 0 22px;
+    background: linear-gradient(180deg, #1e88e5, #1565c0);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    transition: filter 0.18s ease, transform 0.18s ease;
+}
+
+.gate-submit:hover {
+    filter: brightness(1.06);
+}
+
+.gate-submit:active {
+    transform: translateY(1px);
+}
+
+.gate-error {
+    color: #e54d3c;
+    font-size: 13px;
+    font-weight: 600;
+    padding-left: 2px;
+}
+
+.gate-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: #7a5a06;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    background: #fff8e6;
+    border: 1px dashed #f0c44a;
+    animation: gate-hint-in 0.32s ease;
+}
+
+@keyframes gate-hint-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.gate-hint-badge {
+    flex: none;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #f0c44a;
+    color: #5a4400;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0;
+}
+
+@media (max-width: 640px) {
+    .gate-input-row {
+        grid-template-columns: 40px 1fr auto;
+    }
+    .gate-submit {
+        padding: 0 16px;
+    }
+}
 
 
 .install-hero {
