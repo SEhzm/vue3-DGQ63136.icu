@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.18.08
+// @version      2026.08.19.01
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -19,6 +19,7 @@
 // @connect      hguofichp.cn
 // @connect      update.greasyfork.org
 // @connect      ycfg.mygamemod.com
+
 // @connect      dgq63136.cn
 // @icon         https://apic.douyucdn.cn/upload/avatar_v3/201808/e2b4d01edd7dd82f44efeb434a0d3a86_big.jpg
 // @license      MIT
@@ -30,7 +31,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.34";
+    const DISPLAY_VERSION = "V0.2.35";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -42,6 +43,7 @@
         INCREASE_COPY_COUNT: "/dgq/addCnt",
         HOT_MEME_24H: "/dgq/hotBarrageOf24H",
         HOT_MEME_7D: "/dgq/hotBarrageOf7Day",
+
         HOTWALL_STREAM: "/dgq/hotwall/stream"
     };
     const UPDATE_SOURCE_URL = "https://dgq63136.cn/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js";
@@ -67,6 +69,7 @@
     const LIST_PAGE_SIZE = 5;
     const HOTWALL_STREAM_LIMIT = 40;
     const HOTWALL_RANK_LIMIT = 20;
+
     const HOTWALL_SETTLE_MS = 1200;
     const BARRAGE_ITEM_SELECTOR = ".Barrage-listItem, [class*='Barrage-listItem']";
     const BARRAGE_LIST_ROOT_SELECTOR = "#js-barrage-list, .Barrage-list, [class*='Barrage-list']";
@@ -101,6 +104,10 @@
         reviewerToken: ""
     };
     const CHANGELOG = {
+        "V0.2.35": [
+            "优化投稿失败诊断体验。",
+            "@呆物麋羊"
+        ],
         "V0.2.34": [
             "优化投稿接口兼容体验。",
             "@呆物麋羊"
@@ -291,6 +298,7 @@
         "V0.0.1": ["新增一键投稿、本地收藏和更新提示。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.19.01": "0.2.35",
         "2026.08.18.08": "0.2.34",
         "2026.08.18.07": "0.2.33",
         "2026.08.18.06": "0.2.32",
@@ -298,14 +306,23 @@
         "2026.08.18.04": "0.2.30",
         "2026.08.18.03": "0.2.29",
         "2026.08.18.02": "0.2.28",
+
         "2026.08.18.01": "0.2.27",
+
         "2026.08.18.01": "0.2.27",
+
         "2026.08.17.10": "0.2.26",
+
         "2026.08.17.10": "0.2.26",
+
         "2026.08.17.09": "0.2.25",
+
         "2026.08.17.09": "0.2.25",
+
         "2026.08.17.08": "0.2.24",
+
         "2026.08.17.04": "0.2.20",
+
         "2026.08.17.03": "0.2.19",
         "2026.08.17.02": "0.2.18",
         "2026.08.17.01": "0.2.17",
@@ -386,6 +403,7 @@
         hotLoading: false,
         hotLoadingTab: "",
         hotCache: { "realtime": [], "five": [], "24h": [], "7d": [] },
+
         hotwallRequest: null,
         tagPickerButton: null,
         tagPickerMenu: null,
@@ -1933,7 +1951,28 @@
     }
 
     function getResponseMessage(response) {
-        return String(response?.reason || response?.message || response?.msg || "").trim();
+        if (response === null || response === undefined) return "";
+        if (typeof response === "string") return response.trim();
+        if (Array.isArray(response)) {
+            for (const item of response) {
+                const text = getResponseMessage(item);
+                if (text) return text;
+            }
+            return "";
+        }
+        if (typeof response !== "object") return String(response || "").trim();
+        const direct = response.reason || response.message || response.msg || response.errorMsg || response.error_message || response.detail || response.desc;
+        if (direct) return String(direct).trim();
+        const nested = response.data || response.result || response.error || response.payload;
+        if (nested && nested !== response) return getResponseMessage(nested);
+        return "";
+    }
+
+    function compactDiagnosticText(value, limit = 120) {
+        const text = String(value || "").replace(/\s+/g, " ").trim();
+        if (!text) return "";
+        if (text.length <= limit) return text;
+        return `${text.slice(0, limit - 1)}…`;
     }
 
     function isDuplicateSubmissionResponse(response) {
@@ -1951,16 +1990,28 @@
             /limit/i.test(text);
     }
 
-    function getSubmissionFailureMessage(response, error = null) {
-        const rawMessage = getResponseMessage(response) || String(error?.message || "").replace(/^HTTP\s+\d+:\s*/i, "").trim();
-        const codeText = response?.code !== undefined && response?.code !== 200 ? `（错误码：${response.code}）` : "";
+    function getSubmissionFailureMessage(response, error = null, meta = {}) {
+        const payload = response || error?.payload || null;
+        const rawMessage = getResponseMessage(payload) || String(error?.message || "").replace(/^HTTP\s+\d+:\s*/i, "").trim();
+        const codeValue = payload?.code ?? error?.status ?? payload?.status;
+        const codeText = codeValue !== undefined ? `（错误码：${codeValue}）` : "";
+        const tagText = Array.isArray(meta.tags) && meta.tags.length > 0 ? `，标签：${compactDiagnosticText(meta.tags.map(getTagLabel).join("、"), 40)}` : "";
+        const contentText = meta.text ? `，字数：${String(meta.text).length}` : "";
+        const payloadText = payload && typeof payload === "object"
+            ? compactDiagnosticText(getResponseMessage(payload) || JSON.stringify(payload), 120)
+            : "";
+
+        if (isDuplicateSubmissionResponse(payload)) {
+            return `投稿失败：内容可能重复或相似${codeText}${tagText}`;
+        }
         if (rawMessage && !/^请求失败$/.test(rawMessage) && !isUnexpectedSubmissionLimitMessage(rawMessage)) {
-            return `投稿失败：${rawMessage}${codeText}`;
+            return `投稿失败：${compactDiagnosticText(rawMessage, 90)}${codeText}${tagText}${contentText}`;
         }
-        if (response?.code !== undefined && response?.code !== 200) {
-            return `投稿失败：接口返回异常${codeText}，请稍后再试`;
+        if (codeValue !== undefined && codeValue !== 200) {
+            const tail = payloadText ? `，后端提示：${payloadText}` : "";
+            return `投稿失败：接口返回异常${codeText}${tagText}${contentText}${tail}`;
         }
-        return "投稿失败，请稍后再试";
+        return `投稿失败，请稍后再试${tagText}${contentText}`;
     }
 
     async function submitMeme(text, tags = [], meta = {}) {
@@ -1994,8 +2045,14 @@
                 showMsg("烂梗库里已存在相同或相似内容，搜索页可能还没显示出来", "warn");
                 return false;
             }
-            showMsg(getSubmissionFailureMessage(response), "error");
-            console.warn("[dgq63136] 投稿未通过", response);
+            showMsg(getSubmissionFailureMessage(response, null, { tags, text }), "error");
+            console.warn("[dgq63136] 投稿未通过", {
+                status: response?.code,
+                message: getResponseMessage(response),
+                tags,
+                textLength: text.length,
+                response
+            });
             return false;
         } catch (error) {
             console.error("[dgq63136] 投稿失败", error);
@@ -2003,8 +2060,16 @@
             if (isDuplicateSubmissionResponse(payload)) {
                 showMsg("烂梗库里已存在相同或相似内容，搜索页可能还没显示出来", "warn");
             } else {
-                showMsg(getSubmissionFailureMessage(payload, error), "error");
+                showMsg(getSubmissionFailureMessage(payload, error, { tags, text }), "error");
             }
+            console.warn("[dgq63136] 投稿诊断", {
+                status: payload?.code ?? error?.status,
+                message: getResponseMessage(payload) || String(error?.message || "").replace(/^HTTP\s+\d+:\s*/i, "").trim(),
+                tags,
+                textLength: text.length,
+                response: payload,
+                errorText: String(error?.message || "")
+            });
             return false;
         }
     }
@@ -2070,6 +2135,7 @@
             label.appendChild(span);
             tagsWrap.appendChild(label);
         }
+
 
 
         const actions = document.createElement("div");
@@ -3011,7 +3077,9 @@
             if (!latestParsed.ranking.length && !latestParsed.events.length) throw error;
         } finally {
             clearTimeout(timer);
+
             clearTimeout(settleTimer);
+
             if (state.hotwallRequest === controller) state.hotwallRequest = null;
             try { controller.abort(); } catch (error) { /* ignore */ }
         }
@@ -3035,6 +3103,7 @@
         }
         renderHotEmpty("实时暂无新弹幕，稍后点击刷新。");
     }
+
     function renderHotEmpty(message) {
         if (!state.hotList) return;
         state.hotList.innerHTML = "";
@@ -4853,5 +4922,3 @@
         ensureVideoSyncButton();
     }, 2000);
 })();
-
-
