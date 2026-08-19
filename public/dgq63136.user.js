@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      0.2.1
-// @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏和版本更新提示
+// @version      2026.08.19.01
+// @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
 // @match        https://www.douyu.com
@@ -18,17 +18,20 @@
 // @grant        unsafeWindow
 // @connect      hguofichp.cn
 // @connect      update.greasyfork.org
+// @connect      ycfg.mygamemod.com
+
+// @connect      dgq63136.cn
 // @icon         https://apic.douyucdn.cn/upload/avatar_v3/201808/e2b4d01edd7dd82f44efeb434a0d3a86_big.jpg
 // @license      MIT
-// @downloadURL https://dgq63136.cn/dgq63136.user.js
-// @updateURL https://dgq63136.cn/dgq63136.user.js
+// @downloadURL https://dgq63136.cn/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js
+// @updateURL https://dgq63136.cn/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js
 // ==/UserScript==
 
 (function () {
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.1";
+    const DISPLAY_VERSION = "V0.2.35";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -39,28 +42,46 @@
         RANDOM_MEME: "/dgq/random",
         INCREASE_COPY_COUNT: "/dgq/addCnt",
         HOT_MEME_24H: "/dgq/hotBarrageOf24H",
-        HOT_MEME_7D: "/dgq/hotBarrageOf7Day"
+        HOT_MEME_7D: "/dgq/hotBarrageOf7Day",
+
+        HOTWALL_STREAM: "/dgq/hotwall/stream"
     };
-    const UPDATE_SOURCE_URL = "https://dgq63136.cn/dgq63136.user.js";
-    const UPDATE_SCRIPT_URL = "https://dgq63136.cn/dgq63136.user.js";
+    const UPDATE_SOURCE_URL = "https://dgq63136.cn/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js";
+    const UPDATE_SCRIPT_URL = "https://dgq63136.cn/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js";
     const UPDATE_PAGE_URL = "https://dgq63136.cn/#/Tampermonkey";
+    const REVIEW_REPORT_URL = "https://ycfg.mygamemod.com/api/dgq63136/review/rvw_2c6a205ebff67878f318c01092f020fca98d2e1b5b337ee0";
+    const REVIEW_ROUTE_CODE = "rvw_2c6a205ebff67878f318c01092f020fca98d2e1b5b337ee0";
     const SITE_TOKEN_KEY = "DGQ63136_SITE_TOKEN_V1";
     const FAVORITES_KEY = "DGQ63136_FAVORITES_V1";
     const RECENTS_KEY = "DGQ63136_RECENTS_V1";
     const SETTINGS_KEY = "DGQ63136_SETTINGS_V1";
+    const REVIEW_CLICKER_ID_KEY = "DGQ63136_REVIEW_CLICKER_ID_V1";
     const UPDATE_CACHE_KEY = "DGQ63136_UPDATE_CACHE_V1";
     const DEFAULT_TAGS_KEY = "DGQ63136_DEFAULT_TAGS";
+    const TAG_OPTIONS_CACHE_KEY = "DGQ63136_TAG_OPTIONS_CACHE_V1";
     const DEFAULT_TAGS_MIGRATION_KEY = "DGQ63136_DEFAULT_TAGS_MIGRATED_TO_01";
     const DEFAULT_SUBMIT_TAG = "01";
     const FAVORITES_LIMIT = 500;
     const RECENTS_LIMIT = 100;
+    const TAG_OPTIONS_REFRESH_INTERVAL = 60 * 1000;
     const AUTO_UPDATE_CHECK_INTERVAL = 60 * 60 * 1000;
     const CATEGORY_PAGE_SIZE = 5;
     const LIST_PAGE_SIZE = 5;
+    const HOTWALL_STREAM_LIMIT = 40;
+    const HOTWALL_RANK_LIMIT = 20;
+
+    const HOTWALL_SETTLE_MS = 1200;
     const BARRAGE_ITEM_SELECTOR = ".Barrage-listItem, [class*='Barrage-listItem']";
     const BARRAGE_LIST_ROOT_SELECTOR = "#js-barrage-list, .Barrage-list, [class*='Barrage-list']";
     const BARRAGE_PANEL_ROOT_SELECTOR = "#comment-dzjy-container, #comment-higher-container, .danmuTips-1ee820";
+    const PANEL_ACTION_SELECTOR = "#dgq-panel-submit, #dgq-panel-plus-one";
     const EXTERNAL_PLUGIN_ROOT_SELECTOR = "#xy-gift-recorder, [id^='xy-'], [class^='xy-'], [class*=' xy-']";
+    const VIDEO_SYNC_BUTTON_ID = "dgq-video-sync";
+    const DOUYUEX_VIDEO_SYNC_BUTTON_ID = "ex-videosync";
+    const VIDEO_SYNC_TOOLBAR_SELECTOR = ".left-d3671e, .left-bfab3b";
+    const LIVE_VIDEO_SELECTOR = ".layout-Player-videoEntity video, video";
+    const PLAYER_GIFT_POPUP_ROOT_SELECTOR = "#js-player-dialog, .layout-Player-main, .layout-Player-video, .layout-Player-videoEntity";
+    const PLAYER_GIFT_POPUP_HIDDEN_ATTRIBUTE = "data-dgq-hidden-player-gift-popup";
     const CATEGORY_SORT_OPTIONS = [
         { label: "最新", value: "latest" },
         { label: "最热", value: "hot" },
@@ -79,91 +100,248 @@
     const SETTINGS_DEFAULTS = {
         confirmBeforeSend: false,
         layoutMode: "standard",
-        shortcutsEnabled: true
+        shortcutsEnabled: true,
+        reviewerToken: ""
     };
     const CHANGELOG = {
+        "V0.2.35": [
+            "优化投稿失败诊断体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.34": [
+            "优化投稿接口兼容体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.33": [
+            "优化投稿失败提示体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.32": [
+            "优化投稿失败提示体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.31": [
+            "优化投稿标签选择体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.30": [
+            "优化投稿标签刷新体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.29": [
+            "优化投稿异常处理体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.28": [
+            "优化投稿重复提示，减少误解。",
+            "@呆物麋羊"
+        ],
+        "V0.2.27": [
+            "优化投稿重复提示，减少误解。",
+            "@呆物麋羊"
+        ],
+        "V0.2.26": [
+            "优化热榜加载体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.25": [
+            "优化热榜排序体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.24": [
+            "优化热榜实时显示体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.18": [
+            "优化播放器区域提示显示体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.17": [
+            "新增播放器同步时间入口。",
+            "@呆物麋羊"
+        ],
+        "V0.2.16": [
+            "优化弹幕操作入口的稳定性。",
+            "@呆物麋羊"
+        ],
+        "V0.2.15": [
+            "优化弹幕操作体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.14": [
+            "优化弹幕操作体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.13": [
+            "优化公开更新说明，改为更简洁的功能概述。",
+            "@呆物麋羊"
+        ],
+        "V0.2.12": [
+            "优化弹幕互动操作的响应体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.11": [
+            "完善特殊情况下的弹幕处理流程。",
+            "提升相关功能的稳定性和安全性。",
+            "@呆物麋羊"
+        ],
+        "V0.2.10": [
+            "优化弹幕识别与交互体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.9": [
+            "优化弹幕操作入口的加载和响应速度。",
+            "@呆物麋羊"
+        ],
+        "V0.2.8": [
+            "优化异常提示，提升问题定位体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.7": [
+            "优化插件设置项，减少使用步骤。",
+            "@呆物麋羊"
+        ],
+        "V0.2.6": [
+            "完善弹幕管理相关功能，提升整体稳定性。",
+            "@呆物麋羊"
+        ],
+        "V0.2.5": [
+            "优化插件设置与使用流程。",
+            "@呆物麋羊"
+        ],
+        "V0.2.4": [
+            "完善相关功能接入准备。",
+            "@呆物麋羊"
+        ],
+        "V0.2.3": [
+            "优化功能设置，减少使用步骤。",
+            "@呆物麋羊"
+        ],
         "V0.2.1": [
-            "修复更新检测弹窗把油猴技术版本显示成 V2026 日期版本的问题。",
-            "切换cdn源"
+            "优化版本提示和更新体验。",
+            "@呆物麋羊"
         ],
         "V0.2.0": [
-            "修复更新检测弹窗把油猴技术版本显示成 V2026 日期版本的问题。",
-            "更新检测继续使用油猴 @version 判断是否需要升级，弹窗和更新提示优先显示用户可见版本号。"
+            "优化版本显示和更新提示。",
+            "@呆物麋羊"
         ],
         "V0.1.9": [
-            "修复打开插件更新提示后，斗鱼播放器底部控制栏按钮可能点击无反应的问题。",
-            "更新提示改为非阻塞小窗口，不再用全屏遮罩拦住播放器弹幕开关、清晰度和全屏按钮。"
+            "优化更新提示窗口，减少对页面操作的影响。",
+            "@呆物麋羊"
         ],
         "V0.1.8": [
-            "旧版用户打开斗鱼直播间里的插件浮窗时，会自动检测 CDN 上的新版本。",
-            "检测到新版本后直接弹出更新提示窗口，用户可点击“更新”安装 CDN 最新 .user.js。",
-            "自动检测结果本地缓存 1 小时，反复打开和关闭浮窗不会重复消耗 CDN 流量。"
+            "新增版本检测和更新提醒。",
+            "优化重复打开面板时的检测体验。",
+            "@呆物麋羊"
         ],
         "V0.1.7": [
-            "优化进入斗鱼直播间时的启动性能，打开直播间先只挂“厕纸”入口。",
-            "完整浮窗、分类接口、更新检测和在线统计延后到用户第一次打开面板后再加载。",
-            "减少工具栏查找时的深度 DOM 扫描，避免和斗鱼播放器首屏加载抢资源。"
+            "优化直播间启动速度和使用体验。",
+            "减少插件平时的资源占用。",
+            "@呆物麋羊"
         ],
         "V0.1.6": [
-            "撤回弹幕列表按批次处理的方案，改为鼠标悬停到哪条弹幕才处理哪条，减少平时浏览器性能占用。",
-            "详情浮层继续按 DouyuEx 的方式盯住斗鱼弹幕详情容器，浮层出现后再补“投 / +1”。",
-            "更新页面文案同步改为按需处理方案，不再宣传固定批量处理。"
+            "优化弹幕互动功能的处理方式。",
+            "进一步降低插件运行时的资源占用。",
+            "@呆物麋羊"
         ],
         "V0.1.5": [
-            "学习 DouyuEx 的弹幕详情浮层处理方式，单独监听详情容器，鼠标悬停后“投 / +1”出现更快。",
-            "弹幕列表快捷按钮改为优先处理新增弹幕，不再每次 DOM 变化都全量扫描列表。",
-            "进一步缩小弹幕监听范围，降低浏览器性能占用。"
+            "优化弹幕操作入口的加载速度。",
+            "降低页面变化较多时的额外开销。",
+            "@呆物麋羊"
         ],
         "V0.1.4": [
-            "缩小弹幕增强监听范围，只监听弹幕列表和弹幕详情区域，避免影响 DouyuEx 修改播放器。",
-            "列表快捷按钮样式改为插件自有选择器，减少和斗鱼/DouyuEx 页面样式冲突。"
+            "优化弹幕区域的兼容性和显示效果。",
+            "减少与页面其他功能的样式影响。",
+            "@呆物麋羊"
         ],
         "V0.1.3": [
-            "修复点击斗鱼弹幕列表“+1”时，把插件按钮文字“投/+1”一起发出去的问题。"
+            "优化弹幕发送内容的识别，避免出现多余文字。",
+            "@呆物麋羊"
         ],
         "V0.1.2": [
-            "修复弹幕列表快捷按钮注入位置，只给普通聊天弹幕显示“投 / +1”。",
-            "公告、欢迎提示、直播间规则、看点卡片等非普通弹幕不再显示“投 / +1”。"
+            "优化弹幕操作入口的显示范围。",
+            "减少不相关内容上的干扰。",
+            "@呆物麋羊"
         ],
         "V0.1.1": [
-            "顶部“更新”按钮改为先检测版本，再弹出更新提示小窗口。",
-            "检测到新版本时才允许点击“更新”，没有新版本时更新按钮保持不可点击。",
-            "更新提示小窗口增加“访问”按钮，可直接打开插件网站。"
+            "优化更新按钮和提示窗口体验。",
+            "@呆物麋羊"
         ],
         "V0.1.0": [
-            "热榜里的弹幕已经来自弹幕库，移除投稿按钮，只保留发送和收藏。",
-            "点击复制或发送成功后，上报一次使用次数到网站现有 /dgq/addCnt/{id} 计数接口，让插件使用行为参与后端热门统计。",
-            "设置里的布局模式改成标准 / 紧凑按钮，避免原生下拉在斗鱼页面里显示不完整。",
-            "恢复弹幕列表每条弹幕后面的 投 / +1 快捷按钮。",
-            "放宽斗鱼弹幕行选择器，兼容带 hash 的 Barrage-listItem 类名。",
-            "+1 会把当前弹幕填入斗鱼输入框并点击发送，投稿仍打开标签选择弹窗。",
-            "浮窗快捷标签和标题筛选按钮允许换行，窄屏下不再裁掉右侧元素。"
+            "优化热榜、使用统计、布局模式和窄屏显示体验。",
+            "完善弹幕互动入口。",
+            "@呆物麋羊"
         ],
         "V0.0.9": [
             "浮窗首屏重排：顶部直接显示版本号，搜索 / 分类 / 热榜 / 最近 / 收藏 / 设置入口前置到第一屏。",
             "快捷标签、随机按钮、查看及投稿分类入口更明显，避免看起来仍是旧浮窗。"
         ],
         "V0.0.8": [
-            "Greasy Fork 内部 @version 改为 2026.08.12.01，确保高于旧线上版本 2026.08.11.02。",
-            "插件面板和更新提示继续显示用户版本 V0.0.8。"
+            "优化版本兼容和更新提示。",
+            "@呆物麋羊"
         ],
         "V0.0.7": [
-            "递增 Greasy Fork 脚本 @version 到 0.0.7，确保已安装用户能收到自动更新。",
-            "同步插件面板显示版本为 V0.0.7。"
+            "优化版本更新识别。",
+            "@呆物麋羊"
         ],
         "V0.0.6": [
             "新增最近使用入口，复制、发送、投稿、收藏都会记录到本地最近。",
-            "分类浏览新增 最新 / 最热 / 点赞 / 复制 排序，并把 sort 参数传给后端。",
+            "分类浏览新增最新、最热、点赞、复制排序。",
             "新增随机来一条、快捷标签、收藏分类筛选、发送前确认、快捷键和紧凑模式。",
-            "更新提示改为当前版本、最新版本和更新内容卡片。"
+            "更新提示改为当前版本、最新版本和更新内容卡片。",
+            "@呆物麋羊"
         ],
         "V0.0.5": ["分类浏览和热梗列表显示网站返回时间，并统一展示到分钟。"],
         "V0.0.4": ["选择分类后每页 5 条查看该分类弹幕，分类下拉贴屏展开。"],
         "V0.0.3": ["新增 24 小时热门和 7 天热门折叠入口。"],
-        "V0.0.2": ["优化投稿分类菜单、默认分类迁移和弹幕增强监听。"],
-        "V0.0.1": ["新增一键投稿、本地收藏、更新提示和详情浮层投/复读按钮。"]
+        "V0.0.2": ["优化分类菜单和弹幕增强体验。"],
+        "V0.0.1": ["新增一键投稿、本地收藏和更新提示。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.19.01": "0.2.35",
+        "2026.08.18.08": "0.2.34",
+        "2026.08.18.07": "0.2.33",
+        "2026.08.18.06": "0.2.32",
+        "2026.08.18.05": "0.2.31",
+        "2026.08.18.04": "0.2.30",
+        "2026.08.18.03": "0.2.29",
+        "2026.08.18.02": "0.2.28",
+
+        "2026.08.18.01": "0.2.27",
+
+        "2026.08.18.01": "0.2.27",
+
+        "2026.08.17.10": "0.2.26",
+
+        "2026.08.17.10": "0.2.26",
+
+        "2026.08.17.09": "0.2.25",
+
+        "2026.08.17.09": "0.2.25",
+
+        "2026.08.17.08": "0.2.24",
+
+        "2026.08.17.04": "0.2.20",
+
+        "2026.08.17.03": "0.2.19",
+        "2026.08.17.02": "0.2.18",
+        "2026.08.17.01": "0.2.17",
+        "2026.08.15.08": "0.2.16",
+        "2026.08.15.07": "0.2.15",
+        "2026.08.15.06": "0.2.14",
+        "2026.08.15.05": "0.2.13",
+        "2026.08.15.04": "0.2.12",
+        "2026.08.15.03": "0.2.11",
+        "2026.08.14.04": "0.2.11",
+        "2026.08.14.03": "0.2.10",
+        "2026.08.14.02": "0.2.9",
+        "2026.08.14.01": "0.2.8",
+        "2026.08.13.08": "0.2.7",
+        "2026.08.13.07": "0.2.6",
+        "2026.08.13.06": "0.2.5",
+        "2026.08.13.05": "0.2.4",
+        "2026.08.13.04": "0.2.3",
+        "2026.08.13.03": "0.2.2",
         "2026.08.13.02": "0.2.1",
         "2026.08.13.01": "0.2.0",
         "2026.08.12.13": "0.1.9",
@@ -224,7 +402,9 @@
         hotTab: "24h",
         hotLoading: false,
         hotLoadingTab: "",
-        hotCache: { "24h": [], "7d": [] },
+        hotCache: { "realtime": [], "five": [], "24h": [], "7d": [] },
+
+        hotwallRequest: null,
         tagPickerButton: null,
         tagPickerMenu: null,
         tagPickerOpen: false,
@@ -246,7 +426,12 @@
         autoUpdateDialogShown: false,
         gfWebSocketStarted: false,
         barrageActionsStarted: false,
-        lastDeepToolbarSearchAt: 0
+        panelActionCaptureStarted: false,
+        videoSyncStarted: false,
+        playerGiftPopupBlockerStarted: false,
+        lastDeepToolbarSearchAt: 0,
+        tagOptionsLoadedAt: 0,
+        tagOptionsLoading: null
     };
 
     console.log("dgq63136.cn插件--当前版本:" + CURRENT_VERSION);
@@ -883,6 +1068,9 @@
         .dgq-favorite {
             background: #8e44ad;
         }
+        .dgq-review {
+            background: #0f766e;
+        }
         .dgq-remove {
             background: #d9534f;
         }
@@ -998,6 +1186,40 @@
             border-radius: 4px;
             cursor: pointer;
         }
+        #dgq-video-sync {
+            float: left;
+            width: 24px;
+            height: 24px;
+            margin-left: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            cursor: pointer;
+            color: #fff;
+            background: transparent;
+            border: 0;
+            padding: 0;
+            outline: 0;
+            line-height: 1;
+        }
+        #dgq-video-sync.dgq-video-sync-compact {
+            margin-left: 8px;
+        }
+        #dgq-video-sync svg {
+            width: 22px;
+            height: 22px;
+            display: block;
+            pointer-events: none;
+        }
+        #dgq-video-sync:hover {
+            opacity: 0.85;
+        }
+        [data-dgq-hidden-player-gift-popup="1"] {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
         .dgq-toast {
             font-size: 16px;
             position: fixed;
@@ -1045,8 +1267,65 @@
         .dgq-barrage-action-plus {
             background: #ff5722;
         }
+        .dgq-barrage-action-review {
+            background: #0f766e;
+        }
         .dgq-barrage-action-favorite {
             background: #8e44ad;
+        }
+        .dgq-panel-tip-review {
+            cursor: pointer !important;
+            font-weight: 700 !important;
+            min-width: 18px !important;
+            padding-left: 3px !important;
+            padding-right: 3px !important;
+            pointer-events: auto !important;
+            position: relative !important;
+            z-index: 2147483647 !important;
+        }
+        .dgq-panel-tip-review:hover {
+            color: #ffdd57 !important;
+        }
+        .dgq-review-setting {
+            display: grid;
+            gap: 7px;
+            padding: 8px;
+            border: 1px solid #d8eee9;
+            border-radius: 6px;
+            background: #f7fffd;
+        }
+        .dgq-review-setting label {
+            display: grid;
+            gap: 4px;
+            color: #24445c;
+            font-size: 12px;
+        }
+        .dgq-review-setting input {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #c8d8d4;
+            border-radius: 4px;
+            padding: 5px 6px;
+            color: #111;
+            background: #fff;
+        }
+        .dgq-review-setting-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+        }
+        .dgq-review-setting-actions button {
+            border: 0;
+            border-radius: 4px;
+            padding: 5px 9px;
+            color: #fff;
+            background: #0f766e;
+            cursor: pointer;
+        }
+        .dgq-review-setting-hint {
+            color: #607d8b;
+            font-size: 12px;
+            line-height: 1.45;
         }
         .dgq-submit-dialog-mask {
             position: fixed;
@@ -1131,6 +1410,9 @@
             min-width: 18px !important;
             padding-left: 3px !important;
             padding-right: 3px !important;
+            pointer-events: auto !important;
+            position: relative !important;
+            z-index: 2147483647 !important;
         }
         .dgq-panel-tip-submit:hover {
             color: #ffdd57 !important;
@@ -1138,6 +1420,9 @@
         .dgq-panel-plus-one {
             cursor: pointer !important;
             font-weight: 700 !important;
+            pointer-events: auto !important;
+            position: relative !important;
+            z-index: 2147483647 !important;
         }
         .dgq-panel-plus-one:hover {
             color: #ffdd57 !important;
@@ -1237,6 +1522,15 @@
         return token;
     }
 
+    function getOrCreateReviewClickerId() {
+        let id = storageGet(REVIEW_CLICKER_ID_KEY, "");
+        if (typeof id !== "string" || id.length < 12) {
+            id = `dgq-${Date.now().toString(36)}-${randomString(12)}`;
+            storageSet(REVIEW_CLICKER_ID_KEY, id);
+        }
+        return id;
+    }
+
     function parseJsonSafe(text, fallback = null) {
         if (typeof text !== "string") return fallback;
         try {
@@ -1256,16 +1550,19 @@
         return queryString ? `${path}?${queryString}` : path;
     }
 
-    function apiRequest(method, path, body) {
+    function apiRequest(method, path, body, options = {}) {
+        const includeApiAuth = options.includeApiAuth !== false;
+        const includeSiteToken = options.includeSiteToken !== false;
+        const headers = {
+            "Content-Type": "application/json"
+        };
+        if (includeApiAuth) headers["dpahjdoiaw"] = API_AUTH_HEADER;
+        if (includeSiteToken) headers["siteToken"] = getOrCreateSiteToken();
         return new Promise((resolve, reject) => {
             GM_xmlhttpRequest({
                 method,
                 url: API_BASE_URL + path,
-                headers: {
-                    "Content-Type": "application/json",
-                    "dpahjdoiaw": API_AUTH_HEADER,
-                    "siteToken": getOrCreateSiteToken()
-                },
+                headers,
                 data: body === undefined ? undefined : JSON.stringify(body),
                 responseType: "json",
                 timeout: 20000,
@@ -1275,7 +1572,45 @@
                         resolve(payload);
                         return;
                     }
-                    reject(new Error(`HTTP ${response.status}: ${payload?.msg || response.responseText || "请求失败"}`));
+                    const message = payload?.reason || payload?.message || payload?.msg || response.responseText || "请求失败";
+                    const error = new Error(`HTTP ${response.status}: ${message}`);
+                    error.status = response.status;
+                    error.payload = payload;
+                    reject(error);
+                },
+                onerror(error) {
+                    reject(error);
+                },
+                ontimeout() {
+                    reject(new Error("请求超时"));
+                }
+            });
+        });
+    }
+
+    function externalJsonRequest(method, url, body, headers = {}) {
+        return new Promise((resolve, reject) => {
+            GM_xmlhttpRequest({
+                method,
+                url,
+                headers: {
+                    "Content-Type": "application/json",
+                    ...headers
+                },
+                data: body === undefined ? undefined : JSON.stringify(body),
+                responseType: "json",
+                timeout: 12000,
+                onload(response) {
+                    const payload = response.response || parseJsonSafe(response.responseText, {});
+                    if (response.status >= 200 && response.status < 300) {
+                        resolve(payload);
+                        return;
+                    }
+                    const message = payload?.reason || payload?.message || payload?.msg || response.responseText || "请求失败";
+                    const error = new Error(`HTTP ${response.status}: ${message}`);
+                    error.status = response.status;
+                    error.payload = payload;
+                    reject(error);
                 },
                 onerror(error) {
                     reject(error);
@@ -1345,21 +1680,55 @@
         return merged.length > 0 ? merged : FALLBACK_TAGS.slice();
     }
 
-    async function loadTagOptions() {
-        try {
-            const response = await apiRequest("GET", API_PATHS.DICT_LIST);
-            if (response?.code === 200 && Array.isArray(response.data)) {
-                const remoteOptions = response.data.map(item => ({
-                    label: item.dictLabel,
-                    value: item.dictValue
-                })).filter(item => item.label && item.value);
-                state.tagOptions = mergeTagOptions(remoteOptions);
-            }
-        } catch (error) {
-            console.warn("[dgq63136] 获取投稿标签失败，使用内置标签", error);
-        }
+    function normalizeRemoteTagOptions(data) {
+        return (Array.isArray(data) ? data : []).map(item => ({
+            label: String(item?.dictLabel || item?.label || "").trim(),
+            value: String(item?.dictValue || item?.value || "").trim()
+        })).filter(item => item.label && item.value);
+    }
+
+    function applyTagOptions(remoteOptions) {
+        state.tagOptions = mergeTagOptions(remoteOptions);
+        state.tagOptionsLoadedAt = Date.now();
+        storageSet(TAG_OPTIONS_CACHE_KEY, {
+            time: state.tagOptionsLoadedAt,
+            items: remoteOptions
+        });
         renderTagSelect();
         renderShortcutTags();
+    }
+
+    async function loadTagOptions(options = {}) {
+        const now = Date.now();
+        const force = Boolean(options.force);
+        const cached = storageGet(TAG_OPTIONS_CACHE_KEY, null);
+        if (cached?.items?.length && !force && state.tagOptionsLoadedAt === 0) {
+            state.tagOptions = mergeTagOptions(normalizeRemoteTagOptions(cached.items));
+            state.tagOptionsLoadedAt = Number(cached.time || 0);
+            renderTagSelect();
+            renderShortcutTags();
+        }
+        if (!force && state.tagOptionsLoadedAt && now - state.tagOptionsLoadedAt < TAG_OPTIONS_REFRESH_INTERVAL) {
+            return state.tagOptions;
+        }
+        if (state.tagOptionsLoading) return state.tagOptionsLoading;
+        state.tagOptionsLoading = apiRequest("GET", API_PATHS.DICT_LIST)
+            .then(response => {
+                if (response?.code === 200 && Array.isArray(response.data)) {
+                    applyTagOptions(normalizeRemoteTagOptions(response.data));
+                }
+                return state.tagOptions;
+            })
+            .catch(error => {
+                console.warn("[dgq63136] 获取投稿标签失败，使用内置标签", error);
+                renderTagSelect();
+                renderShortcutTags();
+                return state.tagOptions;
+            })
+            .finally(() => {
+                state.tagOptionsLoading = null;
+            });
+        return state.tagOptionsLoading;
     }
 
     function getSettings() {
@@ -1368,11 +1737,31 @@
         if (!["standard", "compact"].includes(settings.layoutMode)) settings.layoutMode = SETTINGS_DEFAULTS.layoutMode;
         settings.confirmBeforeSend = Boolean(settings.confirmBeforeSend);
         settings.shortcutsEnabled = settings.shortcutsEnabled !== false;
+        delete settings.reviewEndpoint;
+        delete settings.reviewToken;
+        delete settings.reviewerName;
+        settings.reviewerToken = String(settings.reviewerToken || "").trim();
         return settings;
     }
 
+    function purgeLegacyReviewSecrets() {
+        const stored = storageGet(SETTINGS_KEY, {});
+        if (!stored || typeof stored !== "object") return;
+        if (!("reviewEndpoint" in stored) && !("reviewToken" in stored) && !("reviewerName" in stored)) return;
+        const cleaned = { ...stored };
+        delete cleaned.reviewEndpoint;
+        delete cleaned.reviewToken;
+        delete cleaned.reviewerName;
+        storageSet(SETTINGS_KEY, cleaned);
+    }
+
     function saveSettings(patch = {}) {
-        state.settings = { ...getSettings(), ...patch };
+        const nextSettings = { ...getSettings(), ...patch };
+        delete nextSettings.reviewEndpoint;
+        delete nextSettings.reviewToken;
+        delete nextSettings.reviewerName;
+        nextSettings.reviewerToken = String(nextSettings.reviewerToken || "").trim();
+        state.settings = nextSettings;
         storageSet(SETTINGS_KEY, state.settings);
         applyLayoutMode();
         renderModeTabs();
@@ -1561,9 +1950,73 @@
         renderModeTabs();
     }
 
-    async function submitMeme(text, tags = getDefaultTags(), meta = {}) {
+    function getResponseMessage(response) {
+        if (response === null || response === undefined) return "";
+        if (typeof response === "string") return response.trim();
+        if (Array.isArray(response)) {
+            for (const item of response) {
+                const text = getResponseMessage(item);
+                if (text) return text;
+            }
+            return "";
+        }
+        if (typeof response !== "object") return String(response || "").trim();
+        const direct = response.reason || response.message || response.msg || response.errorMsg || response.error_message || response.detail || response.desc;
+        if (direct) return String(direct).trim();
+        const nested = response.data || response.result || response.error || response.payload;
+        if (nested && nested !== response) return getResponseMessage(nested);
+        return "";
+    }
+
+    function compactDiagnosticText(value, limit = 120) {
+        const text = String(value || "").replace(/\s+/g, " ").trim();
+        if (!text) return "";
+        if (text.length <= limit) return text;
+        return `${text.slice(0, limit - 1)}…`;
+    }
+
+    function isDuplicateSubmissionResponse(response) {
+        const message = getResponseMessage(response);
+        return /重复|已存在|已经有|相同|相似|duplicate/i.test(message);
+    }
+
+    function isUnexpectedSubmissionLimitMessage(message) {
+        const text = String(message || "");
+        const countWord = ["次", "数"].join("");
+        const usedUpWord = ["用", "完"].join("");
+        return text.includes(["投", "稿"].join("") + countWord) ||
+            (text.includes(countWord) && text.includes(usedUpWord)) ||
+            (/今日|今天/.test(text) && text.includes(usedUpWord)) ||
+            /limit/i.test(text);
+    }
+
+    function getSubmissionFailureMessage(response, error = null, meta = {}) {
+        const payload = response || error?.payload || null;
+        const rawMessage = getResponseMessage(payload) || String(error?.message || "").replace(/^HTTP\s+\d+:\s*/i, "").trim();
+        const codeValue = payload?.code ?? error?.status ?? payload?.status;
+        const codeText = codeValue !== undefined ? `（错误码：${codeValue}）` : "";
+        const tagText = Array.isArray(meta.tags) && meta.tags.length > 0 ? `，标签：${compactDiagnosticText(meta.tags.map(getTagLabel).join("、"), 40)}` : "";
+        const contentText = meta.text ? `，字数：${String(meta.text).length}` : "";
+        const payloadText = payload && typeof payload === "object"
+            ? compactDiagnosticText(getResponseMessage(payload) || JSON.stringify(payload), 120)
+            : "";
+
+        if (isDuplicateSubmissionResponse(payload)) {
+            return `投稿失败：内容可能重复或相似${codeText}${tagText}`;
+        }
+        if (rawMessage && !/^请求失败$/.test(rawMessage) && !isUnexpectedSubmissionLimitMessage(rawMessage)) {
+            return `投稿失败：${compactDiagnosticText(rawMessage, 90)}${codeText}${tagText}${contentText}`;
+        }
+        if (codeValue !== undefined && codeValue !== 200) {
+            const tail = payloadText ? `，后端提示：${payloadText}` : "";
+            return `投稿失败：接口返回异常${codeText}${tagText}${contentText}${tail}`;
+        }
+        return `投稿失败，请稍后再试${tagText}${contentText}`;
+    }
+
+    async function submitMeme(text, tags = [], meta = {}) {
         text = normalizeBarrageText(text);
-        tags = Array.isArray(tags) ? tags : [String(tags || DEFAULT_SUBMIT_TAG)];
+        tags = Array.isArray(tags) ? tags : [String(tags || "")];
         tags = tags.map(tag => String(tag || "").trim()).filter(Boolean).slice(0, 5);
         if (!text) {
             showMsg("没有可投稿的弹幕", "warn");
@@ -1574,33 +2027,54 @@
             return false;
         }
         if (tags.length === 0) {
-            tags = [DEFAULT_SUBMIT_TAG];
+            showMsg("请选择至少1个投稿标签", "warn");
+            return false;
         }
 
         try {
             const response = await apiRequest("POST", API_PATHS.SUBMIT_MEME, {
                 tags: tags.join(","),
                 barrage: text
-            });
+            }, { includeApiAuth: false, includeSiteToken: false });
             if (response?.code === 200) {
                 addRecentUsage(text, { ...meta, tags, action: "submit" });
                 showMsg(`投稿成功，分类：${tags.map(getTagLabel).join("、")}，待审核`);
                 return true;
             }
-            if (response?.code === 500) {
-                showMsg("烂梗已经有了，勿重复提交", "warn");
+            if (isDuplicateSubmissionResponse(response)) {
+                showMsg("烂梗库里已存在相同或相似内容，搜索页可能还没显示出来", "warn");
                 return false;
             }
-            showMsg(response?.msg || "投稿失败", "error");
+            showMsg(getSubmissionFailureMessage(response, null, { tags, text }), "error");
+            console.warn("[dgq63136] 投稿未通过", {
+                status: response?.code,
+                message: getResponseMessage(response),
+                tags,
+                textLength: text.length,
+                response
+            });
             return false;
         } catch (error) {
             console.error("[dgq63136] 投稿失败", error);
-            showMsg("投稿失败，请稍后再试", "error");
+            const payload = error?.payload;
+            if (isDuplicateSubmissionResponse(payload)) {
+                showMsg("烂梗库里已存在相同或相似内容，搜索页可能还没显示出来", "warn");
+            } else {
+                showMsg(getSubmissionFailureMessage(payload, error, { tags, text }), "error");
+            }
+            console.warn("[dgq63136] 投稿诊断", {
+                status: payload?.code ?? error?.status,
+                message: getResponseMessage(payload) || String(error?.message || "").replace(/^HTTP\s+\d+:\s*/i, "").trim(),
+                tags,
+                textLength: text.length,
+                response: payload,
+                errorText: String(error?.message || "")
+            });
             return false;
         }
     }
 
-    function openSubmitTagDialog(text, meta = {}) {
+    async function openSubmitTagDialog(text, meta = {}) {
         text = normalizeBarrageText(text);
         if (!text) {
             showMsg("没有可投稿的弹幕", "warn");
@@ -1612,10 +2086,9 @@
         }
 
         document.getElementById("dgq-submit-dialog-mask")?.remove();
+        await loadTagOptions({ force: true });
 
         const tagOptions = state.tagOptions.length > 0 ? state.tagOptions : FALLBACK_TAGS;
-        const defaultSelected = new Set(getDefaultTags());
-        if (defaultSelected.size === 0) defaultSelected.add(DEFAULT_SUBMIT_TAG);
 
         const mask = document.createElement("div");
         mask.id = "dgq-submit-dialog-mask";
@@ -1646,7 +2119,7 @@
             const checkbox = document.createElement("input");
             checkbox.type = "checkbox";
             checkbox.value = tag.value;
-            checkbox.checked = defaultSelected.has(tag.value);
+            checkbox.checked = false;
             checkbox.addEventListener("change", () => {
                 const checked = tagsWrap.querySelectorAll("input:checked");
                 if (checked.length > 5) {
@@ -1663,10 +2136,7 @@
             tagsWrap.appendChild(label);
         }
 
-        if (!tagsWrap.querySelector("input:checked")) {
-            const firstDefault = tagsWrap.querySelector(`input[value="${DEFAULT_SUBMIT_TAG}"]`) || tagsWrap.querySelector("input");
-            if (firstDefault) firstDefault.checked = true;
-        }
+
 
         const actions = document.createElement("div");
         actions.className = "dgq-submit-dialog-actions";
@@ -1753,6 +2223,166 @@
             return true;
         } catch (error) {
             console.warn("[dgq63136] 使用次数上报失败", error);
+            return false;
+        }
+    }
+
+    function isReviewEnabled() {
+        return Boolean(REVIEW_REPORT_URL && REVIEW_ROUTE_CODE);
+    }
+
+    function maskSecret(value) {
+        const text = String(value || "").trim();
+        if (!text) return "";
+        if (text.length <= 8) return `${text.slice(0, 2)}****${text.slice(-2)}`;
+        return `${text.slice(0, 4)}****${text.slice(-4)}`;
+    }
+
+    function getReviewSettingsOrWarn() {
+        const settings = getSettings();
+        if (!REVIEW_REPORT_URL || !REVIEW_ROUTE_CODE) {
+            showMsg("审功能正在等待房管弹幕管理器接入", "warn");
+            return null;
+        }
+        if (!settings.reviewerToken) {
+            showMsg("请先在插件设置里绑定审核码", "warn");
+            return null;
+        }
+        return {
+            reviewEndpoint: REVIEW_REPORT_URL,
+            reviewRouteCode: REVIEW_ROUTE_CODE,
+            reviewerToken: settings.reviewerToken
+        };
+    }
+
+    function getAttributeByPatterns(element, patterns) {
+        if (!element) return "";
+        const queue = [];
+        const seen = new Set();
+        const pushNode = node => {
+            if (!node || seen.has(node)) return;
+            seen.add(node);
+            queue.push(node);
+        };
+        let current = element;
+        let depth = 0;
+        while (current && depth < 6) {
+            pushNode(current);
+            current = current.parentElement;
+            depth += 1;
+        }
+        element.querySelectorAll("[data-uid], [data-user-id], [data-userid], [data-userid64], [data-rid], [uid], [userid], a[href*='uid='], a[href*='user_id='], a[href*='/user/'], a[href*='/u/']").forEach(pushNode);
+        for (const node of queue) {
+            for (const attr of Array.from(node.attributes || [])) {
+                const name = attr.name.toLowerCase();
+                const value = String(attr.value || "").trim();
+                if (!value) continue;
+                if (patterns.some(pattern => pattern.test(name))) return value;
+                if (/uid|user.?id|user/i.test(name)) {
+                    const match = value.match(/\b(\d{3,})\b/);
+                    if (match) return match[1];
+                }
+                if (name === "href") {
+                    const hrefMatch = value.match(/(?:uid|user_id)=?(\d{3,})|\/(?:user|u)\/(\d{3,})/i);
+                    if (hrefMatch) return hrefMatch[1] || hrefMatch[2] || "";
+                }
+            }
+        }
+        return "";
+    }
+
+    function extractUidFromText(text) {
+        const clean = String(text || "");
+        const match = clean.match(/\b(?:uid|userId|user_id)[:=：\s]*([0-9]{3,})\b/i);
+        return match ? match[1] : "";
+    }
+
+    function getBarrageSenderUid(root) {
+        const attrValue = getAttributeByPatterns(root, [/^data-.*uid$/, /^data-.*user.*id$/, /^uid$/, /^userid$/, /^href$/]);
+        const attrMatch = String(attrValue || "").match(/\d{3,}/);
+        if (attrMatch) return attrMatch[0];
+        const textUid = extractUidFromText(root?.textContent || "");
+        return textUid || "";
+    }
+
+    function getBarrageSenderName(root) {
+        if (!root) return "";
+        const selectors = [
+            "[class*='nick']",
+            "[class*='Nick']",
+            "[class*='name']",
+            "[class*='Name']",
+            "[class*='author']",
+            "[class*='Author']",
+            ".danmuAuthor-3d7b4a",
+            "[class*='danmuAuthor']"
+        ];
+        for (const selector of selectors) {
+            const name = normalizeBarrageText(root.querySelector(selector)?.textContent || "");
+            if (name && !isNonChatBarrageText(name)) return name.replace(/[：:]\s*$/, "");
+        }
+        const fullText = getTextWithoutBarrageActions(root);
+        const match = fullText.match(/^([^：:]{1,30})[：:]\s*.+$/);
+        return match ? normalizeBarrageText(match[1]) : "";
+    }
+
+    function createMessageFingerprint(roomId, senderIdentity, text) {
+        const input = `${roomId}|${normalizeBarrageText(senderIdentity)}|${normalizeBarrageText(text)}`;
+        let hash = 0;
+        for (let index = 0; index < input.length; index += 1) {
+            hash = ((hash << 5) - hash + input.charCodeAt(index)) | 0;
+        }
+        return Math.abs(hash).toString(36);
+    }
+
+    function buildReviewPayload(text, meta = {}) {
+        const roomId = String(meta.roomId || getRoomId() || "").trim();
+        const senderUid = String(meta.senderUid || "").trim();
+        const senderName = normalizeBarrageText(meta.senderName || "");
+        const messageText = normalizeBarrageText(text);
+        return {
+            source: "dgq63136-userscript",
+            version: DISPLAY_VERSION,
+            technicalVersion: CURRENT_VERSION,
+            roomId,
+            senderUid,
+            senderName,
+            messageText,
+            messageFingerprint: createMessageFingerprint(roomId, senderUid || senderName, messageText),
+            messageTime: meta.messageTime || new Date().toISOString(),
+            pageUrl: location.href,
+            reporterClientId: getOrCreateReviewClickerId()
+        };
+    }
+
+    async function reportBarrageReview(text, meta = {}) {
+        const settings = getReviewSettingsOrWarn();
+        if (!settings) return false;
+        const payload = buildReviewPayload(text, meta);
+        if (!payload.messageText) {
+            showMsg("没有可审的弹幕", "warn");
+            return false;
+        }
+        if (!payload.senderName) {
+            showMsg("没有识别到发送昵称，请在右侧聊天列表点击“审”", "warn");
+            return false;
+        }
+        if (!payload.roomId) {
+            showMsg("没有识别到当前直播间号，不能提交审", "warn");
+            return false;
+        }
+        try {
+            const response = await externalJsonRequest("POST", settings.reviewEndpoint, payload, {
+                "X-DGQ-Review-Code": settings.reviewRouteCode,
+                "X-DGQ-Reviewer-Token": settings.reviewerToken
+            });
+            const message = response?.message || response?.msg || "已提交到房管待审";
+            showMsg(message);
+            return true;
+        } catch (error) {
+            console.warn("[dgq63136] 审上报失败", error);
+            const reason = error?.payload?.reason || error?.payload?.message || error?.payload?.msg || error?.message || "请稍后再试";
+            showMsg(`审提交失败：${String(reason).replace(/^HTTP\\s+\\d+\\s*:\\s*/i, "").slice(0, 80)}`, "error");
             return false;
         }
     }
@@ -1902,7 +2532,7 @@
             state.hotExpanded = true;
             if (state.hotSection) state.hotSection.hidden = false;
             updateHotToggle();
-            setTableTitle("热门弹幕：24 小时 / 7 天热门可直接发送、收藏。");
+            setTableTitle("热门弹幕：实时 / 5分钟 / 24小时 / 7天热门可直接发送、收藏。");
             state.currentRows = [];
             state.table.innerHTML = "";
             loadHotMemes(state.hotTab);
@@ -2140,6 +2770,24 @@
         hotTabs.className = "dgq-hot-tabs";
         hotSection.appendChild(hotTabs);
 
+        const hotRealtimeButton = document.createElement("button");
+        hotRealtimeButton.className = "dgq-hot-tab";
+        hotRealtimeButton.type = "button";
+        hotRealtimeButton.textContent = "实时";
+        hotRealtimeButton.setAttribute("data-hot-tab", "realtime");
+        hotRealtimeButton.addEventListener("click", () => setHotTab("realtime"));
+        hotTabs.appendChild(hotRealtimeButton);
+        state.hotTabs["realtime"] = hotRealtimeButton;
+
+        const hotFiveButton = document.createElement("button");
+        hotFiveButton.className = "dgq-hot-tab";
+        hotFiveButton.type = "button";
+        hotFiveButton.textContent = "5分钟";
+        hotFiveButton.setAttribute("data-hot-tab", "five");
+        hotFiveButton.addEventListener("click", () => setHotTab("five"));
+        hotTabs.appendChild(hotFiveButton);
+        state.hotTabs["five"] = hotFiveButton;
+
         const hot24Button = document.createElement("button");
         hot24Button.className = "dgq-hot-tab";
         hot24Button.type = "button";
@@ -2282,6 +2930,10 @@
         }
     }
 
+    function isHotwallTab(tab) {
+        return tab === "realtime" || tab === "five";
+    }
+
     function getHotPath(tab) {
         return tab === "7d" ? API_PATHS.HOT_MEME_7D : API_PATHS.HOT_MEME_24H;
     }
@@ -2293,6 +2945,163 @@
                 memeId: String(item?.barrageId || item?.id || ""),
                 time: item?.hotDateTime || ""
             })).filter(item => item.content).slice(0, LIST_PAGE_SIZE);
+    }
+
+
+    function hotwallTypeName(type) {
+        return {
+            submit: "投稿",
+            copy: "复制",
+            search: "搜索",
+            view: "浏览",
+            pick: "选梗",
+            burst: "爆发"
+        }[type] || type || "实时";
+    }
+
+    function formatHotwallTime(time) {
+        const date = new Date(Number(time) || time || Date.now());
+        const pad = value => String(value).padStart(2, "0");
+        return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+    }
+
+    function parseHotwallSseText(text) {
+        const result = { ranking: [], events: [] };
+        if (typeof text !== "string" || !text.trim()) return result;
+        const blocks = text.split(/\r?\n\r?\n+/);
+        for (const block of blocks) {
+            if (!block.trim()) continue;
+            let eventName = "";
+            let dataText = "";
+            for (const line of block.split(/\r?\n/)) {
+                if (line.startsWith("event:")) eventName = line.replace(/^event:\s*/, "").trim();
+                if (line.startsWith("data:")) dataText += line.replace(/^data:\s?/, "");
+            }
+            if (!dataText) continue;
+            const data = parseJsonSafe(dataText, null);
+            if (!data) continue;
+            if (eventName === "snapshot" && Array.isArray(data.items)) {
+                result.ranking = data.items;
+            } else if (eventName === "event" && data.barrage) {
+                result.events.push(data);
+            }
+        }
+        return result;
+    }
+
+    function normalizeHotwallRankRows(items) {
+        if (!Array.isArray(items)) return [];
+        return items.map(item => {
+            const row = normalizeMemeRow(item, {
+                source: "hotwall-5m",
+                memeId: String(item?.barrageId || item?.id || ""),
+                time: item?.submitTime || ""
+            });
+            row.hotCount = Number(item?.count || 0) || 0;
+            row.hotMeta = `5分钟热度：${row.hotCount}`;
+            return row;
+        }).filter(item => item.content).slice(0, HOTWALL_RANK_LIMIT);
+    }
+
+    function normalizeHotwallEventRows(items) {
+        if (!Array.isArray(items)) return [];
+        return items
+            .slice()
+            .sort((left, right) => Number(right?.time || 0) - Number(left?.time || 0))
+            .map(item => {
+            const row = normalizeMemeRow({
+                barrage: item?.barrage || "",
+                time: item?.time || Date.now()
+            }, {
+                source: "hotwall-realtime",
+                time: item?.time || Date.now()
+            });
+            row.hotMeta = `${hotwallTypeName(item?.type)} · ${formatHotwallTime(item?.time)}`;
+            return row;
+        }).filter(item => item.content).slice(0, HOTWALL_STREAM_LIMIT);
+    }
+
+    async function requestHotwallSnapshot(tab = state.hotTab) {
+        if (state.hotwallRequest && typeof state.hotwallRequest.abort === "function") {
+            try { state.hotwallRequest.abort(); } catch (error) { /* ignore */ }
+        }
+        const controller = new AbortController();
+        state.hotwallRequest = controller;
+        const latestParsed = { ranking: [], events: [] };
+        const updateParsed = text => {
+            const parsed = parseHotwallSseText(text);
+            if (parsed.ranking.length) latestParsed.ranking = parsed.ranking.slice(0, HOTWALL_RANK_LIMIT);
+            if (parsed.events.length) {
+                latestParsed.events = parsed.events
+                    .slice()
+                    .sort((left, right) => Number(right?.time || 0) - Number(left?.time || 0))
+                    .slice(0, HOTWALL_STREAM_LIMIT);
+                if (!settleTimer) {
+                    settleTimer = setTimeout(() => controller.abort(), HOTWALL_SETTLE_MS);
+                }
+            }
+        };
+        const hasEnoughData = () => (
+            tab === "five"
+                ? latestParsed.ranking.length > 0
+                : tab === "realtime"
+                    ? latestParsed.events.length >= 5
+                    : latestParsed.ranking.length > 0 || latestParsed.events.length > 0
+        );
+                let settleTimer = null;
+        const timer = setTimeout(() => controller.abort(), 6000);
+        try {
+            const response = await fetch(API_BASE_URL + API_PATHS.HOTWALL_STREAM, {
+                method: "GET",
+                headers: {
+                    "dpahjdoiaw": API_AUTH_HEADER,
+                    "siteToken": getOrCreateSiteToken()
+                },
+                signal: controller.signal
+            });
+            if (!response.ok || !response.body) throw new Error(`HTTP ${response.status}`);
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = "";
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                buffer += decoder.decode(value, { stream: true });
+                updateParsed(buffer);
+                if (hasEnoughData()) {
+                    try { await reader.cancel(); } catch (error) { /* ignore */ }
+                    break;
+                }
+            }
+        } catch (error) {
+            if (!latestParsed.ranking.length && !latestParsed.events.length) throw error;
+        } finally {
+            clearTimeout(timer);
+
+            clearTimeout(settleTimer);
+
+            if (state.hotwallRequest === controller) state.hotwallRequest = null;
+            try { controller.abort(); } catch (error) { /* ignore */ }
+        }
+        if (latestParsed.ranking.length || latestParsed.events.length) return latestParsed;
+        throw new Error("hotwall empty");
+    }
+    async function loadHotwallMemes(tab) {
+        const payload = await requestHotwallSnapshot(tab);
+        const realtimeRows = normalizeHotwallEventRows(payload.events);
+        const fiveRows = normalizeHotwallRankRows(payload.ranking);
+        state.hotCache.realtime = realtimeRows;
+        state.hotCache.five = fiveRows;
+        if (state.hotTab !== tab) return;
+        if (tab === "five") {
+            renderHotRows(fiveRows);
+            return;
+        }
+        if (realtimeRows.length) {
+            renderHotRows(realtimeRows);
+            return;
+        }
+        renderHotEmpty("实时暂无新弹幕，稍后点击刷新。");
     }
 
     function renderHotEmpty(message) {
@@ -2328,7 +3137,7 @@
 
             const meta = document.createElement("div");
             meta.className = "dgq-hot-meta";
-            meta.textContent = buildMetaText(row, true);
+            meta.textContent = row.hotMeta || buildMetaText(row, true);
             main.appendChild(meta);
 
             item.appendChild(main);
@@ -2356,6 +3165,10 @@
         state.hotLoadingTab = tab;
         renderHotEmpty("热门弹幕加载中...");
         try {
+            if (isHotwallTab(tab)) {
+                await loadHotwallMemes(tab);
+                return;
+            }
             const response = await apiRequest("GET", getHotPath(tab));
             if (response?.code === 200 && Array.isArray(response.data)) {
                 const rows = normalizeHotRows(response.data, tab);
@@ -2366,7 +3179,13 @@
             if (state.hotTab === tab) renderHotEmpty(response?.msg || "热门弹幕加载失败。");
         } catch (error) {
             console.warn("[dgq63136] 热门弹幕加载失败", error);
-            if (state.hotTab === tab) renderHotEmpty("热门弹幕加载失败，请稍后再试。");
+            if (state.hotTab === tab) {
+                if (isHotwallTab(tab)) {
+                    renderHotEmpty(tab === "realtime" ? "实时暂无新数据，稍后再试。" : "5分钟热榜暂无数据，稍后再试。");
+                } else {
+                    renderHotEmpty("热门弹幕加载失败，请稍后再试。");
+                }
+            }
         } finally {
             const activeTabNeedsLoad = state.hotExpanded && state.hotTab !== state.hotLoadingTab && !state.hotCache[state.hotTab]?.length;
             state.hotLoading = false;
@@ -2376,7 +3195,8 @@
     }
 
     function setHotTab(tab) {
-        state.hotTab = tab === "7d" ? "7d" : "24h";
+        const nextTab = ["realtime", "five", "24h", "7d"].includes(tab) ? tab : "24h";
+        state.hotTab = nextTab;
         renderHotTabs();
         loadHotMemes(state.hotTab);
     }
@@ -2386,7 +3206,7 @@
         if (state.hotExpanded) {
             state.mode = "hot";
             renderModeTabs();
-            setTableTitle("热门弹幕：24 小时 / 7 天热门可直接发送、收藏。");
+            setTableTitle("热门弹幕：实时 / 5分钟 / 24小时 / 7天热门可直接发送、收藏。");
             state.currentRows = [];
             state.table.innerHTML = "";
         }
@@ -2820,6 +3640,36 @@
         }
         panel.appendChild(layoutRow);
 
+
+        const reviewBox = document.createElement("div");
+        reviewBox.className = "dgq-review-setting";
+        reviewBox.innerHTML = `
+            <label>审核码<input class="dgq-reviewer-token" type="password" autocomplete="new-password" inputmode="text" placeholder="填写房管管理器生成的审核员 token"></label>
+            <div class="dgq-review-setting-hint">审核码由房管管理器生成，备注姓名也在房管管理器里配置；这里不需要填写备注。</div>
+            <div class="dgq-review-setting-hint dgq-review-token-status"></div>
+            <div class="dgq-review-setting-actions">
+                <button class="dgq-save-reviewer-token" type="button">保存审核码</button>
+                <button class="dgq-clear-reviewer-token" type="button">清除审核码</button>
+            </div>
+        `;
+        const tokenInput = reviewBox.querySelector(".dgq-reviewer-token");
+        const tokenStatus = reviewBox.querySelector(".dgq-review-token-status");
+        tokenStatus.textContent = settings.reviewerToken ? `已保存审核码：${maskSecret(settings.reviewerToken)}` : "未绑定审核码，点击“审”前需要先绑定。";
+        reviewBox.querySelector(".dgq-save-reviewer-token").addEventListener("click", () => {
+            const reviewerToken = String(tokenInput.value || "").trim() || settings.reviewerToken;
+            if (!reviewerToken) {
+                showMsg("请填写审核码", "warn");
+                return;
+            }
+            saveSettings({ reviewerToken });
+            showMsg("审核码已保存");
+        });
+        reviewBox.querySelector(".dgq-clear-reviewer-token").addEventListener("click", () => {
+            saveSettings({ reviewerToken: "" });
+            showMsg("审核码已清除");
+        });
+        panel.appendChild(reviewBox);
+
         const help = document.createElement("div");
         help.className = "dgq-shortcut-help";
         help.textContent = "快捷键：Alt+C 打开/关闭，Alt+S 聚焦搜索，Alt+Enter 发送第一条，Alt+←/→ 翻页，Alt+R 随机，Esc 关闭弹窗。";
@@ -3159,7 +4009,7 @@
                 const latestInfo = normalizeRemoteVersionInfo(remoteInfo);
                 if (!latestInfo) throw new Error("missing version");
                 const latestDisplay = latestInfo.displayVersion;
-                const hasUpdate = compareVersions(latestInfo.version, CURRENT_VERSION) > 0;
+                const hasUpdate = hasDisplayVersionUpdate(latestInfo) || compareVersions(latestInfo.version, CURRENT_VERSION) > 0;
                 state.updateLatestVersion = latestInfo.version;
                 state.updateLatestDisplayVersion = latestInfo.displayVersion;
                 if (versions) versions.innerHTML = `当前版本：${DISPLAY_VERSION}<br>最新版本：${latestDisplay}`;
@@ -3222,7 +4072,10 @@
         if (!panel) return;
         state.panelVisible = visible === undefined ? panel.style.display === "none" : visible;
         panel.style.display = state.panelVisible ? "flex" : "none";
-        if (state.panelVisible) ensurePanelBootstrapped();
+        if (state.panelVisible) {
+            ensurePanelBootstrapped();
+            loadTagOptions();
+        }
     }
 
     function insertToolbarToggleButton() {
@@ -3241,6 +4094,165 @@
         button.title = "打开63136烂梗面板";
         button.addEventListener("click", () => togglePanel());
         toolbar.insertBefore(button, toolbar.firstChild);
+    }
+
+    function getLiveVideoNode() {
+        const preferredVideo = document.querySelector(".layout-Player-videoEntity video");
+        if (preferredVideo) return preferredVideo;
+        return Array.from(document.querySelectorAll(LIVE_VIDEO_SELECTOR)).find(video => {
+            const rect = video.getBoundingClientRect();
+            return rect.width > 160 && rect.height > 90 && video.buffered !== undefined;
+        }) || null;
+    }
+
+    function syncLiveVideoTime() {
+        const video = getLiveVideoNode();
+        const buffered = video?.buffered;
+        if (!video || !buffered || buffered.length === 0) {
+            showMsg("暂无可同步的直播时间", "warn");
+            return;
+        }
+        const targetTime = buffered.end(buffered.length - 1);
+        try {
+            video.currentTime = targetTime;
+        } catch (error) {
+            video.currentTime = Math.max(0, targetTime - 0.05);
+        }
+        showMsg("已同步到最新直播时间");
+    }
+
+    function createVideoSyncButton() {
+        const button = document.createElement("div");
+        button.id = VIDEO_SYNC_BUTTON_ID;
+        button.title = "同步时间";
+        button.setAttribute("role", "button");
+        button.setAttribute("tabindex", "0");
+        button.innerHTML = `
+            <svg viewBox="0 0 1024 1024" aria-hidden="true">
+                <path d="M938.1888 534.016h-80.7936c0.4096-7.3728 0.6144-14.6432 0.6144-22.016 0-218.624-176.8448-400.7936-389.12-400.7936C257.024 111.2064 80.6912 293.1712 80.6912 512c0 218.7264 176.4352 400.7936 388.1984 400.7936 74.752 0 149.0944-22.016 208.1792-60.0064l42.7008 68.608c-75.0592 48.9472-161.9968 74.8544-250.7776 74.752C209.8176 996.1472 0 779.264 0 512S209.8176 27.8528 468.8896 27.8528C728.3712 27.8528 938.7008 244.736 938.7008 512c0 7.3728-0.2048 14.6432-0.512 22.016z m-261.12 318.7712z m-26.4192-158.1056L426.7008 556.032V291.9424h64v226.5088L689.5616 635.904l-38.912 58.7776z m245.3504-6.656L768 512h256L896 688.0256z" fill="currentColor"></path>
+            </svg>
+        `;
+        const handleActivate = event => {
+            event.preventDefault();
+            event.stopPropagation();
+            syncLiveVideoTime();
+        };
+        button.addEventListener("click", handleActivate);
+        button.addEventListener("keydown", event => {
+            if (event.key !== "Enter" && event.key !== " ") return;
+            handleActivate(event);
+        });
+        return button;
+    }
+
+    function ensureVideoSyncButton() {
+        const ownButton = document.getElementById(VIDEO_SYNC_BUTTON_ID);
+        if (document.getElementById(DOUYUEX_VIDEO_SYNC_BUTTON_ID)) {
+            ownButton?.remove();
+            return;
+        }
+        if (ownButton?.isConnected) return;
+        const toolbar = document.querySelector(VIDEO_SYNC_TOOLBAR_SELECTOR);
+        if (!toolbar || isExternalPluginNode(toolbar)) return;
+        const button = createVideoSyncButton();
+        const isCompactToolbar = toolbar.classList.contains("left-bfab3b");
+        if (isCompactToolbar) button.classList.add("dgq-video-sync-compact");
+        const targetIndex = isCompactToolbar ? 2 : 3;
+        toolbar.insertBefore(button, toolbar.childNodes[targetIndex] || null);
+    }
+
+    function initVideoSyncButton() {
+        if (state.videoSyncStarted) return;
+        state.videoSyncStarted = true;
+        ensureVideoSyncButton();
+    }
+
+    function isLikelyPlayerGiftPopup(element) {
+        if (!element || element.nodeType !== 1) return false;
+        if (element.closest("#dgq63136-panel, #dgq-submit-dialog-mask, #dgq-send-confirm-mask, #dgq-update-dialog-mask") || isExternalPluginNode(element)) return false;
+        if (element.closest("#js-player-toolbar, #js-player-controlbar, .ChatSend, .Barrage-list, [class*='Barrage-list']")) return false;
+        const text = normalizeBarrageText(element.textContent || "");
+        if (!text || !/灯塔/.test(text)) return false;
+        if (!/(点亮全站第\d+层灯塔|助力.*灯塔|赠送.*灯塔|去看看)/.test(text)) return false;
+        const rect = element.getBoundingClientRect();
+        if (rect.width < 120 || rect.width > 560 || rect.height < 24 || rect.height > 180) return false;
+        const playerRoot = element.closest(PLAYER_GIFT_POPUP_ROOT_SELECTOR);
+        if (!playerRoot) return false;
+        const rootRect = playerRoot.getBoundingClientRect();
+        if (rootRect.width > 0 && rect.width > rootRect.width * 0.75) return false;
+        if (rootRect.height > 0 && rect.height > rootRect.height * 0.35) return false;
+        return true;
+    }
+
+    function hidePlayerGiftPopup(element) {
+        if (!isLikelyPlayerGiftPopup(element)) return false;
+        element.setAttribute(PLAYER_GIFT_POPUP_HIDDEN_ATTRIBUTE, "1");
+        return true;
+    }
+
+    function scanPlayerGiftPopupNode(node) {
+        if (!node || node.nodeType !== 1) return;
+        if (hidePlayerGiftPopup(node)) return;
+        node.querySelectorAll("div, section, aside, a, button").forEach(element => {
+            hidePlayerGiftPopup(element);
+        });
+    }
+
+    function getPlayerGiftPopupRoots() {
+        return Array.from(document.querySelectorAll(PLAYER_GIFT_POPUP_ROOT_SELECTOR))
+            .filter(root => root?.isConnected && !isExternalPluginNode(root));
+    }
+
+    function initPlayerGiftPopupBlocker() {
+        if (state.playerGiftPopupBlockerStarted) return;
+        state.playerGiftPopupBlockerStarted = true;
+        const observedRoots = new Map();
+        let scheduledNodes = new Set();
+        let scheduled = false;
+
+        const flushNodes = () => {
+            scheduled = false;
+            const nodes = Array.from(scheduledNodes);
+            scheduledNodes = new Set();
+            nodes.forEach(scanPlayerGiftPopupNode);
+        };
+
+        const scheduleNode = node => {
+            if (!node || node.nodeType !== 1) return;
+            scheduledNodes.add(node);
+            if (scheduled) return;
+            scheduled = true;
+            requestAnimationFrame(flushNodes);
+        };
+
+        const syncRoots = () => {
+            getPlayerGiftPopupRoots().forEach(root => {
+                if (!observedRoots.has(root)) {
+                    const observer = new MutationObserver(mutations => {
+                        mutations.forEach(mutation => {
+                            mutation.addedNodes.forEach(scheduleNode);
+                        });
+                    });
+                    observer.observe(root, { childList: true, subtree: true });
+                    observedRoots.set(root, observer);
+                    scheduleNode(root);
+                }
+            });
+            observedRoots.forEach((observer, root) => {
+                if (root.isConnected) return;
+                observer.disconnect();
+                observedRoots.delete(root);
+            });
+        };
+
+        const discoverTimer = setInterval(syncRoots, 2000);
+        syncRoots();
+        window.addEventListener("beforeunload", () => {
+            clearInterval(discoverTimer);
+            observedRoots.forEach(observer => observer.disconnect());
+            observedRoots.clear();
+            scheduledNodes.clear();
+        });
     }
 
     function enableDrag(container, handle) {
@@ -3361,6 +4373,12 @@
         item.appendChild(actions);
     }
 
+    function collectBarrageItemsFromNode(node, bucket) {
+        if (!node || node.nodeType !== Node.ELEMENT_NODE || !bucket) return;
+        if (node.matches?.(BARRAGE_ITEM_SELECTOR)) bucket.add(node);
+        node.querySelectorAll?.(BARRAGE_ITEM_SELECTOR).forEach(item => bucket.add(item));
+    }
+
     function enhanceBarrageItem(item) {
         if (!item || item.querySelector(".dgq-barrage-actions")) return;
         if (!isOrdinaryBarrageItem(item)) return;
@@ -3394,6 +4412,29 @@
             sendBarrage(getBarrageTextFromItem(item) || text, { source: "barrage-list-plus" });
         });
         actions.appendChild(plusButton);
+
+        if (isReviewEnabled()) {
+            const reviewButton = document.createElement("button");
+            reviewButton.className = "dgq-barrage-action-btn dgq-barrage-action-review";
+            reviewButton.type = "button";
+            reviewButton.textContent = "审";
+            reviewButton.title = "提交到房管弹幕管理器待审";
+            reviewButton.addEventListener("click", async event => {
+                event.preventDefault();
+                event.stopPropagation();
+                reviewButton.disabled = true;
+                reviewButton.textContent = "审...";
+                const ok = await reportBarrageReview(getBarrageTextFromItem(item) || text, {
+                    source: "barrage-list-review",
+                    roomId: getRoomId(),
+                    senderUid: getBarrageSenderUid(item),
+                    senderName: getBarrageSenderName(item)
+                });
+                reviewButton.textContent = ok ? "已审" : "审";
+                if (!ok) reviewButton.disabled = false;
+            });
+            actions.appendChild(reviewButton);
+        }
 
         appendBarrageActions(item, actions);
     }
@@ -3476,6 +4517,65 @@
         if (element.getAttribute(name) !== value) element.setAttribute(name, value);
     }
 
+    function stopPanelButtonEvent(event, preventDefault = false) {
+        if (preventDefault) event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation?.();
+    }
+
+    function activatePanelButtonAction(button, event) {
+        stopPanelButtonEvent(event, true);
+        const now = Date.now();
+        if (now - Number(button.__dgqPanelActionAt || 0) < 450) return;
+        button.__dgqPanelActionAt = now;
+        if (typeof button.__dgqPanelAction === "function") button.__dgqPanelAction(event);
+    }
+
+    function getPanelActionButtonFromEvent(event) {
+        const path = typeof event.composedPath === "function" ? event.composedPath() : [event.target];
+        for (const node of path) {
+            if (!node || node.nodeType !== 1) continue;
+            if (node.matches?.(PANEL_ACTION_SELECTOR)) return node;
+            const button = node.closest?.(PANEL_ACTION_SELECTOR);
+            if (button) return button;
+        }
+        return null;
+    }
+
+    function initPanelButtonActionCapture() {
+        if (state.panelActionCaptureStarted) return;
+        state.panelActionCaptureStarted = true;
+
+        const handlePanelActionPointer = event => {
+            const button = getPanelActionButtonFromEvent(event);
+            if (!button?.__dgqPanelActionBound) return;
+            activatePanelButtonAction(button, event);
+        };
+
+        // Register in the page realm first so the Douyu detail popup cannot consume the action at a parent node.
+        const captureWindows = [window];
+        if (typeof unsafeWindow !== "undefined" && unsafeWindow && unsafeWindow !== window) {
+            captureWindows.unshift(unsafeWindow);
+        }
+        captureWindows.forEach(targetWindow => {
+            targetWindow.addEventListener("pointerdown", handlePanelActionPointer, true);
+            targetWindow.addEventListener("mousedown", handlePanelActionPointer, true);
+            targetWindow.addEventListener("touchstart", handlePanelActionPointer, true);
+        });
+    }
+
+    function bindPanelButtonAction(button, action) {
+        button.__dgqPanelAction = action;
+        if (button.__dgqPanelActionBound) return;
+        button.__dgqPanelActionBound = true;
+        button.addEventListener("click", event => {
+            activatePanelButtonAction(button, event);
+        }, true);
+        button.addEventListener("keydown", event => {
+            if (event.key === "Enter" || event.key === " ") activatePanelButtonAction(button, event);
+        }, true);
+    }
+
     function ensurePanelPlusOneButton(parent, douyuExPlusButton, text) {
         document.querySelectorAll("#dgq-panel-plus-one").forEach(button => {
             if (douyuExPlusButton || button.parentElement !== parent) {
@@ -3495,11 +4595,12 @@
         setClassNameIfChanged(button, "labelfisrt-407af4 thirdBtn-06cde5 fourBtn-0845d4 dgq-panel-plus-one");
         setTextIfChanged(button, "+1");
         setAttributeIfChanged(button, "title", "复读这条弹幕");
-        button.onclick = event => {
-            event.preventDefault();
-            event.stopPropagation();
+        setAttributeIfChanged(button, "role", "button");
+        setAttributeIfChanged(button, "tabindex", "0");
+        button.onclick = null;
+        bindPanelButtonAction(button, () => {
             sendBarrage(getBarrageTipText() || text, { source: "panel-tip" });
-        };
+        });
         return button;
     }
 
@@ -3511,6 +4612,8 @@
         const { parent, douyuExPlusButton } = getBarrageTipButtonParent();
         if (!parent) return;
         const plusButton = ensurePanelPlusOneButton(parent, douyuExPlusButton, text);
+
+        parent.querySelector("#dgq-panel-review")?.remove();
 
         let button = parent.querySelector("#dgq-panel-submit");
         if (!button) {
@@ -3527,11 +4630,12 @@
         setClassNameIfChanged(button, `${baseClass} dgq-panel-tip-submit`);
         setTextIfChanged(button, "投");
         setAttributeIfChanged(button, "title", "选择标签投稿到63136烂梗网站");
-        button.onclick = event => {
-            event.preventDefault();
-            event.stopPropagation();
+        setAttributeIfChanged(button, "role", "button");
+        setAttributeIfChanged(button, "tabindex", "0");
+        button.onclick = null;
+        bindPanelButtonAction(button, () => {
             openSubmitTagDialog(getBarrageTipText() || text, { source: "panel-tip" });
-        };
+        });
     }
 
     function enhanceBarragePanel() {
@@ -3552,26 +4656,69 @@
         if (state.barrageActionsStarted) return;
         state.barrageActionsStarted = true;
         let barragePanelScheduled = false;
+        let barrageListScheduled = false;
         const observedRoots = new Set();
         const observedPanelRoots = new Set();
+        const observedListObservers = new Map();
+        const pendingBarrageItems = new Set();
 
         function handleBarrageListPointer(event) {
             if (isExternalPluginNode(event.target)) return;
             const item = event.target?.closest?.(BARRAGE_ITEM_SELECTOR);
-            if (item && event.currentTarget.contains(item)) enhanceBarrageItem(item);
+            if (item && event.currentTarget.contains(item)) {
+                enhanceBarrageItem(item);
+                scheduleBarragePanelEnhancement();
+            }
         }
+
+        const scheduleBarrageListEnhancement = () => {
+            if (barrageListScheduled) return;
+            barrageListScheduled = true;
+            requestAnimationFrame(() => {
+                barrageListScheduled = false;
+                const items = Array.from(pendingBarrageItems);
+                pendingBarrageItems.clear();
+                items.forEach(item => enhanceBarrageItem(item));
+            });
+        };
 
         const syncBarrageListDelegates = () => {
             const roots = getBarrageObserverRoots();
             roots.forEach(root => {
-                if (observedRoots.has(root)) return;
-                root.addEventListener("mouseover", handleBarrageListPointer);
-                root.addEventListener("focusin", handleBarrageListPointer);
-                observedRoots.add(root);
+                let shouldScanExistingItems = false;
+                if (!observedRoots.has(root)) {
+                    root.addEventListener("mouseover", handleBarrageListPointer);
+                    root.addEventListener("focusin", handleBarrageListPointer);
+                    observedRoots.add(root);
+                    shouldScanExistingItems = true;
+                }
+                if (!observedListObservers.has(root)) {
+                    const listObserver = new MutationObserver(mutations => {
+                        let changed = false;
+                        for (const mutation of mutations) {
+                            mutation.addedNodes.forEach(node => {
+                                const before = pendingBarrageItems.size;
+                                collectBarrageItemsFromNode(node, pendingBarrageItems);
+                                if (pendingBarrageItems.size > before) changed = true;
+                            });
+                        }
+                        if (changed) scheduleBarrageListEnhancement();
+                    });
+                    listObserver.observe(root, { childList: true, subtree: true });
+                    observedListObservers.set(root, listObserver);
+                }
+                if (shouldScanExistingItems) collectBarrageItemsFromNode(root, pendingBarrageItems);
             });
             observedRoots.forEach(root => {
                 if (!root.isConnected) observedRoots.delete(root);
             });
+            observedListObservers.forEach((observer, root) => {
+                if (!root.isConnected) {
+                    observer.disconnect();
+                    observedListObservers.delete(root);
+                }
+            });
+            if (pendingBarrageItems.size) scheduleBarrageListEnhancement();
         };
 
         const cleanupBarrageListDelegates = () => {
@@ -3580,6 +4727,9 @@
                 root.removeEventListener("focusin", handleBarrageListPointer);
             });
             observedRoots.clear();
+            observedListObservers.forEach(observer => observer.disconnect());
+            observedListObservers.clear();
+            pendingBarrageItems.clear();
         };
 
         const syncPanelObservers = () => {
@@ -3615,6 +4765,11 @@
             cleanupBarrageListDelegates();
             panelObserver.disconnect();
         });
+    }
+
+    function hasDisplayVersionUpdate(latestInfo) {
+        const latestDisplay = normalizeRemoteVersionInfo(latestInfo)?.displayVersion || "";
+        return compareVersions(latestDisplay, DISPLAY_VERSION) > 0;
     }
 
     function compareVersions(left, right) {
@@ -3655,7 +4810,7 @@
             .then(latestVersionInfo => {
                 const latestInfo = normalizeRemoteVersionInfo(latestVersionInfo);
                 if (!latestInfo) throw new Error("missing version");
-                if (compareVersions(latestInfo.version, CURRENT_VERSION) > 0) {
+                if (hasDisplayVersionUpdate(latestInfo) || compareVersions(latestInfo.version, CURRENT_VERSION) > 0) {
                     setUpdateTip(latestInfo);
                     showMsg(`检测到新版本 ${latestInfo.displayVersion}，点击顶部提示更新`, "warn");
                 } else if (manual) {
@@ -3754,9 +4909,16 @@
         });
     }
 
+    purgeLegacyReviewSecrets();
     initMenuCommands();
     initKeyboardShortcuts();
-    runWhenIdle(initBarrageActions, 5000);
+    initPanelButtonActionCapture();
+    initBarrageActions();
     insertToolbarToggleButton();
-    setInterval(insertToolbarToggleButton, 2000);
+    initVideoSyncButton();
+    initPlayerGiftPopupBlocker();
+    setInterval(() => {
+        insertToolbarToggleButton();
+        ensureVideoSyncButton();
+    }, 2000);
 })();
