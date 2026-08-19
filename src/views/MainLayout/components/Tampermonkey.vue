@@ -95,9 +95,9 @@
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.2.35';
-const currentPluginUpdatedAt = '2026-08-20 00:11';
-const userscriptInstallUrl = '/dgq63136.user.js?v=202608200011';
+const currentPluginVersion = 'V0.2.36';
+const currentPluginUpdatedAt = '2026-08-20 04:22';
+const userscriptInstallUrl = '/dgq63136.user.js?v=202608200422';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
 const greasyForkUrl =
     'https://greasyfork.org/zh-CN/scripts/511991-dgq63136-cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86';
@@ -166,6 +166,14 @@ const permissionChecks = [
 ];
 
 const updateHistory = [
+    {
+        version: 'V0.2.36',
+        updatedAt: '2026-08-20 04:22',
+        changes: [
+            '优化版本更新识别体验。',
+            '@呆物麋羊',
+        ],
+    },
     {
         version: 'V0.2.35',
         updatedAt: '2026-08-20 00:11',

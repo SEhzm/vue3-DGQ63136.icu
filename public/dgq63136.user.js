@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.19.01
+// @version      2026.08.20.01
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -31,7 +31,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.35";
+    const DISPLAY_VERSION = "V0.2.36";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -104,6 +104,10 @@
         reviewerToken: ""
     };
     const CHANGELOG = {
+        "V0.2.36": [
+            "优化版本更新识别体验。",
+            "@呆物麋羊"
+        ],
         "V0.2.35": [
             "优化投稿失败诊断体验。",
             "@呆物麋羊"
@@ -298,6 +302,7 @@
         "V0.0.1": ["新增一键投稿、本地收藏和更新提示。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.20.01": "0.2.36",
         "2026.08.19.01": "0.2.35",
         "2026.08.18.08": "0.2.34",
         "2026.08.18.07": "0.2.33",
