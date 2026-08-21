@@ -34,7 +34,7 @@
             <a class="icon-container" href="https://yuba.douyu.com/feed/2639094748291342931" target="_blank">
                 <img src="@/assets/imgs/douyu.png" alt="douyu" class="icon-img" />
             </a>
-            <a class="icon-container" href="https://github.com/SEhzm/sb6657/" target="_blank">
+            <a class="icon-container" href="https://github.com/SEhzm/vue3-DGQ63136.icu" target="_blank">
                 <img src="@/assets/imgs/github.png" alt="github" class="icon-img" />
             </a>
 
