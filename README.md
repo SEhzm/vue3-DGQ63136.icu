@@ -1,33 +1,94 @@
-# DGQ63136.cn 前端
+<p align="center">
+    <a href="https://github.com/SEhzm/vue3-DGQ63136.icu">
+        <img src="https://pic.imgdb.cn/item/6607ee8f9f345e8d03ae3a77.png" width="150" height="150"/>
+    </a>
+    <h3 align="center">sb6657.cn</h3>
+    <br>
+    <p align="center">
+        <a href="https://github.com/SEhzm/vue3-DGQ63136.icu"><img src="https://img.shields.io/github/languages/code-size/SEhzm/vue3-DGQ63136.icu?color=blueviolet"></a>
+        <a href="https://github.com/SEhzm/vue3-DGQ63136.icu"><img src="https://img.shields.io/github/stars/SEhzm/vue3-DGQ63136.icu?color=green"></a>
+        <a href="https://github.com/SEhzm/vue3-DGQ63136.icu"><img src="https://img.shields.io/github/commit-activity/m/SEhzm/vue3-DGQ63136.icu?color=9cf"></a>
+        <a href="https://github.com/SEhzm/vue3-DGQ63136.icu"><img src="https://img.shields.io/github/last-commit/sehzm/vue3-DGQ63136.icu"></a>
+        <a href="https://github.com/SEhzm/vue3-DGQ63136.icu"><img src="https://img.shields.io/github/languages/count/sehzm/vue3-DGQ63136.icu
+        "></a>
+        <p align="center"">
+    这是一个斗鱼TV主播冬瓜强的弹幕收集网站项目，白字的在线记事本        
+</p>
 
-斗鱼 63136 弹幕库网站前端。
+## 🌐 官方网站
 
-## 项目说明
+[https://dgq63136.icu](https://dgq63136.icu)
 
-本仓库只保存公开网站前端代码和必要的公开静态资源。
+## 简介
 
-主要包含：
+这是一个斗鱼TV主播冬瓜强的弹幕收集网站项目，白字的在线记事本  
 
-- 网站首页
-- 弹幕库浏览页面
-- 图片展示页面
-- 插件安装入口页面
+网站地址：**dgq63136.icu**
 
-## 本地运行
+请使用Edge浏览器，chrome浏览器，QQ浏览器，Safari浏览器等浏览器访问。
 
-```powershell
-npm install
+## 🏆dgq63136.icu已收集600+条有意思的弹幕，日访问量200+，IP数100+
+
+------
+
+### 🎯目标
+
+1.旨在收集好玩的，有意思的弹幕。
+
+2.方便水友复制弹幕，增加直播间趣味性。
+
+------
+
+### 技术栈
+前端：
+Vue3 + Vite + axios + elementUIPlus + Typescript
+
+后端：
+SpringBoot + MyBatis + MySQL + Redis
+
+
+
+## 声明
+
+目前本页面是个人开发，可能存在未发现的bug，请勿吐槽😚。
+
+**仅供学习，请勿直接拿走应用于其他直播间，引用请注明出处**
+
+作者：
+
+斗鱼ID：瓜瓜的御用攻城狮
+
+QQ：2693445032
+
+VX：H2693445032
+
+## 🎈后端暂不开源！获取请联系上方咨询
+
+------
+
+### 启动
+
+```
+cd vue
 npm run dev
 ```
 
-## 构建
+------
 
-```powershell
+### 打包
+
+```
 npm run build
 ```
 
-## 安全说明
+### 后端启动：
 
-本仓库是公开仓库，不应提交账号、密码、Token、Cookie、后台地址、接口密钥、日志、缓存、浏览器会话、用户隐私或其他敏感信息。
 
-涉及安装地址、隐藏路径、口令、内部规则、接口细节和维护记录的内容，不写入公开 README。
+(1.测试) ：注释yml中ssl,request.ts中调整baseURL
+
+(2.上线)：放开yml注释,request.ts中调整baseURL
+
+2.配置跨域设置(非必须)
+
+有建议或BUG请提交在[这里提交建议和bug](https://www.wjx.cn/vm/QmBulzI.aspx#)
+
