@@ -138,9 +138,9 @@ const GATE_HINTS = [
     '5EPL rating = ?',
     '团播飞盘🙋‍♂️',
 ];
-const currentPluginVersion = 'V0.2.29';
-const currentPluginUpdatedAt = '2026-08-18 06:00';
-const userscriptInstallUrl = '/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js?v=202608180600';
+const currentPluginVersion = 'V0.2.38';
+const currentPluginUpdatedAt = '2026-08-21 20:39';
+const userscriptInstallUrl = '/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js?v=202608212039';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
 const greasyForkUrl =
     'https://greasyfork.org/zh-CN/scripts/511991-dgq63136-cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86';
@@ -231,6 +231,96 @@ const permissionChecks = [
 ];
 
 const updateHistory = [
+    {
+        date: '2026-08-21',
+        updatedAt: '2026-08-21 20:39',
+        version: 'V0.2.38',
+        changes: [
+            '优化插件版本同步和安装页更新体验。',
+            '@呆物麋羊',
+        ],
+    },
+    {
+        date: '2026-08-21',
+        updatedAt: '2026-08-21 19:05',
+        version: 'V0.2.37',
+        changes: [
+            '优化投稿异常提示和安装版本同步。',
+            '@呆物麋羊',
+        ],
+    },
+    {
+        date: '2026-08-20',
+        updatedAt: '2026-08-20 04:31',
+        version: 'V0.2.36',
+        changes: [
+            '优化版本更新识别体验。',
+            '@呆物麋羊',
+        ],
+    },
+    {
+        date: '2026-08-20',
+        updatedAt: '2026-08-20 00:11',
+        version: 'V0.2.35',
+        changes: [
+            '优化投稿失败诊断体验。',
+            '@呆物麋羊',
+        ],
+    },
+    {
+        date: '2026-08-18',
+        updatedAt: '2026-08-18 17:19',
+        version: 'V0.2.34',
+        changes: [
+            '优化投稿接口兼容体验。',
+            '@呆物麋羊',
+        ],
+    },
+    {
+        date: '2026-08-18',
+        updatedAt: '2026-08-18 16:47',
+        version: 'V0.2.33',
+        changes: [
+            '优化投稿失败提示体验。',
+            '@呆物麋羊',
+        ],
+    },
+    {
+        date: '2026-08-18',
+        updatedAt: '2026-08-18 16:40',
+        version: 'V0.2.32',
+        changes: [
+            '优化投稿失败提示体验。',
+            '@呆物麋羊',
+        ],
+    },
+    {
+        date: '2026-08-18',
+        updatedAt: '2026-08-18 16:23',
+        version: 'V0.2.31',
+        changes: [
+            '优化投稿标签选择体验。',
+            '@呆物麋羊',
+        ],
+    },
+    {
+        date: '2026-08-18',
+        updatedAt: '2026-08-18 16:13',
+        version: 'V0.2.30',
+        changes: [
+            '优化投稿标签刷新体验。',
+            '@呆物麋羊',
+        ],
+    },
+    {
+        date: '2026-08-18',
+        updatedAt: '2026-08-18 16:07',
+        version: 'V0.2.29',
+        changes: [
+            '优化投稿异常处理体验。',
+            '@呆物麋羊',
+        ],
+    },
     {
         date: '2026-08-18',
         updatedAt: '2026-08-18 05:28',
