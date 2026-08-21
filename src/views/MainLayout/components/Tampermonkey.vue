@@ -138,9 +138,9 @@ const GATE_HINTS = [
     '5EPL rating = ?',
     '团播飞盘🙋‍♂️',
 ];
-const currentPluginVersion = 'V0.2.38';
-const currentPluginUpdatedAt = '2026-08-21 20:39';
-const userscriptInstallUrl = '/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js?v=202608212039';
+const currentPluginVersion = 'V0.2.39';
+const currentPluginUpdatedAt = '2026-08-21 21:41';
+const userscriptInstallUrl = '/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js?v=202608212141';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
 const greasyForkUrl =
     'https://greasyfork.org/zh-CN/scripts/511991-dgq63136-cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86';
@@ -231,6 +231,15 @@ const permissionChecks = [
 ];
 
 const updateHistory = [
+    {
+        date: '2026-08-21',
+        updatedAt: '2026-08-21 21:41',
+        version: 'V0.2.39',
+        changes: [
+            '优化投稿接口异常提示，减少误解。',
+            '@呆物麋羊',
+        ],
+    },
     {
         date: '2026-08-21',
         updatedAt: '2026-08-21 20:39',
