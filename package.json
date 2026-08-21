@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
+    "build": "vite build && node tools/verify-build-assets.mjs",
     "verify": "node tools/verify-install-page.mjs && vite build",
     "preview": "vite preview"
   },

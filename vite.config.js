@@ -18,6 +18,25 @@ import {
 import IconsResolver from 'unplugin-icons/resolver'
 import ElementPlus from 'unplugin-element-plus/vite'
 
+function getVendorChunkName(id) {
+    const normalizedId = id.replace(/\\/g, '/')
+    const nodeModulesIndex = normalizedId.lastIndexOf('/node_modules/')
+    if (nodeModulesIndex === -1) return undefined
+
+    const packagePath = normalizedId.slice(nodeModulesIndex + '/node_modules/'.length)
+    const parts = packagePath.split('/').filter(Boolean)
+    let packageName = parts[0]
+
+    if (packageName === '.pnpm') {
+        const pnpmPackage = parts[1] || 'vendor'
+        packageName = pnpmPackage.split('@npm:').pop().split('@')[0] || 'vendor'
+    } else if (packageName?.startsWith('@')) {
+        packageName = `${packageName.slice(1)}-${parts[1] || 'vendor'}`
+    }
+
+    return `vendor-${packageName.replace(/[^a-zA-Z0-9_-]/g, '-') || 'vendor'}`
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
     base: '/',
@@ -82,9 +101,7 @@ export default defineConfig({
             output: {
                 // 最小化拆分包
                 manualChunks(id) {
-                    if (id.includes('node_modules')) {
-                        return id.toString().split('node_modules/')[1].split('/')[0].toString()
-                    }
+                    return getVendorChunkName(id)
                 },
                 // 用于从入口点创建的块的打包输出格式[name]表示文件名,[hash]表示该文件内容hash值
                 entryFileNames: 'assets/js/[name].[hash].js', // 用于命名代码拆分时创建的共享块的输出命名

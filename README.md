@@ -26,6 +26,14 @@ npm run dev
 npm run build
 ```
 
+`npm run build` 会在 Vite 构建后执行 `tools/verify-build-assets.mjs`。发布前必须确认：
+
+- `dist/assets` 里不能出现 `.pnpm.*` 这类点开头文件。
+- 入口 JS 不能引用 `./.xxx` 点开头 chunk。
+- 构建产物里不能带本机磁盘路径。
+
+原因：公开域名/CDN/GitHub Pages 链路可能不返回点开头静态资源，页面会停在加载中。
+
 ## 插件更新发布规则
 
 本仓库的插件安装页只负责展示和分发公开 `.user.js` 文件。更新插件时按下面规则处理：
