@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.21.04
+// @version      2026.08.21.05
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -31,7 +31,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.40";
+    const DISPLAY_VERSION = "V0.2.41";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -104,6 +104,10 @@
         reviewerToken: ""
     };
     const CHANGELOG = {
+        "V0.2.41": [
+            "修复旧识别码导致投稿失败的问题。",
+            "@呆物麋羊"
+        ],
         "V0.2.40": [
             "修复投稿接口识别异常导致部分用户投稿失败的问题。",
             "@呆物麋羊"
@@ -318,6 +322,7 @@
         "V0.0.1": ["新增一键投稿、本地收藏和更新提示。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.21.05": "0.2.41",
         "2026.08.21.04": "0.2.40",
         "2026.08.21.03": "0.2.39",
         "2026.08.21.02": "0.2.38",
@@ -1547,6 +1552,12 @@
         return token;
     }
 
+    function refreshSiteToken() {
+        const token = randomString(16);
+        storageSet(SITE_TOKEN_KEY, token);
+        return token;
+    }
+
     function getOrCreateReviewClickerId() {
         let id = storageGet(REVIEW_CLICKER_ID_KEY, "");
         if (typeof id !== "string" || id.length < 12) {
@@ -2005,6 +2016,11 @@
         return /重复|已存在|已经有|相同|相似|duplicate/i.test(message);
     }
 
+    function isSubmissionTokenQuotaResponse(response) {
+        const message = getResponseMessage(response);
+        return /今天投稿次数已用完|投稿次数已用完/.test(message);
+    }
+
     function getSubmissionFailureMessage(response, error = null, meta = {}) {
         const payload = response || error?.payload || null;
         const rawMessage = getResponseMessage(payload) || String(error?.message || "").replace(/^HTTP\s+\d+:\s*/i, "").trim();
@@ -2051,11 +2067,17 @@
             return false;
         }
 
-        try {
-            const response = await apiRequest("POST", API_PATHS.SUBMIT_MEME, {
+        const submitRequest = () => apiRequest("POST", API_PATHS.SUBMIT_MEME, {
                 tags: tags.join(","),
                 barrage: text
             }, { includeApiAuth: false });
+
+        try {
+            let response = await submitRequest();
+            if (response?.code !== 200 && isSubmissionTokenQuotaResponse(response)) {
+                refreshSiteToken();
+                response = await submitRequest();
+            }
             if (response?.code === 200) {
                 addRecentUsage(text, { ...meta, tags, action: "submit" });
                 showMsg(`投稿成功，分类：${tags.map(getTagLabel).join("、")}，待审核`);
