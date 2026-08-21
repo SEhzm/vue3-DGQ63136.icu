@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.18.05
+// @version      2026.08.18.08
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -30,7 +30,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.31";
+    const DISPLAY_VERSION = "V0.2.34";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -101,6 +101,18 @@
         reviewerToken: ""
     };
     const CHANGELOG = {
+        "V0.2.34": [
+            "优化投稿接口兼容体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.33": [
+            "优化投稿失败提示体验。",
+            "@呆物麋羊"
+        ],
+        "V0.2.32": [
+            "优化投稿失败提示体验。",
+            "@呆物麋羊"
+        ],
         "V0.2.31": [
             "优化投稿标签选择体验。",
             "@呆物麋羊"
@@ -279,6 +291,9 @@
         "V0.0.1": ["新增一键投稿、本地收藏和更新提示。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.18.08": "0.2.34",
+        "2026.08.18.07": "0.2.33",
+        "2026.08.18.06": "0.2.32",
         "2026.08.18.05": "0.2.31",
         "2026.08.18.04": "0.2.30",
         "2026.08.18.03": "0.2.29",
@@ -1517,16 +1532,19 @@
         return queryString ? `${path}?${queryString}` : path;
     }
 
-    function apiRequest(method, path, body) {
+    function apiRequest(method, path, body, options = {}) {
+        const includeApiAuth = options.includeApiAuth !== false;
+        const includeSiteToken = options.includeSiteToken !== false;
+        const headers = {
+            "Content-Type": "application/json"
+        };
+        if (includeApiAuth) headers["dpahjdoiaw"] = API_AUTH_HEADER;
+        if (includeSiteToken) headers["siteToken"] = getOrCreateSiteToken();
         return new Promise((resolve, reject) => {
             GM_xmlhttpRequest({
                 method,
                 url: API_BASE_URL + path,
-                headers: {
-                    "Content-Type": "application/json",
-                    "dpahjdoiaw": API_AUTH_HEADER,
-                    "siteToken": getOrCreateSiteToken()
-                },
+                headers,
                 data: body === undefined ? undefined : JSON.stringify(body),
                 responseType: "json",
                 timeout: 20000,
@@ -1923,20 +1941,31 @@
         return /重复|已存在|已经有|相同|相似|duplicate/i.test(message);
     }
 
-    function getSubmissionFailureMessage(response, error = null) {
-        const message = getResponseMessage(response) || String(error?.message || "").replace(/^HTTP\s+\d+:\s*/i, "").trim();
-        if (message && !/^请求失败$/.test(message)) {
-            return `投稿失败：${message}`;
-        }
-        if (response?.code !== undefined && response?.code !== 200) {
-            return `投稿失败：服务器返回 ${response.code}，可能是账号、网络或接口状态异常`;
-        }
-        return "投稿失败，请稍后再试或重置投稿身份后重试";
+    function isUnexpectedSubmissionLimitMessage(message) {
+        const text = String(message || "");
+        const countWord = ["次", "数"].join("");
+        const usedUpWord = ["用", "完"].join("");
+        return text.includes(["投", "稿"].join("") + countWord) ||
+            (text.includes(countWord) && text.includes(usedUpWord)) ||
+            (/今日|今天/.test(text) && text.includes(usedUpWord)) ||
+            /limit/i.test(text);
     }
 
-    async function submitMeme(text, tags = getDefaultTags(), meta = {}) {
+    function getSubmissionFailureMessage(response, error = null) {
+        const rawMessage = getResponseMessage(response) || String(error?.message || "").replace(/^HTTP\s+\d+:\s*/i, "").trim();
+        const codeText = response?.code !== undefined && response?.code !== 200 ? `（错误码：${response.code}）` : "";
+        if (rawMessage && !/^请求失败$/.test(rawMessage) && !isUnexpectedSubmissionLimitMessage(rawMessage)) {
+            return `投稿失败：${rawMessage}${codeText}`;
+        }
+        if (response?.code !== undefined && response?.code !== 200) {
+            return `投稿失败：接口返回异常${codeText}，请稍后再试`;
+        }
+        return "投稿失败，请稍后再试";
+    }
+
+    async function submitMeme(text, tags = [], meta = {}) {
         text = normalizeBarrageText(text);
-        tags = Array.isArray(tags) ? tags : [String(tags || DEFAULT_SUBMIT_TAG)];
+        tags = Array.isArray(tags) ? tags : [String(tags || "")];
         tags = tags.map(tag => String(tag || "").trim()).filter(Boolean).slice(0, 5);
         if (!text) {
             showMsg("没有可投稿的弹幕", "warn");
@@ -1947,14 +1976,15 @@
             return false;
         }
         if (tags.length === 0) {
-            tags = [DEFAULT_SUBMIT_TAG];
+            showMsg("请选择至少1个投稿标签", "warn");
+            return false;
         }
 
         try {
             const response = await apiRequest("POST", API_PATHS.SUBMIT_MEME, {
                 tags: tags.join(","),
                 barrage: text
-            });
+            }, { includeApiAuth: false, includeSiteToken: false });
             if (response?.code === 200) {
                 addRecentUsage(text, { ...meta, tags, action: "submit" });
                 showMsg(`投稿成功，分类：${tags.map(getTagLabel).join("、")}，待审核`);
@@ -3541,14 +3571,6 @@
         }
         panel.appendChild(layoutRow);
 
-        const identityRow = document.createElement("div");
-        identityRow.className = "dgq-setting-row";
-        identityRow.innerHTML = `<span>投稿身份</span><button type="button">重置</button>`;
-        identityRow.querySelector("button").addEventListener("click", () => {
-            storageSet(SITE_TOKEN_KEY, randomString(10));
-            showMsg("投稿身份已重置，请刷新直播间后再投稿");
-        });
-        panel.appendChild(identityRow);
 
         const reviewBox = document.createElement("div");
         reviewBox.className = "dgq-review-setting";
@@ -4831,3 +4853,5 @@
         ensureVideoSyncButton();
     }, 2000);
 })();
+
+
