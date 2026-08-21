@@ -9,7 +9,7 @@
                         <RouterLink to="/Starrysky">星空背景</RouterLink>
                         <RouterLink to="/update">更新日志</RouterLink>
                         <button class="link-button" type="button" @click="supportDialogVisible = true">赞赏支持</button>
-                        <a href="https://github.com/SEhzm/sb6657/" target="_blank" rel="noopener noreferrer">前端源码</a>
+                        <a href="https://github.com/SEhzm/vue3-DGQ63136.icu" target="_blank" rel="noopener noreferrer">前端源码</a>
                     </nav>
                 </section>
                 <section class="footer-section">
