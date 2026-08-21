@@ -1,5 +1,33 @@
 <template>
     <div class="install-page">
+        <section v-if="!installGatePassed" class="card install-gate">
+            <p class="eyebrow">63136 弹幕插件</p>
+            <h1>一键安装插件</h1>
+            <p class="gate-desc">输入正确答案后继续访问安装教程、安装按钮和更新历史。</p>
+            <form class="gate-form" @submit.prevent="checkInstallGate">
+                <label class="gate-label" for="install-gate-answer">冬瓜强意难平的数字</label>
+                <div class="gate-input-row">
+                    <span class="gate-input-icon" aria-hidden="true">#</span>
+                    <input
+                        id="install-gate-answer"
+                        v-model.trim="installGateAnswer"
+                        class="gate-input"
+                        :class="{ 'gate-input-invalid': installGateError }"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        spellcheck="false"
+                        placeholder="请输入答案"
+                    />
+                    <button class="gate-submit" type="submit">进入</button>
+                </div>
+                <p v-if="installGateError" class="gate-error">{{ installGateError }}</p>
+                <p v-if="installGateHint" class="gate-hint">
+                    <span class="gate-hint-badge">提示</span>{{ installGateHint }}
+                </p>
+            </form>
+        </section>
+
+        <template v-else>
         <section class="card install-hero">
             <div>
                 <p class="eyebrow">63136 弹幕插件</p>
@@ -91,16 +119,42 @@
                 </article>
             </div>
         </section>
+        </template>
     </div>
 </template>
 
 <script setup>
-const currentPluginVersion = 'V0.2.36';
-const currentPluginUpdatedAt = '2026-08-20 04:22';
-const userscriptInstallUrl = '/dgq63136.user.js?v=202608200422';
+import { ref } from 'vue';
+
+const currentPluginVersion = 'V0.2.37';
+const currentPluginUpdatedAt = '2026-08-21 10:00';
+const userscriptInstallUrl = '/dgq63136.user.js?v=202608211000';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
 const greasyForkUrl =
     'https://greasyfork.org/zh-CN/scripts/511991-dgq63136-cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86';
+
+const installGatePassed = ref(false);
+const installGateAnswer = ref('');
+const installGateError = ref('');
+const installGateHint = ref('');
+const installGateAttempts = ref(0);
+
+const checkInstallGate = () => {
+    const answer = Number(installGateAnswer.value);
+    if (installGateAnswer.value === '') {
+        installGateError.value = '先输入一个数字试试。';
+        return;
+    }
+    if (!Number.isNaN(answer) && answer === 70) {
+        installGatePassed.value = true;
+        installGateError.value = '';
+        installGateHint.value = '';
+        return;
+    }
+    installGateAttempts.value += 1;
+    installGateError.value = '答案不对，再想想。';
+    installGateHint.value = installGateAttempts.value >= 5 ? '5EPL rating = ?' : '';
+};
 
 const installSteps = [
     {
@@ -166,6 +220,14 @@ const permissionChecks = [
 ];
 
 const updateHistory = [
+    {
+        version: 'V0.2.37',
+        updatedAt: '2026-08-21 10:00',
+        changes: [
+            '优化投稿异常提示和安装版本同步。',
+            '@呆物麋羊',
+        ],
+    },
     {
         version: 'V0.2.36',
         updatedAt: '2026-08-20 04:22',
@@ -398,6 +460,92 @@ const updateHistory = [
 :global(.aplayer),
 :global(.version) {
     display: none !important;
+}
+
+.install-gate {
+    max-width: 620px;
+    margin: 32px auto 0;
+}
+
+.gate-desc {
+    margin-top: 10px;
+    color: #333;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.gate-form {
+    display: grid;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.gate-label {
+    color: #333;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.gate-input-row {
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr) 92px;
+    min-height: 44px;
+    border: 1px solid #d6e2ee;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.gate-input-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #1976d2;
+    background: #edf6ff;
+    font-weight: 800;
+}
+
+.gate-input {
+    min-width: 0;
+    border: 0;
+    outline: none;
+    padding: 0 12px;
+    color: #111;
+    font-size: 15px;
+}
+
+.gate-input-invalid {
+    background: #fff8f8;
+}
+
+.gate-submit {
+    border: 0;
+    color: #fff;
+    background: #1976d2;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.gate-error {
+    color: #c62828;
+    font-size: 13px;
+}
+
+.gate-hint {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    color: #5f4b14;
+    font-size: 13px;
+}
+
+.gate-hint-badge {
+    border-radius: 999px;
+    padding: 3px 8px;
+    background: #fff5cc;
+    color: #6b520e;
+    font-size: 12px;
+    font-weight: 800;
 }
 
 .install-hero {

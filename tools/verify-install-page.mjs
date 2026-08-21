@@ -22,8 +22,8 @@ const displayedVersions = [
 ].map((match) => match[1]);
 assert.deepEqual(
   displayedVersions,
-  ["V0.2.36", "V0.2.36", "V0.2.35", "V0.2.1", "V0.2.0", "V0.1.9", "V0.1.8", "V0.1.7", "V0.1.6", "V0.1.5", "V0.1.4", "V0.1.3", "V0.1.2", "V0.1.1", "V0.1.0", "V0.0.9", "V0.0.8", "V0.0.7", "V0.0.6", "V0.0.5", "V0.0.4", "V0.0.3", "V0.0.2", "V0.0.1"],
-  "plugin versions should advance from V0.0.9 to V0.1.0 and continue to V0.2.36",
+  ["V0.2.37", "V0.2.37", "V0.2.36", "V0.2.35", "V0.2.1", "V0.2.0", "V0.1.9", "V0.1.8", "V0.1.7", "V0.1.6", "V0.1.5", "V0.1.4", "V0.1.3", "V0.1.2", "V0.1.1", "V0.1.0", "V0.0.9", "V0.0.8", "V0.0.7", "V0.0.6", "V0.0.5", "V0.0.4", "V0.0.3", "V0.0.2", "V0.0.1"],
+  "plugin versions should advance from V0.0.9 to V0.1.0 and continue to V0.2.37",
 );
 assert.ok(!displayedVersions.includes("V0.0.10"), "V0.0.9 should advance to V0.1.0, not V0.0.10");
 for (const version of displayedVersions) {
@@ -37,6 +37,8 @@ assert.doesNotMatch(
 assert.ok(page.includes(installLink), "page should link to packaged userscript install path");
 assert.ok(page.includes(greasyForkUrl), "page should keep Greasy Fork as backup install page");
 assert.ok(page.includes("一键安装插件"), "page should have a primary install button");
+assert.ok(page.includes("installGatePassed"), "page should keep the per-visit answer gate");
+assert.ok(page.includes("冬瓜强意难平的数字"), "install gate should show the required question");
 assert.ok(page.includes("安装油猴管理器"), "page should have Tampermonkey install entry");
 assert.ok(page.includes("允许用户脚本"), "page should remind users to enable Tampermonkey user scripts");
 assert.ok(page.includes("permissionSteps"), "page should include a detailed user-script permission tutorial");

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.20.01
+// @version      2026.08.21.01
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -31,7 +31,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.36";
+    const DISPLAY_VERSION = "V0.2.37";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -104,6 +104,10 @@
         reviewerToken: ""
     };
     const CHANGELOG = {
+        "V0.2.37": [
+            "优化投稿异常提示和安装版本同步。",
+            "@呆物麋羊"
+        ],
         "V0.2.36": [
             "优化版本更新识别体验。",
             "@呆物麋羊"
@@ -302,6 +306,7 @@
         "V0.0.1": ["新增一键投稿、本地收藏和更新提示。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.21.01": "0.2.37",
         "2026.08.20.01": "0.2.36",
         "2026.08.19.01": "0.2.35",
         "2026.08.18.08": "0.2.34",
@@ -2008,6 +2013,9 @@
 
         if (isDuplicateSubmissionResponse(payload)) {
             return `投稿失败：内容可能重复或相似${codeText}${tagText}`;
+        }
+        if (rawMessage && isUnexpectedSubmissionLimitMessage(rawMessage)) {
+            return `投稿失败：后端接口拒绝了本次投稿${codeText}${tagText}${contentText}，请稍后再试或联系接口维护方`;
         }
         if (rawMessage && !/^请求失败$/.test(rawMessage) && !isUnexpectedSubmissionLimitMessage(rawMessage)) {
             return `投稿失败：${compactDiagnosticText(rawMessage, 90)}${codeText}${tagText}${contentText}`;
