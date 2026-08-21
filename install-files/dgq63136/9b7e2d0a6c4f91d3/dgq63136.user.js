@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.21.02
+// @version      2026.08.21.03
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -31,7 +31,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.38";
+    const DISPLAY_VERSION = "V0.2.39";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -104,6 +104,10 @@
         reviewerToken: ""
     };
     const CHANGELOG = {
+        "V0.2.39": [
+            "优化投稿接口异常提示，减少误解。",
+            "@呆物麋羊"
+        ],
         "V0.2.38": [
             "优化插件版本同步和安装页更新体验。",
             "@呆物麋羊"
@@ -310,6 +314,7 @@
         "V0.0.1": ["新增一键投稿、本地收藏和更新提示。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.08.21.03": "0.2.39",
         "2026.08.21.02": "0.2.38",
         "2026.08.21.01": "0.2.37",
         "2026.08.20.01": "0.2.36",
@@ -1995,16 +2000,6 @@
         return /重复|已存在|已经有|相同|相似|duplicate/i.test(message);
     }
 
-    function isUnexpectedSubmissionLimitMessage(message) {
-        const text = String(message || "");
-        const countWord = ["次", "数"].join("");
-        const usedUpWord = ["用", "完"].join("");
-        return text.includes(["投", "稿"].join("") + countWord) ||
-            (text.includes(countWord) && text.includes(usedUpWord)) ||
-            (/今日|今天/.test(text) && text.includes(usedUpWord)) ||
-            /limit/i.test(text);
-    }
-
     function getSubmissionFailureMessage(response, error = null, meta = {}) {
         const payload = response || error?.payload || null;
         const rawMessage = getResponseMessage(payload) || String(error?.message || "").replace(/^HTTP\s+\d+:\s*/i, "").trim();
@@ -2019,10 +2014,12 @@
         if (isDuplicateSubmissionResponse(payload)) {
             return `投稿失败：内容可能重复或相似${codeText}${tagText}`;
         }
-        if (rawMessage && isUnexpectedSubmissionLimitMessage(rawMessage)) {
-            return `投稿失败：后端接口拒绝了本次投稿${codeText}${tagText}${contentText}，请稍后再试或联系接口维护方`;
+        if (codeValue !== undefined && Number(codeValue) >= 500) {
+            const detail = payloadText || compactDiagnosticText(rawMessage, 90);
+            const tail = detail ? `，后端提示：${detail}` : "";
+            return `投稿失败：投稿接口异常${codeText}${tagText}${contentText}${tail}`;
         }
-        if (rawMessage && !/^请求失败$/.test(rawMessage) && !isUnexpectedSubmissionLimitMessage(rawMessage)) {
+        if (rawMessage && !/^请求失败$/.test(rawMessage)) {
             return `投稿失败：${compactDiagnosticText(rawMessage, 90)}${codeText}${tagText}${contentText}`;
         }
         if (codeValue !== undefined && codeValue !== 200) {
