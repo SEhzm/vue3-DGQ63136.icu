@@ -138,9 +138,9 @@ const GATE_HINTS = [
     '5EPL rating = ?',
     '团播飞盘🙋‍♂️',
 ];
-const currentPluginVersion = 'V0.2.41';
-const currentPluginUpdatedAt = '2026-08-21 23:20';
-const userscriptInstallUrl = '/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js?v=202608212320';
+const currentPluginVersion = 'V0.2.42';
+const currentPluginUpdatedAt = '2026-09-06 01:33';
+const userscriptInstallUrl = '/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js?v=202609060133';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
 const greasyForkUrl =
     'https://greasyfork.org/zh-CN/scripts/511991-dgq63136-cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86';
@@ -231,6 +231,15 @@ const permissionChecks = [
 ];
 
 const updateHistory = [
+    {
+        date: '2026-09-06',
+        updatedAt: '2026-09-06 01:33',
+        version: 'V0.2.42',
+        changes: [
+            '优化插件启动兼容，减少和其他斗鱼油猴脚本互相影响。',
+            '@呆物麋羊',
+        ],
+    },
     {
         date: '2026-08-21',
         updatedAt: '2026-08-21 23:20',
