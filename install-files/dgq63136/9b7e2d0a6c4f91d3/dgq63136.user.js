@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.08.21.05
+// @version      2026.09.06.01
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -31,7 +31,7 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.41";
+    const DISPLAY_VERSION = "V0.2.42";
     const API_BASE_URL = "https://hguofichp.cn:10086";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
@@ -103,7 +103,12 @@
         shortcutsEnabled: true,
         reviewerToken: ""
     };
+    const BOOTSTRAP_LOCK_KEY = "__DGQ63136_BOOTSTRAPPED__";
     const CHANGELOG = {
+        "V0.2.42": [
+            "优化插件启动兼容，减少和其他斗鱼油猴脚本互相影响。",
+            "@呆物麋羊"
+        ],
         "V0.2.41": [
             "修复旧识别码导致投稿失败的问题。",
             "@呆物麋羊"
@@ -322,6 +327,7 @@
         "V0.0.1": ["新增一键投稿、本地收藏和更新提示。"]
     };
     const LEGACY_VERSION_MAP = {
+        "2026.09.06.01": "0.2.42",
         "2026.08.21.05": "0.2.41",
         "2026.08.21.04": "0.2.40",
         "2026.08.21.03": "0.2.39",
@@ -4941,6 +4947,11 @@
         setTimeout(callback, Math.min(timeout, 1200));
     }
 
+    function shouldRunOnCurrentPage() {
+        if (!/^(?:www\.)?(?:douyu\.com)$/i.test(location.hostname) && !/\.douyu\.com$/i.test(location.hostname)) return false;
+        return /^\/(?:room\/)?\d+(?:[/?#]|$)/.test(location.pathname);
+    }
+
     function initMenuCommands() {
         if (typeof GM_registerMenuCommand !== "function") return;
         GM_registerMenuCommand("63136：检查更新", () => checkUpdate(true));
@@ -4950,6 +4961,10 @@
             renderFavorites(1);
         });
     }
+
+    if (!shouldRunOnCurrentPage()) return;
+    if (window[BOOTSTRAP_LOCK_KEY]) return;
+    window[BOOTSTRAP_LOCK_KEY] = true;
 
     purgeLegacyReviewSecrets();
     initMenuCommands();
