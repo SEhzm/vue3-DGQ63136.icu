@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dgq63136.cn斗鱼冬瓜强烂梗收集
 // @namespace    http://tampermonkey.net/
-// @version      2026.09.06.01
+// @version      2026.09.25.01
 // @description  在斗鱼直播间 63136 添加搜索、发送、分类排序、随机、最近、本地收藏、审弹幕和版本更新提示
 // @author       dgq63136.cn
 // @match        https://www.douyu.com/*
@@ -17,6 +17,7 @@
 // @grant        GM_info
 // @grant        unsafeWindow
 // @connect      hguofichp.cn
+// @connect      api.hguofichp.cn
 // @connect      update.greasyfork.org
 // @connect      ycfg.mygamemod.com
 
@@ -31,8 +32,8 @@
     "use strict";
 
     const CURRENT_VERSION = GM_info?.script?.version || "0";
-    const DISPLAY_VERSION = "V0.2.42";
-    const API_BASE_URL = "https://hguofichp.cn:10086";
+    const DISPLAY_VERSION = "V0.2.43";
+    const API_BASE_URL = "https://api.hguofichp.cn";
     const API_AUTH_HEADER = "eAR48ZFJwfRTy6SyQPFj";
     const API_PATHS = {
         QUERY_MEME: "/dgq/Query",
@@ -96,7 +97,7 @@
         { label: "收藏", value: "favorites" },
         { label: "设置", value: "settings" }
     ];
-    const QUICK_TAG_LABELS = ["喷冬瓜强", "直播间互喷 +1", "QUQU", "亿星大家庭"];
+    const QUICK_TAG_LABELS = ["喷冬瓜强", "直播间互喷 +1", "团播", "亿星大家庭"];
     const SETTINGS_DEFAULTS = {
         confirmBeforeSend: false,
         layoutMode: "standard",
@@ -105,7 +106,11 @@
     };
     const BOOTSTRAP_LOCK_KEY = "__DGQ63136_BOOTSTRAPPED__";
     const CHANGELOG = {
-        "V0.2.42": [
+        "V0.2.43": [
+            "调整后端地址。",
+            "@攻城狮"
+        ]
+        ,"V0.2.42": [
             "优化插件启动兼容，减少和其他斗鱼油猴脚本互相影响。",
             "@呆物麋羊"
         ],
@@ -4892,7 +4897,7 @@
 
         const connect = () => {
             try {
-                const wsUrl = `wss://hguofichp.cn:10086/dgq/GFPlugin/ws/${sid}`;
+                const wsUrl = `wss://api.hguofichp.cn/dgq/GFPlugin/ws/${sid}`;
                 const WSCtor = typeof unsafeWindow !== "undefined" && unsafeWindow.WebSocket
                     ? unsafeWindow.WebSocket
                     : (window.WebSocket || WebSocket);
