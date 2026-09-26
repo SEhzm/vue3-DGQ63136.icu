@@ -28,6 +28,8 @@
                     <button type="button" class="text-link" @click="showResetPassword">重置密码 &gt;</button>
                 </div>
 
+                <TurnstileWidget ref="turnstileRef" action="login" v-model="turnstileToken" />
+
                 <el-form-item>
                     <el-button :loading="loading" type="primary" native-type="submit" class="login-submit">
                         <span v-if="!loading">登 录</span>
@@ -45,12 +47,16 @@
 
 <script setup>
 import httpInstance, { isRelogin } from "@/apis/httpInstance";
+import TurnstileWidget from "@/components/TurnstileWidget.vue";
 import { useIsMobile } from '@/composables/useIsMobile';
 import { setToken } from "@/utils/cookieUtils";
 import { ElMessage } from "element-plus";
 import Cookies from "js-cookie";
 import { reactive, ref } from "vue";
 import resetPassword from './resetPassword.vue';
+
+const turnstileRef = ref();
+const turnstileToken = ref("");
 
 const props = defineProps({
     onRegister: {
@@ -99,8 +105,16 @@ getDialogWidth();
 function login() {
     formRef.value.validate((valid) => {
         if (valid) {
+            if (!turnstileToken.value) {
+                ElMessage.warning('请先完成人机安全验证');
+                return;
+            }
             loading.value = true;
-            httpInstance.post('/login', loginForm.value).then(res => {
+            httpInstance.post('/login', loginForm.value, {
+                headers: {
+                    'cf-turnstile-response': turnstileToken.value
+                }
+            }).then(res => {
                 if (res.code === 200) {
                     ElMessage.success('登录成功')
                     isRelogin.value.show = true;
@@ -108,10 +122,12 @@ function login() {
                     closeLoginDialog();
                 } else {
                     loading.value = false;
+                    turnstileRef.value?.reset();
                     ElMessage.error(res.msg)
                 }
             }).catch(() => {
                 loading.value = false;
+                turnstileRef.value?.reset();
                 if (captchaEnabled.value) {
                     getCode();
                 }

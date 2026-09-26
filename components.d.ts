@@ -52,7 +52,6 @@ declare module 'vue' {
     ElRow: typeof import('element-plus/es')['ElRow']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     ElSelect: typeof import('element-plus/es')['ElSelect']
-    ElSlider: typeof import('element-plus/es')['ElSlider']
     ElStep: typeof import('element-plus/es')['ElStep']
     ElSteps: typeof import('element-plus/es')['ElSteps']
     ElTable: typeof import('element-plus/es')['ElTable']
@@ -81,6 +80,8 @@ declare module 'vue' {
     TagSelector: typeof import('./src/components/tag-selector.vue')['default']
     ThemeDropdown: typeof import('./src/components/ThemeDropdown.vue')['default']
     ThemeSwitcher: typeof import('./src/components/ThemeSwitcher.vue')['default']
+    TurnstileGuardModal: typeof import('./src/components/TurnstileGuardModal.vue')['default']
+    TurnstileWidget: typeof import('./src/components/TurnstileWidget.vue')['default']
     WordCloud: typeof import('./src/components/wordCloud.vue')['default']
   }
   export interface ComponentCustomProperties {

@@ -6,6 +6,7 @@
         <AnnouncementDialog />
         <MergePigLauncher />
         <MergePigDialog />
+        <TurnstileGuardModal />
     </div>
 </template>
 
@@ -15,6 +16,7 @@ import IdleScreensaver from '@/views/IdleScreensaver.vue';
 import AnnouncementDialog from '@/components/AnnouncementDialog.vue';
 import MergePigLauncher from '@/components/MergePig/MergePigLauncher.vue';
 import MergePigDialog from '@/components/MergePig/MergePigDialog.vue';
+import TurnstileGuardModal from '@/components/TurnstileGuardModal.vue';
 import { useThemeStore } from '@/stores/themeStore';
 
 const theme = useThemeStore();
