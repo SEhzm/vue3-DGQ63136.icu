@@ -11,7 +11,7 @@ const httpInstance = axios.create({
     // baseURL: 'http://127.0.0.1:9999',
     timeout: 60000, // 默认超时时间
 });
-export const sbVersion = 'V1.1.5.20260818';
+export const sbVersion = 'V1.2.0.20261012';
 
 interface req<T> {
     url: string;

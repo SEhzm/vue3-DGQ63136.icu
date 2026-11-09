@@ -54,6 +54,49 @@
             </div>
         </section>
 
+        <section class="card install-hero douyin-hero">
+            <div class="douyin-hero-body">
+                <p class="eyebrow douyin-eyebrow">新增插件 · 抖音直播专版</p>
+                <h2 class="douyin-title">douyin++（dgq63136冬瓜强烂梗·抖音版）</h2>
+                <p class="hero-desc">
+                    专为抖音直播网页版（<code>live.douyin.com</code>）打造：在直播间提供 <strong>dgq63136 悬浮图标</strong>与播放器清晰度旁<strong>“玩烂梗”</strong>按钮随时打开「dgq63136冬瓜强烂梗（抖音版）」面板；鼠标放在原生飘屏弹幕上时弹幕暂停并显示 <strong>+1</strong> 与 <strong>回复</strong>（自动按 <code>@发送者ID：内容</code> 填入输入框）；默认展示最新 <strong>50 条 dgq63136 烂梗</strong>，支持分类标签、关键词检索发送、顶部充电赞赏及<strong>自动检查更新与一键更新</strong>。
+                </p>
+                <div class="version-row douyin-version-row">
+                    <span>当前插件版本号</span>
+                    <strong>{{ douyinPluginVersion }}</strong>
+                    <em>更新时间：{{ douyinPluginUpdatedAt }}</em>
+                    <span class="douyin-env-tag">支持环境：Tampermonkey 5.5.1 及以上</span>
+                </div>
+                <div class="douyin-highlights">
+                    <span class="douyin-highlight-pill">🔘 页面悬浮图标 &amp; 清晰度旁“玩烂梗”入口</span>
+                    <span class="douyin-highlight-pill">🎈 原生飘屏悬停即停：+1 一键复读 / 回复 @发送者 填框</span>
+                    <span class="douyin-highlight-pill">🔍 接入 dgq63136 最新 50 条烂梗（触底加载下一页）、搜索发送与一键更新</span>
+                </div>
+            </div>
+            <div class="hero-actions">
+                <a
+                    class="primary-action douyin-primary-action"
+                    :href="douyinUserscriptInstallUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="装有 Tampermonkey 5.5.1+ 的用户点击后会自动弹出安装页"
+                >
+                    一键安装 douyin++（推荐）
+                </a>
+                <a
+                    class="secondary-action douyin-secondary-action"
+                    :href="douyinUserscriptInstallUrl"
+                    download="douyin++.user.js"
+                    title="下载 douyin++.user.js 本地脚本文件"
+                >
+                    下载脚本 (.user.js)
+                </a>
+                <a class="text-action" :href="tampermonkeyUrl" target="_blank" rel="noopener noreferrer">
+                    安装油猴管理器
+                </a>
+            </div>
+        </section>
+
         <section class="card permission-tip">
             <div class="tip-badge">重要提醒</div>
             <div>
@@ -141,6 +184,9 @@ const GATE_HINTS = [
 const currentPluginVersion = 'V0.2.42';
 const currentPluginUpdatedAt = '2026-09-06 01:33';
 const userscriptInstallUrl = '/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js?v=202609060133';
+const douyinPluginVersion = 'v2026.11.09.06';
+const douyinPluginUpdatedAt = '2026-11-09';
+const douyinUserscriptInstallUrl = '/douyin++.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
 const greasyForkUrl =
     'https://greasyfork.org/zh-CN/scripts/511991-dgq63136-cn%E6%96%97%E9%B1%BC%E5%86%AC%E7%93%9C%E5%BC%BA%E7%83%82%E6%A2%97%E6%94%B6%E9%9B%86';
@@ -1138,6 +1184,88 @@ h3 {
     background: #f3f5f7;
 }
 
+.douyin-hero {
+    border-left: 4px solid #16a34a;
+}
+
+.douyin-hero-body {
+    flex: 1 1 320px;
+    min-width: 0;
+}
+
+.douyin-eyebrow {
+    color: #15803d;
+}
+
+.douyin-title {
+    color: #111;
+    font-size: 26px;
+    line-height: 1.25;
+}
+
+.douyin-hero .hero-desc code {
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #ecfdf5;
+    color: #15803d;
+    font-size: 14px;
+}
+
+.douyin-version-row strong {
+    background: #ecfdf5;
+    color: #15803d;
+}
+
+.douyin-env-tag {
+    padding: 4px 10px;
+    border-radius: 5px;
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.douyin-highlights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.douyin-highlight-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.douyin-hero .primary-action,
+.douyin-hero .secondary-action,
+.douyin-hero .text-action {
+    text-decoration: none;
+    box-sizing: border-box;
+    transition: filter 0.16s ease, transform 0.16s ease;
+}
+
+.douyin-hero .primary-action:hover,
+.douyin-hero .secondary-action:hover,
+.douyin-hero .text-action:hover {
+    filter: brightness(0.97);
+}
+
+.douyin-primary-action {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.douyin-secondary-action {
+    color: #15803d;
+    border-color: #22c55e;
+    background: #f0fdf4;
+}
+
 .steps {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1227,6 +1355,10 @@ h3 {
 
     h1 {
         font-size: 26px;
+    }
+
+    .douyin-title {
+        font-size: 22px;
     }
 
     .hero-actions {

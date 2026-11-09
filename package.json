@@ -1,6 +1,6 @@
 {
     "name": "dgq63136.cn",
-    "version": "0.1.4+20260812",
+    "version": "1.2.0+20261012",
     "private": true,
     "scripts": {
         "dev": "vite --host 0.0.0.0",

@@ -155,8 +155,7 @@ function parseUpdateLog(): VersionInfo[] {
         }
     });
 
-    // 倒序排列，最新版本在最上面
-    return versions.reverse();
+    return versions;
 }
 
 function groupVersionsByDate(versions: VersionInfo[]): VersionGroup[] {
