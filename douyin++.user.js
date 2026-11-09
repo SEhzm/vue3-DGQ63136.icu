@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         dgq63136.cn烂梗（抖音版）
+// @name         dgq63136厕纸（抖音版）
 // @namespace    https://dgq63136.cn/
-// @version      v2026.11.09.06
-// @description  dgq63136冬瓜强烂梗（抖音版）：原生飘屏弹幕悬停即停并显示+1与回复、玩烂梗按钮与面板默认展示最新50条dgq烂梗（支持触底自动加载下一页）/搜索发送、赞赏充电及自动检查更新/一键更新支持，兼容油猴 5.5.1 及以上
+// @version      v2026.11.09.07
+// @description  dgq63136厕纸（抖音版）：原生飘屏弹幕悬停即停并显示+1与回复、播放器清晰度旁「厕纸」按钮与面板默认展示最新50条63136烂梗（支持触底自动加载下一页）/搜索发送、赞赏充电及自动检查更新/一键更新支持，兼容油猴 5.5.1 及以上
 // @author       HZM
 // @match        https://live.douyin.com/*
 // @include      https://live.douyin.com/*
@@ -25,7 +25,7 @@
         return;
     }
 
-    const CURRENT_VERSION = 'v2026.11.09.06';
+    const CURRENT_VERSION = 'v2026.11.09.07';
     const SCRIPT_DOWNLOAD_URL = 'https://dgq63136.cn/douyin++.user.js';
     const PLUGIN_HEADER_NAME = 'dpahjdoiaw';
     const PLUGIN_HEADER_VALUE = 'douyinpp';
@@ -39,7 +39,7 @@
     const SPONSOR_HOME_URL = 'https://dgq63136.cn';
     const DEFAULT_PAGE_SIZE = 50;
 
-    console.log('[dgq63136 douyin++] 抖音直播增强插件启动中，版本:', CURRENT_VERSION);
+    console.log('[dgq63136 厕纸 douyin++] 抖音直播增强插件启动中，版本:', CURRENT_VERSION);
 
     function installMainWorldTransferHook() {
         const hookCode = `
@@ -85,7 +85,7 @@
             }
         } catch (e) {
             if (!injected) {
-                console.warn('[dgq63136 douyin++] transferControlToOffscreen Hook 注册受限:', e);
+                console.warn('[dgq63136 厕纸 douyin++] transferControlToOffscreen Hook 注册受限:', e);
             }
         }
     }
@@ -1150,7 +1150,7 @@
         }
         const msgEl = banner.querySelector('.dgq63136-banner-msg');
         if (msgEl) {
-            msgEl.innerHTML = `🎉 dgq63136 douyin++ 发现新版本：<strong>${remoteVer}</strong>（当前：${CURRENT_VERSION}）`;
+            msgEl.innerHTML = `🎉 dgq63136厕纸（抖音版）发现新版本：<strong>${remoteVer}</strong>（当前：${CURRENT_VERSION}）`;
         }
         ensureInOverlayRoot(banner);
     }
@@ -1161,8 +1161,8 @@
         const ballBadge = ball ? ball.querySelector('.pulse-badge') : null;
         if (ball) {
             ball.title = hasUpdate
-                ? `dgq63136冬瓜强烂梗（抖音版）· 发现新版本 ${availableRemoteVersion}`
-                : 'dgq63136冬瓜强烂梗（抖音版）(点击打开/关闭功能面板)';
+                ? `dgq63136厕纸（抖音版）· 发现新版本 ${availableRemoteVersion}`
+                : 'dgq63136厕纸（抖音版）(点击打开/关闭厕纸面板)';
         }
         if (ballBadge) {
             ballBadge.classList.toggle('visible', hasUpdate);
@@ -1678,7 +1678,7 @@
             <div class="dgq63136-panel-header" id="dgq63136-panel-header">
                 <div class="dgq63136-panel-title">
                     <img src="${BRAND_ICON_URL}" alt="LOGO">
-                    <span>dgq63136冬瓜强烂梗（抖音版）</span>
+                    <span>dgq63136厕纸（抖音版）</span>
                 </div>
                 <div class="dgq63136-header-actions">
                     <button class="dgq63136-sponsor-btn" id="dgq63136-btn-sponsor" type="button" title="赞赏支持 / 为 dgq63136.cn 充电">
@@ -1724,7 +1724,7 @@
 
             <div class="dgq63136-sponsor-view" id="dgq63136-sponsor-view">
                 <div class="dgq63136-sponsor-top">
-                    <button class="dgq63136-back-btn" id="dgq63136-sponsor-back" type="button">← 返回烂梗</button>
+                    <button class="dgq63136-back-btn" id="dgq63136-sponsor-back" type="button">← 返回厕纸</button>
                     <div class="dgq63136-sponsor-tabs">
                         <button class="dgq63136-sponsor-tab active" data-channel="wx" type="button">微信赞赏码</button>
                         <button class="dgq63136-sponsor-tab" data-channel="alipay" type="button">支付宝赞赏码</button>
@@ -1734,7 +1734,7 @@
                     <img id="dgq63136-sponsor-qr-img" src="${SPONSOR_WX_QR}" alt="赞赏码" />
                 </div>
                 <div class="dgq63136-sponsor-desc" id="dgq63136-sponsor-desc">
-                    微信扫码赞赏支持 dgq63136.cn（抖音版），感谢老板充电！
+                    微信扫码赞赏支持 dgq63136厕纸（抖音版），感谢老板充电！
                 </div>
                 <div class="dgq63136-sponsor-links">
                     <button class="dgq63136-sponsor-open-btn" id="dgq63136-sponsor-open-img" type="button">新窗口查看原图</button>
@@ -1780,10 +1780,10 @@
                 const ch = tab.getAttribute('data-channel');
                 if (ch === 'alipay') {
                     currentSponsorUrl = SPONSOR_ALIPAY_QR;
-                    sponsorDesc.innerText = '支付宝扫码赞赏支持 dgq63136.cn（抖音版），感谢老板充电！';
+                    sponsorDesc.innerText = '支付宝扫码赞赏支持 dgq63136厕纸（抖音版），感谢老板充电！';
                 } else {
                     currentSponsorUrl = SPONSOR_WX_QR;
-                    sponsorDesc.innerText = '微信扫码赞赏支持 dgq63136.cn（抖音版），感谢老板充电！';
+                    sponsorDesc.innerText = '微信扫码赞赏支持 dgq63136厕纸（抖音版），感谢老板充电！';
                 }
                 sponsorQrImg.src = currentSponsorUrl;
             });
@@ -2211,7 +2211,7 @@
         if (!ball) {
             ball = document.createElement('div');
             ball.id = 'dgq63136-douyin-ball';
-            ball.title = 'dgq63136冬瓜强烂梗（抖音版）(点击打开/关闭功能面板)';
+            ball.title = 'dgq63136厕纸（抖音版）(点击打开/关闭厕纸面板)';
             if (document.getElementById('sb6657-douyin-ball')) {
                 ball.style.bottom = '192px';
             }
@@ -2247,8 +2247,8 @@
             const btn = document.createElement('button');
             btn.className = 'dgq63136-toolbar-btn';
             btn.type = 'button';
-            btn.innerHTML = `<img src="${BRAND_ICON_URL}" /><span>玩烂梗</span>`;
-            btn.title = '打开 dgq63136冬瓜强烂梗（抖音版）面板';
+            btn.innerHTML = `<img src="${BRAND_ICON_URL}" /><span>厕纸</span>`;
+            btn.title = '打开 dgq63136厕纸（抖音版）面板';
 
             const blockBubble = (e) => {
                 e.stopPropagation();
