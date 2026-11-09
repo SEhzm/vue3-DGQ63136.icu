@@ -28,22 +28,26 @@
         </section>
 
         <template v-else>
-        <section class="card install-hero">
-            <div>
-                <p class="eyebrow">63136 弹幕插件</p>
-                <h1>一键安装插件</h1>
+        <section class="card install-hero douyu-hero">
+            <div class="hero-body">
+                <div class="platform-pill-row">
+                    <span class="platform-tag douyu-platform-tag">🐟 斗鱼直播专版</span>
+                    <span class="scope-tag douyu-scope-tag">仅生效于 douyu.com</span>
+                </div>
+                <p class="eyebrow">63136 弹幕插件 · 斗鱼版</p>
+                <h1>一键安装插件（斗鱼版）</h1>
                 <p class="hero-desc">
-                    安装后打开斗鱼直播间，输入框旁会出现“厕纸”按钮，可以搜索、发送、投稿和收藏 63136 烂梗弹幕。
+                    安装后打开斗鱼直播间，输入框旁会出现“厕纸”按钮，可以搜索、发送、投稿和收藏 63136 烂梗弹幕，并支持审弹幕与直播同步。
                 </p>
                 <div class="version-row">
-                    <span>当前插件版本号</span>
+                    <span>斗鱼版版本号</span>
                     <strong>{{ currentPluginVersion }}</strong>
                     <em>更新时间：{{ currentPluginUpdatedAt }}</em>
                 </div>
             </div>
             <div class="hero-actions">
                 <a class="primary-action" :href="userscriptInstallUrl" target="_blank" rel="noopener noreferrer">
-                    一键安装插件
+                    一键安装斗鱼版
                 </a>
                 <a class="secondary-action" :href="tampermonkeyUrl" target="_blank" rel="noopener noreferrer">
                     安装油猴管理器
@@ -56,21 +60,26 @@
 
         <section class="card install-hero douyin-hero">
             <div class="douyin-hero-body">
+                <div class="platform-pill-row">
+                    <span class="platform-tag douyin-platform-tag">🎵 抖音直播专版 · 厕纸</span>
+                    <span class="scope-tag douyin-scope-tag">仅生效于 live.douyin.com</span>
+                    <span class="scope-tag douyin-independent-tag">与斗鱼版独立脚本 · 互不冲突</span>
+                </div>
                 <p class="eyebrow douyin-eyebrow">新增插件 · 抖音直播专版</p>
-                <h2 class="douyin-title">douyin++（dgq63136冬瓜强烂梗·抖音版）</h2>
+                <h2 class="douyin-title">dgq63136 抖音「厕纸」插件（douyin++）</h2>
                 <p class="hero-desc">
-                    专为抖音直播网页版（<code>live.douyin.com</code>）打造：在直播间提供 <strong>dgq63136 悬浮图标</strong>与播放器清晰度旁<strong>“玩烂梗”</strong>按钮随时打开「dgq63136冬瓜强烂梗（抖音版）」面板；鼠标放在原生飘屏弹幕上时弹幕暂停并显示 <strong>+1</strong> 与 <strong>回复</strong>（自动按 <code>@发送者ID：内容</code> 填入输入框）；默认展示最新 <strong>50 条 dgq63136 烂梗</strong>，支持分类标签、关键词检索发送、顶部充电赞赏及<strong>自动检查更新与一键更新</strong>。
+                    专为抖音直播网页版（<code>live.douyin.com</code>）单独编写：在直播间提供 <strong>dgq63136 悬浮图标</strong>与播放器清晰度旁<strong>“厕纸”</strong>按钮随时打开「dgq63136厕纸（抖音版）」面板；鼠标放在原生飘屏弹幕上时弹幕暂停并显示 <strong>+1</strong> 与 <strong>回复</strong>（自动按 <code>@发送者ID：内容</code> 填入输入框）；默认展示最新 <strong>50 条 dgq63136 烂梗（触底加载下一页）</strong>，支持分类标签、关键词检索发送、顶部充电赞赏及<strong>自动检查更新与一键更新</strong>。
                 </p>
                 <div class="version-row douyin-version-row">
-                    <span>当前插件版本号</span>
+                    <span>抖音版版本号</span>
                     <strong>{{ douyinPluginVersion }}</strong>
                     <em>更新时间：{{ douyinPluginUpdatedAt }}</em>
                     <span class="douyin-env-tag">支持环境：Tampermonkey 5.5.1 及以上</span>
                 </div>
                 <div class="douyin-highlights">
-                    <span class="douyin-highlight-pill">🔘 页面悬浮图标 &amp; 清晰度旁“玩烂梗”入口</span>
-                    <span class="douyin-highlight-pill">🎈 原生飘屏悬停即停：+1 一键复读 / 回复 @发送者 填框</span>
-                    <span class="douyin-highlight-pill">🔍 接入 dgq63136 最新 50 条烂梗（触底加载下一页）、搜索发送与一键更新</span>
+                    <span class="douyin-highlight-pill">🧻 页面悬浮图标 &amp; 清晰度旁“厕纸”入口</span>
+                    <span class="douyin-highlight-pill">🎈 原生飘屏悬停即停：+1 一键复读 / @回复 填框</span>
+                    <span class="douyin-highlight-pill">📜 默认最新 50 条烂梗（触底加载下一页）、搜索发送与一键更新</span>
                 </div>
             </div>
             <div class="hero-actions">
@@ -81,7 +90,7 @@
                     rel="noopener noreferrer"
                     title="装有 Tampermonkey 5.5.1+ 的用户点击后会自动弹出安装页"
                 >
-                    一键安装 douyin++（推荐）
+                    一键安装抖音「厕纸」（推荐）
                 </a>
                 <a
                     class="secondary-action douyin-secondary-action"
@@ -91,9 +100,40 @@
                 >
                     下载脚本 (.user.js)
                 </a>
-                <a class="text-action" :href="tampermonkeyUrl" target="_blank" rel="noopener noreferrer">
+                <a class="text-action douyin-text-action" :href="tampermonkeyUrl" target="_blank" rel="noopener noreferrer">
                     安装油猴管理器
                 </a>
+            </div>
+        </section>
+
+        <section class="card platform-diff-card">
+            <div class="section-heading">
+                <h2>两个版本怎么选？（斗鱼版 vs 抖音「厕纸」版）</h2>
+                <p>两套脚本分别匹配各自直播站域名，互不覆盖，可按常看平台单独安装或同时安装。</p>
+            </div>
+            <div class="platform-diff-grid">
+                <div class="diff-col diff-douyu">
+                    <div class="diff-col-head">
+                        <span class="platform-tag douyu-platform-tag">🐟 斗鱼版</span>
+                        <code>dgq63136.user.js</code>
+                    </div>
+                    <ul>
+                        <li><strong>生效页面</strong>：斗鱼直播间（<code>douyu.com</code>）</li>
+                        <li><strong>页面入口</strong>：聊天输入框上方“厕纸”按钮</li>
+                        <li><strong>核心能力</strong>：搜索、分类、热榜、最近、本地收藏、投稿、审弹幕</li>
+                    </ul>
+                </div>
+                <div class="diff-col diff-douyin">
+                    <div class="diff-col-head">
+                        <span class="platform-tag douyin-platform-tag">🎵 抖音「厕纸」版</span>
+                        <code>douyin++.user.js</code>
+                    </div>
+                    <ul>
+                        <li><strong>生效页面</strong>：抖音直播间（<code>live.douyin.com</code>）</li>
+                        <li><strong>页面入口</strong>：右下角悬浮球 + 播放器清晰度旁“厕纸”按钮</li>
+                        <li><strong>核心能力</strong>：原生飘屏悬停停驻（+1 / @回复）、最新50条与触底分页、一键更新</li>
+                    </ul>
+                </div>
             </div>
         </section>
 
@@ -147,8 +187,20 @@
 
         <section class="card history-card">
             <div class="section-heading">
-                <h2>更新历史</h2>
-                <p>按插件和网站可见版本整理，方便判断要不要更新。</p>
+                <h2>更新历史（斗鱼版 &amp; 抖音「厕纸」版）</h2>
+                <p>上方为抖音直播「厕纸」当前版本，下方为斗鱼直播版历代迭代记录。</p>
+            </div>
+            <div class="douyin-history-pin">
+                <div class="douyin-history-meta">
+                    <span class="platform-tag douyin-platform-tag">🎵 抖音「厕纸」版</span>
+                    <strong>{{ douyinPluginVersion }}</strong>
+                    <span>更新时间：{{ douyinPluginUpdatedAt }}</span>
+                </div>
+                <ul>
+                    <li>播放器清晰度旁入口、悬浮球与功能面板统一命名为「厕纸（抖音版）」。</li>
+                    <li>面板默认加载最新 50 条 dgq63136 烂梗，标签筛选与关键词搜索均支持触底自动加载下一页。</li>
+                    <li>支持原生飘屏弹幕悬停暂停（+1 一键发送 / @回复 填框）、请求头透传及一键检查更新。</li>
+                </ul>
             </div>
             <div class="history-list">
                 <article v-for="item in updateHistory" :key="item.version" class="history-item">
@@ -184,7 +236,7 @@ const GATE_HINTS = [
 const currentPluginVersion = 'V0.2.42';
 const currentPluginUpdatedAt = '2026-09-06 01:33';
 const userscriptInstallUrl = '/install-files/dgq63136/9b7e2d0a6c4f91d3/dgq63136.user.js?v=202609060133';
-const douyinPluginVersion = 'v2026.11.09.06';
+const douyinPluginVersion = 'v2026.11.09.07';
 const douyinPluginUpdatedAt = '2026-11-09';
 const douyinUserscriptInstallUrl = '/douyin++.user.js';
 const tampermonkeyUrl = 'https://www.tampermonkey.net/';
@@ -221,13 +273,13 @@ const installSteps = [
     },
     {
         index: '2',
-        title: '点击一键安装插件',
-        desc: '浏览器会打开 .user.js 安装页，在油猴确认页点击安装即可。',
+        title: '按平台点击对应安装',
+        desc: '看斗鱼选上方蓝卡【一键安装斗鱼版】，看抖音选深色卡【一键安装抖音「厕纸」】，油猴弹窗中点击安装。',
     },
     {
         index: '3',
-        title: '回到斗鱼直播间验证',
-        desc: '打开斗鱼直播间，输入框旁出现“厕纸”按钮就说明安装成功。',
+        title: '进入对应直播间验证',
+        desc: '斗鱼直播间聊天框旁出现“厕纸”按钮；抖音直播间右下角有悬浮图标、清晰度旁出现“厕纸”按钮即安装成功。',
     },
 ];
 
@@ -271,9 +323,9 @@ const permissionSteps = [
 ];
 
 const permissionChecks = [
-    '打开斗鱼直播间，聊天输入框旁能看到“厕纸”按钮。',
-    '点开“厕纸”能看到搜索、分类、热榜、最近、收藏、设置。',
-    '如果仍然没有显示，刷新斗鱼直播间，或回到扩展管理页确认 Tampermonkey、“允许用户脚本 / Allow user scripts”和“在 InPrivate 中允许”都已开启。',
+    '【斗鱼版】打开 douyu.com 直播间，聊天输入框旁能看到“厕纸”按钮，点开可见搜索、分类、热榜、最近、收藏、设置。',
+    '【抖音版】打开 live.douyin.com 直播间，右下角有悬浮图标且清晰度旁能看到“厕纸”按钮；鼠标放在原生飘屏上会暂停并出现 +1 与 回复。',
+    '如果仍未显示，刷新对应直播间页面，或回到扩展管理页确认 Tampermonkey、“允许用户脚本 / Allow user scripts”和“在 InPrivate 中允许”都已开启。',
 ];
 
 const updateHistory = [
@@ -1184,8 +1236,76 @@ h3 {
     background: #f3f5f7;
 }
 
+.hero-body {
+    flex: 1 1 320px;
+    min-width: 0;
+}
+
+.douyu-hero {
+    border-left: 5px solid #1976d2;
+    background: linear-gradient(135deg, #ffffff 0%, #f3f8ff 100%);
+}
+
+.platform-pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.platform-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.douyu-platform-tag {
+    background: #1976d2;
+    color: #ffffff;
+}
+
+.douyin-platform-tag {
+    background: linear-gradient(135deg, #fe2c55, #e11d48);
+    color: #ffffff;
+}
+
+.scope-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.douyu-scope-tag {
+    background: #e8f2ff;
+    color: #125ea8;
+}
+
+.douyin-scope-tag {
+    background: rgba(37, 244, 238, 0.14);
+    border: 1px solid rgba(37, 244, 238, 0.36);
+    color: #67e8f9;
+}
+
+.douyin-independent-tag {
+    background: rgba(255, 255, 255, 0.09);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #e2e8f0;
+}
+
 .douyin-hero {
-    border-left: 4px solid #16a34a;
+    border: 1px solid rgba(37, 244, 238, 0.35);
+    border-left: 5px solid #fe2c55;
+    background: linear-gradient(135deg, #161823 0%, #1d2233 62%, #132830 100%);
+    color: #f8fafc;
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.18);
 }
 
 .douyin-hero-body {
@@ -1194,33 +1314,47 @@ h3 {
 }
 
 .douyin-eyebrow {
-    color: #15803d;
+    color: #fda4af;
 }
 
 .douyin-title {
-    color: #111;
+    color: #ffffff;
     font-size: 26px;
     line-height: 1.25;
+}
+
+.douyin-hero .hero-desc {
+    color: #cbd5e1;
+}
+
+.douyin-hero .hero-desc strong {
+    color: #ffffff;
 }
 
 .douyin-hero .hero-desc code {
     padding: 1px 6px;
     border-radius: 4px;
-    background: #ecfdf5;
-    color: #15803d;
+    background: rgba(37, 244, 238, 0.16);
+    color: #67e8f9;
     font-size: 14px;
 }
 
+.douyin-version-row span,
+.douyin-version-row em {
+    color: #94a3b8;
+}
+
 .douyin-version-row strong {
-    background: #ecfdf5;
-    color: #15803d;
+    background: rgba(16, 185, 129, 0.22);
+    border: 1px solid rgba(52, 211, 153, 0.4);
+    color: #6ee7b7;
 }
 
 .douyin-env-tag {
     padding: 4px 10px;
     border-radius: 5px;
-    background: #f3f4f6;
-    color: #4b5563;
+    background: rgba(255, 255, 255, 0.09);
+    color: #e2e8f0;
 }
 
 .douyin-highlights {
@@ -1235,9 +1369,9 @@ h3 {
     align-items: center;
     padding: 4px 10px;
     border-radius: 999px;
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
-    color: #166534;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(37, 244, 238, 0.28);
+    color: #e2e8f0;
     font-size: 13px;
     font-weight: 500;
 }
@@ -1253,17 +1387,170 @@ h3 {
 .douyin-hero .primary-action:hover,
 .douyin-hero .secondary-action:hover,
 .douyin-hero .text-action:hover {
-    filter: brightness(0.97);
+    filter: brightness(1.06);
+    transform: translateY(-1px);
 }
 
 .douyin-primary-action {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
+    background: linear-gradient(135deg, #fe2c55, #e11d48);
+    box-shadow: 0 4px 14px rgba(254, 44, 85, 0.35);
 }
 
 .douyin-secondary-action {
-    color: #15803d;
-    border-color: #22c55e;
-    background: #f0fdf4;
+    color: #67e8f9;
+    border-color: rgba(37, 244, 238, 0.52);
+    background: rgba(37, 244, 238, 0.1);
+}
+
+.douyin-text-action {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+}
+
+.platform-diff-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.diff-col {
+    border-radius: 8px;
+    padding: 12px 14px;
+    border: 1px solid #e5e7eb;
+    background: #fafafa;
+}
+
+.diff-douyu {
+    border-left: 4px solid #1976d2;
+    background: #f5f9ff;
+}
+
+.diff-douyin {
+    border-left: 4px solid #fe2c55;
+    background: #f8fafc;
+}
+
+.diff-col-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.diff-col-head code {
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.06);
+    color: #374151;
+}
+
+.diff-col ul {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 13px;
+    line-height: 1.65;
+    color: #374151;
+}
+
+.diff-col code {
+    font-size: 12px;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.douyin-history-pin {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #fe2c55;
+}
+
+.douyin-history-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.douyin-history-meta strong {
+    color: #059669;
+    font-size: 15px;
+}
+
+.douyin-history-meta span:last-child {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.douyin-history-pin ul {
+    margin: 0;
+    padding-left: 18px;
+    color: #334155;
+    line-height: 1.65;
+    font-size: 13.5px;
+}
+
+html.dark .douyu-hero {
+    background: linear-gradient(135deg, #141c27 0%, #162233 100%);
+}
+
+html.dark .douyu-hero h1,
+html.dark .quick-guide h2,
+html.dark .permission-tip h2,
+html.dark .history-card h2,
+html.dark .platform-diff-card h2,
+html.dark .step-item h3,
+html.dark .permission-step h3 {
+    color: #f1f5f9;
+}
+
+html.dark .douyu-hero .hero-desc,
+html.dark .step-item p,
+html.dark .switch-item p,
+html.dark .permission-step p,
+html.dark .section-heading p,
+html.dark .history-item ul,
+html.dark .version-row span,
+html.dark .version-row em {
+    color: #cbd5e1;
+}
+
+html.dark .diff-col,
+html.dark .douyin-history-pin,
+html.dark .step-item,
+html.dark .permission-step,
+html.dark .switch-item {
+    background: #1a2330;
+    border-color: #2c394b;
+}
+
+html.dark .diff-col ul,
+html.dark .douyin-history-pin ul {
+    color: #cbd5e1;
+}
+
+html.dark .diff-col code,
+html.dark .diff-col-head code {
+    background: rgba(255, 255, 255, 0.12);
+    color: #e2e8f0;
+}
+
+html.dark .douyu-scope-tag {
+    background: rgba(56, 189, 248, 0.18);
+    color: #7dd3fc;
+}
+
+html.dark .permission-checks {
+    background: #1f242d;
+    color: #e2e8f0;
 }
 
 .steps {
@@ -1343,11 +1630,12 @@ h3 {
     line-height: 1.65;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 720px) {
     .install-hero,
     .permission-tip,
     .permission-guide,
     .switch-list,
+    .platform-diff-grid,
     .steps,
     .history-item {
         grid-template-columns: 1fr;
