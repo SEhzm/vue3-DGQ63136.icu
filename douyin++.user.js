@@ -1,11 +1,13 @@
 // ==UserScript==
 // @name         dgq63136厕纸（抖音版）
 // @namespace    https://dgq63136.cn/
-// @version      v2026.11.09.07
-// @description  dgq63136厕纸（抖音版）：原生飘屏弹幕悬停即停并显示+1与回复、播放器清晰度旁「厕纸」按钮与面板默认展示最新50条63136烂梗（支持触底自动加载下一页）/搜索发送、赞赏充电及自动检查更新/一键更新支持，兼容油猴 5.5.1 及以上
+// @version      v2026.11.11.01
+// @description  dgq63136厕纸（抖音版）：原生飘屏弹幕悬停即停并显示+1与回复、播放器清晰度旁「厕纸」按钮与面板默认展示最新50条63136烂梗（支持触底自动加载下一页）/搜索发送、赞赏充电及自动检查更新/一键更新支持，兼容 live.douyin.com 与从关注页/首页进入的 www.douyin.com 直播间，支持油猴 5.5.1 及以上
 // @author       HZM
 // @match        https://live.douyin.com/*
+// @match        https://www.douyin.com/*
 // @include      https://live.douyin.com/*
+// @include      https://www.douyin.com/*
 // @icon         https://apic.douyucdn.cn/upload/avatar_v3/201808/e2b4d01edd7dd82f44efeb434a0d3a86_big.jpg
 // @grant        GM_xmlhttpRequest
 // @grant        unsafeWindow
@@ -25,7 +27,7 @@
         return;
     }
 
-    const CURRENT_VERSION = 'v2026.11.09.07';
+    const CURRENT_VERSION = 'v2026.11.11.01';
     const SCRIPT_DOWNLOAD_URL = 'https://dgq63136.cn/douyin++.user.js';
     const PLUGIN_HEADER_NAME = 'dpahjdoiaw';
     const PLUGIN_HEADER_VALUE = 'douyinpp';
@@ -935,7 +937,7 @@
         }
     `;
 
-    addGlobalStyles(globalStyles);
+
 
     let tagList = [];
     let isCooldown = false;
@@ -957,6 +959,21 @@
     const msgMetaMap = new Map();
     const emojiUrlToNameMap = new Map();
     let emojiReverseReady = false;
+    let hasEnteredLiveRoom = false;
+    let hasScheduledUpdateCheck = false;
+    let isDomFallbackObserverAttached = false;
+    let lastObservedLiveHref = '';
+
+    function isDouyinLivePage() {
+        const host = location.hostname;
+        if (host === 'live.douyin.com') return true;
+        const path = location.pathname || '/';
+        if (/(?:^|\/)live\/[^/]+/.test(path)) return true;
+        return Boolean(
+            document.getElementById('chatroom') &&
+            document.querySelector('.douyin-player-controls-right')
+        );
+    }
 
     function getOverlayRoot() {
         return document.fullscreenElement || document.webkitFullscreenElement || document.body || document.documentElement;
@@ -1096,7 +1113,11 @@
     }
 
     function triggerOneClickUpdate() {
-        const targetUrl = getScriptUpdateUrl();
+        const baseUrl = getScriptUpdateUrl();
+        const cacheParam = availableRemoteVersion
+            ? `v=${encodeURIComponent(availableRemoteVersion)}`
+            : `_t=${Date.now()}`;
+        const targetUrl = `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}${cacheParam}`;
         showToast('🚀 正在打开 Tampermonkey 一键更新页...', 2800);
         const opened = window.open(targetUrl, '_blank');
         if (!opened) {
@@ -2200,6 +2221,7 @@
 
         function onMouseUp() {
             isDragging = false;
+            if (hasMoved) target.dataset.userDragged = '1';
             if (onDragStateChange) onDragStateChange(hasMoved);
             document.removeEventListener('mousemove', onMouseMove);
             document.removeEventListener('mouseup', onMouseUp);
@@ -2234,6 +2256,10 @@
                 togglePanel(e);
             });
         }
+        if (!ball.dataset.userDragged && document.getElementById('sb6657-douyin-ball')) {
+            ball.style.bottom = '192px';
+        }
+        ball.style.display = 'flex';
         ensureInOverlayRoot(ball);
         syncUpdateUIState(false);
 
@@ -2464,17 +2490,14 @@
                     msgBus.on('PrivilegeScreenChatMessage', recordList);
                 }
                 if (msgBus && msgBus._dgq63136_msg_mapped) {
+                    cp._dgq63136_cp_hooked = true;
                     hookedAny = true;
                 }
             }
             return hookedAny;
         };
 
-        if (!tryHook()) {
-            const timer = setInterval(() => {
-                if (tryHook()) clearInterval(timer);
-            }, 250);
-        }
+        tryHook();
     }
 
     let highlightBoxEl = null;
@@ -2733,6 +2756,10 @@
     }
 
     function handleCanvasDanmuMouseMove(x, y, targetEl) {
+        if (!isDouyinLivePage()) {
+            if (activePausedBarrage) unlockPausedBarrage();
+            return;
+        }
         lastMouseX = x;
         lastMouseY = y;
 
@@ -2828,7 +2855,10 @@
     }
 
     function observeNativeDomFallback() {
+        if (isDomFallbackObserverAttached || !document.body) return;
+        isDomFallbackObserverAttached = true;
         const observer = new MutationObserver((mutations) => {
+            if (!isDouyinLivePage()) return;
             for (const m of mutations) {
                 for (const node of m.addedNodes) {
                     if (node.nodeType !== 1) continue;
@@ -2862,19 +2892,59 @@
         }
     });
 
-    function init() {
-        fetchDictTags();
+    function deactivateLiveRoomUi() {
+        unlockPausedBarrage();
+        removeUpdateBanner();
+        if (panelEl) {
+            panelEl.style.display = 'none';
+        }
+        const ball = document.getElementById('dgq63136-douyin-ball');
+        if (ball) {
+            ball.style.display = 'none';
+        }
+        document.querySelectorAll('.dgq63136-ctrl-slot').forEach(el => el.remove());
+    }
+
+    function syncLiveRouteState() {
+        if (!isDouyinLivePage()) {
+            if (hasEnteredLiveRoom || document.getElementById('dgq63136-douyin-ball')) {
+                deactivateLiveRoomUi();
+            }
+            lastObservedLiveHref = '';
+            return;
+        }
+
+        addGlobalStyles(globalStyles);
+
+        if (!hasEnteredLiveRoom) {
+            hasEnteredLiveRoom = true;
+            fetchDictTags();
+        }
+        if (!hasScheduledUpdateCheck) {
+            hasScheduledUpdateCheck = true;
+            setTimeout(() => {
+                if (isDouyinLivePage()) checkUpdate(false);
+            }, 1500);
+        }
+
         mountIconButtons();
-        hookDanmuMessageStore();
         observeNativeDomFallback();
 
-        setTimeout(() => {
-            checkUpdate(false);
-        }, 1500);
+        const currentHref = location.href;
+        const needsDanmuHook =
+            lastObservedLiveHref !== currentHref ||
+            Array.from(document.querySelectorAll('.CanvasDanmakuPlugin')).some(cp => !cp._dgq63136_cp_hooked);
+        if (needsDanmuHook) {
+            lastObservedLiveHref = currentHref;
+            hookDanmuMessageStore();
+        }
+    }
 
-        setInterval(() => {
-            mountIconButtons();
-        }, 1500);
+    function init() {
+        syncLiveRouteState();
+        window.addEventListener('popstate', () => setTimeout(syncLiveRouteState, 80));
+        window.addEventListener('hashchange', () => setTimeout(syncLiveRouteState, 80));
+        setInterval(syncLiveRouteState, 600);
     }
 
     if (document.readyState === 'loading') {
